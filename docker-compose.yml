@@ -94,6 +94,7 @@ services:
       KAMIS_KEY: ${KAMIS_KEY}
       KAMIS_ID: ${KAMIS_ID}
       CORS_URL: ${CORS_URL}
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
     networks:
       - mijung_net
     container_name: mijung_fastapi
