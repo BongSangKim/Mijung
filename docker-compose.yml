@@ -72,6 +72,29 @@ services:
       - mijung_net
     container_name: mijung_backend
 
+  fastApi:
+    build:
+      context: ./fastapi
+      target: builder
+    ports:
+      - "8000:8000"
+    restart: always
+    env_file:
+      - .env
+    environment:
+      PORT: 8000
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DB: ${MYSQL_DB}
+      MYSQL_PORT: ${MYSQL_PORT}
+      KAMIS_KEY: ${KAMIS_KEY}
+      KAMIS_ID: ${KAMIS_ID}
+      CORS_URL: ${CORS_URL}
+    networks:
+      - mijung_net
+    container_name: mijung_fastapi
+
 volumes:
   mysql_data:
 
