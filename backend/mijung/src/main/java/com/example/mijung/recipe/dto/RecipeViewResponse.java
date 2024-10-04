@@ -42,7 +42,7 @@ public class RecipeViewResponse {
                 .recipeId(recipe.getId())
                 .name(recipe.getName())
                 .kind(recipe.getKind() != null ? recipe.getKind().getDisplayName() : null)
-                .image(recipe.getImage() != null ? recipe.getImage() : null)
+                .image(recipe.getImage())
                 .inbun(recipe.getInbun() != null ? recipe.getInbun().getDisplayName() : null)
                 .level(recipe.getLevel() != null ? recipe.getLevel().getDisplayName() : null)
                 .time(recipe.getCookingTime() != null ? recipe.getCookingTime().getDisplayName() : null)
