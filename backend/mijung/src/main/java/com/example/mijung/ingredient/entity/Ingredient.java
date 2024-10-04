@@ -52,7 +52,7 @@ public class Ingredient {
     private Boolean isPriced;
 
     @Column
-    private String color;
+    private String colorHex;
 
     @OneToMany(mappedBy = "ingredient")
     private List<Material> materials = new ArrayList<>();
