@@ -6,15 +6,10 @@ import com.example.mijung.common.dto.PaginationAndFilteringDto;
 import com.example.mijung.common.dto.PaginationDTO;
 import com.example.mijung.common.dto.RecipeListResponse;
 import com.example.mijung.common.dto.ResponseDTO;
-import com.example.mijung.ingredient.dto.IngredientInfoViewResponse;
-import com.example.mijung.ingredient.dto.IngredientPriceGraphViewResponse;
-import com.example.mijung.ingredient.dto.IngredientSearchResponse;
-import com.example.mijung.ingredient.dto.IngredientSiseRequest;
-import com.example.mijung.ingredient.entity.Ingredient;
-import com.example.mijung.ingredient.entity.IngredientInfo;
-import com.example.mijung.ingredient.entity.IngredientPredict;
-import com.example.mijung.ingredient.entity.IngredientRate;
+import com.example.mijung.ingredient.dto.*;
+import com.example.mijung.ingredient.entity.*;
 import com.example.mijung.ingredient.enums.IngredientMassage;
+import com.example.mijung.ingredient.repository.IngredientCosineRepository;
 import com.example.mijung.ingredient.repository.IngredientRepository;
 import com.example.mijung.ingredient.repository.IngredientRepositoryCustom;
 import com.example.mijung.recipe.entity.Recipe;
@@ -43,6 +38,7 @@ public class IngredientService {
 
     private final IngredientRepository ingredientRepository;
     private final RecipeRepository recipeRepository;
+    private final IngredientCosineRepository ingredientCosineRepository;
     private final IngredientRepositoryCustom ingredientRepositoryCustom;
 
     @Transactional
@@ -209,6 +205,25 @@ public class IngredientService {
     private List<RecipeListResponse> convertToRecipeListResponse(List<Recipe> recipes) {
         return recipes.stream()
                 .map(RecipeListResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<IngredientCosineResponse> getTopCosineIngredients(Integer ingredientId, int count) {
+        Pageable pageable = PageRequest.of(0, count);
+        List<IngredientCosine> cosines = ingredientCosineRepository.findByIngredientId1OrderByCosineDesc(ingredientId, pageable);
+
+        return cosines.stream()
+                .map(cosine -> {
+                    Ingredient ingredient2 = ingredientRepository.findById(cosine.getIngredientId2())
+                            .orElseThrow(() -> new RuntimeException("Ingredient not found for id: " + cosine.getIngredientId2()));
+
+                    return IngredientCosineResponse.of(
+                            cosine.getIngredientId2(),
+                            ingredient2.getItemName(),
+                            cosine.getCosine()
+                    );
+                })
                 .collect(Collectors.toList());
     }
 

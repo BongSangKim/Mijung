@@ -63,6 +63,7 @@ public class Ingredient {
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IngredientPredict> ingredientPredicts = new ArrayList<>();
 
+
     public IngredientInfo getLatestIngredientInfo() {
         return ingredientInfos.stream()
                 .max((info1, info2) -> info1.getDate().compareTo(info2.getDate()))
