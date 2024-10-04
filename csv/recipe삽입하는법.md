@@ -182,3 +182,11 @@ finally:
   ```mysql
   mysql -umijung -pmijungmijungmijung --default-character-set=utf8mb4 -hlocalhost mijung < {파일경로}\insertingredient.sql
   ```
+
+### update_ingredient_color.sql 삽입하는법 
+
+- 구글 드라이브 or Git csv/update_ingredient_color.sql 에 있습니다.
+
+```mysql
+  mysql -umijung -pmijungmijungmijung --default-character-set=utf8mb4 -hlocalhost mijung < {파일경로}\update_ingredient_color.sql
+```
