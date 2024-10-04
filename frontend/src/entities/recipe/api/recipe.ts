@@ -38,6 +38,6 @@ export default class RecipeApi {
 
   async getRecipeDetail(recipeId: number): Promise<RecipeDetail> {
     const res = await this.client.getRecipeDetail(recipeId);
-    return res.data.data[0];
+    return res.data.data;
   }
 }

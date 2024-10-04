@@ -35,7 +35,7 @@ export const RecipeList = ({ keyword }: Props) => {
     <div className="relative w-full h-3/4">
       <motion.button
         onClick={handleNextPage}
-        className="absolute z-10 top-5 end-20 text-4xl"
+        className="absolute z-10 top-24 end-6 text-4xl"
         animate={{ rotate: rotation }}
         transition={{ duration: 0.5, ease: 'easeInOut' }}
       >

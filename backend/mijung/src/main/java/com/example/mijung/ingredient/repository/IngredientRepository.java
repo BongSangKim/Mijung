@@ -3,7 +3,6 @@ package com.example.mijung.ingredient.repository;
 import com.example.mijung.ingredient.entity.Ingredient;
 import com.example.mijung.ingredient.entity.IngredientInfo;
 import com.example.mijung.ingredient.entity.IngredientPredict;
-import com.example.mijung.ingredient.entity.IngredientRate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+
 
 @Repository
 public interface IngredientRepository extends JpaRepository<Ingredient, Integer> {

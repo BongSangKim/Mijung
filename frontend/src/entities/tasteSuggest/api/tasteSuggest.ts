@@ -14,13 +14,13 @@ export default class TasteSuggestApi {
     ingredients: number[]
   ): Promise<IngredientRecommendation[]> {
     const response = await this.client.getRecommendedIngredients(ingredients);
-    return response.data;
+    return response.data.data;
   }
 
   async getRecommendedRecipes(
     ingredients: number[]
   ): Promise<RecipeRecommendation[]> {
     const response = await this.client.getRecommendedRecipes(ingredients);
-    return response.data;
+    return response.data.data;
   }
 }
