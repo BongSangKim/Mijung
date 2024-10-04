@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import TEXT, Column, Integer, String, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -92,5 +92,4 @@ class RecipeRead(BaseModel):
     image: Optional[str]
     materials: List['MaterialRead']  # Ensure MaterialRead is defined
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

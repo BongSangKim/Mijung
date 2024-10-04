@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import TEXT, Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 from .base import Base
@@ -36,5 +36,4 @@ class MaterialRead(BaseModel):
     recipe_id: int
     ingredient_id: Optional[int] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
