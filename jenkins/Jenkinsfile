@@ -113,40 +113,68 @@ pipeline {
             }
         }
         stage('Deploy to EC2') {
-            steps {
-                echo 'Deploying....'
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'gitlab-credential', 
-                        usernameVariable: 'GITLAB_USERNAME', 
-                        passwordVariable: 'GITLAB_PASSWORD')
-                ]) {
-                    sshagent(['ssh-agent']) {
-                        script {
-                            configFileProvider([configFile(fileId: 'docker-compose-env', variable: 'DOCKER_ENV_FILE')]) {
-                                sh "scp ${DOCKER_ENV_FILE} ubuntu@${AWS_IP}:~/S11P21D107/.env"
+            stages {
+                stage('Initializing server') {
+                    steps {
+                        echo 'Initializing....'
+                        withCredentials([
+                            usernamePassword(
+                                credentialsId: 'gitlab-credential', 
+                                usernameVariable: 'GITLAB_USERNAME', 
+                                passwordVariable: 'GITLAB_PASSWORD')
+                        ]) {
+                            sshagent(['ssh-agent']) {
+                                script {
+                                    configFileProvider([configFile(fileId: 'docker-compose-env', variable: 'DOCKER_ENV_FILE')]) {
+                                        sh "scp ${DOCKER_ENV_FILE} ubuntu@${AWS_IP}:~/S11P21D107/.env"
+                                    }
+
+                                    sh """
+                                        ssh ubuntu@${AWS_IP} '
+                                            echo current branch name is ${env.BRANCH_NAME}
+
+                                            cd ./S11P21D107
+                                            git switch ${env.BRANCH_NAME}
+                                            git pull https://${GITLAB_USERNAME}:${GITLAB_PASSWORD}@lab.ssafy.com/s11-bigdata-dist-sub1/S11P21D107.git ${env.BRANCH_NAME}
+
+                                            docker compose stop backend
+                                            docker compose rm -f backend
+                                            docker rmi vaaastlake/${BACKEND_IMG}
+                                        '
+                                    """
+                                } 
                             }
-
-                            sh """
-                                ssh ubuntu@${AWS_IP} '
-                                    echo current branch name is ${env.BRANCH_NAME}
-
-                                    cd ./S11P21D107
-                                    git switch ${env.BRANCH_NAME}
-                                    git pull https://${GITLAB_USERNAME}:${GITLAB_PASSWORD}@lab.ssafy.com/s11-bigdata-dist-sub1/S11P21D107.git ${env.BRANCH_NAME}
-
-                                    docker compose stop backend
-                                    docker compose rm -f backend
-                                    docker rmi vaaastlake/${BACKEND_IMG}
-                                    docker compose up -d --no-deps --build backend
-
-                                    docker compose restart webserver
-                                    
-                                    cd ../
-                                    rm -f .env
-                                '
-                            """
-                        } 
+                        }
+                    }
+                }
+                stage('Restarting apps') {
+                    steps {
+                        echo 'Restarting...'
+                        sshagent(['ssh-agent']) {
+                            script {
+                                sh """
+                                    ssh ubuntu@${AWS_IP} '
+                                        cd ./S11P21D107
+                                        docker compose up -d --no-deps backend
+                                        docker compose restart webserver
+                                    '
+                                """
+                            }
+                        }
+                    }
+                }
+                stage('Cleaning Server') {
+                    steps {
+                        echo 'Cleaning...'
+                        sshagent(['ssh-agent']) {
+                            script {
+                                sh """
+                                    ssh ubuntu@${AWS_IP} '
+                                        cd ./S11P21D107
+                                    '
+                                """
+                            }
+                        }
                     }
                 }
             }

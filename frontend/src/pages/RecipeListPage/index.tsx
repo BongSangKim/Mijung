@@ -18,15 +18,17 @@ export const RecipeListPage = () => {
   };
 
   return (
-    <div className="grid grid-cols-10">
+    <div className="grid grid-cols-10 h-screen">
       <LeftSideLayout />
       <MainLayout>
-        <RecipeSearchBar
-          keyword={keyword}
-          onKeywordChange={handleKeywordChange}
-          onSubmit={handleSubmit}
-        />
-        <RecipeList keyword={submittedKeyword} />
+        <div className="w-full h-full flex flex-col justify-center">
+          <RecipeSearchBar
+            keyword={keyword}
+            onKeywordChange={handleKeywordChange}
+            onSubmit={handleSubmit}
+          />
+          <RecipeList keyword={submittedKeyword} />
+        </div>
       </MainLayout>
       <RightSideLayout />
     </div>

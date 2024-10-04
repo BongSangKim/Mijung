@@ -2,10 +2,14 @@ import { Link } from 'react-router-dom';
 import { RecipeRecommendation } from '@/shared/api/tasteSuggestTypes';
 
 interface RecommendedRecipesProps {
-  recipes: RecipeRecommendation[];
+  recipes: RecipeRecommendation[] | undefined;
 }
 
 export const RecommendedRecipes = ({ recipes }: RecommendedRecipesProps) => {
+  if (!recipes || recipes.length === 0) {
+    return <div>추천 레시피가 없습니다.</div>;
+  }
+
   return (
     <div className="mt-6">
       <h2 className="text-xl font-bold mb-3 uppercase">추천 레시피</h2>

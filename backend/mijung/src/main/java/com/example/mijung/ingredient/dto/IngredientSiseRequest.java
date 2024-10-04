@@ -11,7 +11,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class IngredientSiseRequest {
-
     @NotBlank(message = "empty period.")
     private String period;
 

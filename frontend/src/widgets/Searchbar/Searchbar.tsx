@@ -5,9 +5,16 @@ import { useIngredientAutoComplete } from '../../features/ingredient/api/useIngr
 interface SearchbarProps {
   type: 'ingredients' | 'recipes';
   onSearch: (keyword: string) => void;
+  isSuggestSearch?: boolean;
+  onSuggestItemClick?: (item: { id: number; name: string }) => void;
 }
 
-const Searchbar = ({ type, onSearch }: SearchbarProps) => {
+const Searchbar = ({
+  type,
+  onSearch,
+  isSuggestSearch = false,
+  onSuggestItemClick,
+}: SearchbarProps) => {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -40,18 +47,30 @@ const Searchbar = ({ type, onSearch }: SearchbarProps) => {
   }, [keyword]);
 
   const handleSearch = () => {
-    onSearch(keyword);
+    if (isSuggestSearch && suggestions && suggestions.length > 0) {
+      const firstSuggestion = suggestions[0];
+      onSuggestItemClick?.({
+        id: firstSuggestion.ingredientId,
+        name: firstSuggestion.name,
+      });
+    } else {
+      onSearch(keyword);
+    }
     setIsDropdownOpen(false);
   };
 
   const handleItemClick = (item: { id: number; name: string }) => {
-    setKeyword(item.name);
-    setIsDropdownOpen(false);
-
-    if (type === 'ingredients') {
-      navigate(`/ingredients/${item.id}`);
+    if (isSuggestSearch && onSuggestItemClick) {
+      onSuggestItemClick(item);
     } else {
-      navigate(`/recipes/${item.id}`);
+      setKeyword(item.name);
+      setIsDropdownOpen(false);
+
+      if (type === 'ingredients') {
+        navigate(`/ingredients/${item.id}`);
+      } else {
+        navigate(`/recipes/${item.id}`);
+      }
     }
   };
 
@@ -67,34 +86,17 @@ const Searchbar = ({ type, onSearch }: SearchbarProps) => {
       />
       {isDropdownOpen && suggestions && suggestions.length > 0 && (
         <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-          {type === 'ingredients'
-            ? suggestions.map(
-                (item: { ingredientId: number; name: string }) => (
-                  <li
-                    key={item.ingredientId}
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() =>
-                      handleItemClick({
-                        id: item.ingredientId,
-                        name: item.name,
-                      })
-                    }
-                  >
-                    {item.name}
-                  </li>
-                )
-              )
-            : suggestions.map((item: { recipeId: number; name: string }) => (
-                <li
-                  key={item.recipeId} // 레시피의 경우 다른 ID를 사용
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() =>
-                    handleItemClick({ id: item.recipeId, name: item.name })
-                  }
-                >
-                  {item.name}
-                </li>
-              ))}
+          {suggestions.map((item: { ingredientId: number; name: string }) => (
+            <li
+              key={item.ingredientId}
+              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={() =>
+                handleItemClick({ id: item.ingredientId, name: item.name })
+              }
+            >
+              {item.name}
+            </li>
+          ))}
         </ul>
       )}
     </div>

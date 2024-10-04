@@ -1,24 +1,31 @@
 import { useNavigate } from 'react-router-dom';
 import { Ingredient, IngredientSise } from '../../shared/api/ingredientTypes';
+import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
 
 interface IngredientCardProps {
   ingredient: Ingredient | IngredientSise;
-  onAddToCart?: (id: number) => void;
 }
 
-const IngredientCard = ({
-  ingredient,
-  onAddToCart,
-}: IngredientCardProps): JSX.Element => {
+const IngredientCard = ({ ingredient }: IngredientCardProps): JSX.Element => {
   const navigate = useNavigate();
+  const { ingredients, addIngredient, removeIngredient } =
+    useMyIngredientsStore();
+
+  const isInMyIngredients = ingredients.some(
+    (i) => i.id === ingredient.ingredientId
+  );
 
   const handleCardClick = () => {
     navigate(`/ingredients/${ingredient.ingredientId}`);
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddOrRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onAddToCart?.(ingredient.ingredientId);
+    if (isInMyIngredients) {
+      removeIngredient(ingredient.ingredientId);
+    } else {
+      addIngredient(ingredient.ingredientId, ingredient.name);
+    }
   };
 
   const formatChange = (value: number | undefined) => {
@@ -94,10 +101,14 @@ const IngredientCard = ({
           )}
         </div>
         <button
-          className="mt-2 bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 w-full"
-          onClick={handleAddToCart}
+          className={`mt-2 ${
+            isInMyIngredients
+              ? 'bg-red-500 hover:bg-red-600'
+              : 'bg-blue-500 hover:bg-blue-600'
+          } text-white px-2 py-1 rounded text-xs w-full`}
+          onClick={handleAddOrRemove}
         >
-          식탁에 추가
+          {isInMyIngredients ? '식탁에서 제거' : '식탁에 추가'}
         </button>
       </div>
     </div>

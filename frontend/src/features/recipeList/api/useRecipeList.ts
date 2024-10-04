@@ -26,9 +26,23 @@ export const useRecipeList = ({ page = 1, perPage = 10, keyword }: Props) => {
       return undefined;
     }
   };
-  return useQuery({
+  const { data, ...rest } = useQuery({
     queryKey: ['recipe-list', page, perPage, keyword],
     queryFn: () => recipeApi.getRecipes(page, perPage, keyword),
     select: (data) => isValid(data, keyword),
   });
+
+  // Prefetch next page
+  if (data?.pagination) {
+    const lastPage = Math.ceil(data.pagination.total / data.pagination.perPage);
+    const nextPage = (page % lastPage) + 1;
+
+    queryClient.prefetchQuery({
+      queryKey: ['recipe-list', nextPage, data.pagination.perPage, keyword],
+      queryFn: () =>
+        recipeApi.getRecipes(nextPage, data.pagination.perPage, keyword),
+    });
+  }
+
+  return { data, ...rest };
 };

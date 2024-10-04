@@ -8,6 +8,7 @@ import {
 } from '../api/useTasteSuggest';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
+import Searchbar from '@/widgets/Searchbar/Searchbar';
 
 export const TasteSuggest = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,9 +27,24 @@ export const TasteSuggest = () => {
     refetchRecipes();
   };
 
+  const handleSearch = (keyword: string) => {
+    console.log('검색어:', keyword);
+    // 이 함수는 사용되지 않지만, Searchbar prop으로 필요합니다.
+  };
+
+  const handleSuggestItemClick = (item: { id: number; name: string }) => {
+    addIngredient(item.id, item.name);
+  };
+
   const content = (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-shadow duration-500 hover:shadow-xl">
       <div className="p-6">
+        <Searchbar
+          type="ingredients"
+          onSearch={handleSearch}
+          isSuggestSearch={true}
+          onSuggestItemClick={handleSuggestItemClick}
+        />
         <MyIngredients
           ingredients={ingredients}
           onRemove={removeIngredient}

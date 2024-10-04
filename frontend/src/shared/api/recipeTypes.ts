@@ -55,5 +55,5 @@ export interface RecipeDetailStep {
 }
 
 export interface RecipeDetailResponse {
-  data: RecipeDetail[];
+  data: RecipeDetail;
 }

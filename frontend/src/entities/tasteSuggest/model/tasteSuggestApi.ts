@@ -3,7 +3,7 @@ import FakeTasteSuggestClient from '@/shared/api/fakeTasteSuggestClient';
 import TasteSuggestClient from '@/shared/api/tasteSuggestClient';
 
 const client =
-  window.location.hostname != 'localhost'
+  window.location.hostname === 'localhost'
     ? new FakeTasteSuggestClient()
     : new TasteSuggestClient();
 
