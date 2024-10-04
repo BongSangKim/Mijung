@@ -209,14 +209,12 @@ public class IngredientService {
     }
 
     @Transactional
-    public List<IngredientCosineResponse> getTop100CosineIngredients(Integer ingredientId) {
+    public List<IngredientCosineResponse> getTopCosineIngredients(Integer ingredientId, int count) {
+        Pageable pageable = PageRequest.of(0, count);
+        List<IngredientCosine> cosines = ingredientCosineRepository.findByIngredientId1OrderByCosineDesc(ingredientId, pageable);
 
-        List<IngredientCosine> cosines = ingredientCosineRepository.findTop100ByIngredientId1OrderByCosineDesc(ingredientId);
-
-        // IngredientCosineResponse DTO로 변환하여 반환
         return cosines.stream()
                 .map(cosine -> {
-                    // ingredientId2로 해당 Ingredient 조회
                     Ingredient ingredient2 = ingredientRepository.findById(cosine.getIngredientId2())
                             .orElseThrow(() -> new RuntimeException("Ingredient not found for id: " + cosine.getIngredientId2()));
 

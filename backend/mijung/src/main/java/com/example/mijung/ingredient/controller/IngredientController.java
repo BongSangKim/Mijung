@@ -16,11 +16,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -147,13 +143,13 @@ public class IngredientController {
     }
 
     @GetMapping("/{ingredientId}/network-graph")
-    public ResponseEntity<ResponseDTO<List<IngredientCosineResponse>>> getTopCosineIngredients(
-            @PathVariable("ingredientId") Integer ingredientId) {
+    public ResponseEntity<List<IngredientCosineResponse>> getTopCosineIngredients(
+            @PathVariable("ingredientId") Integer ingredientId,
+            @RequestParam(defaultValue = "100") int count) {
 
-        List<IngredientCosineResponse> result = ingredientService.getTop100CosineIngredients(ingredientId);
+        List<IngredientCosineResponse> result = ingredientService.getTopCosineIngredients(ingredientId, count);
 
         HttpStatus status = result.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
-
-        return ResponseEntity.status(status).body(ResponseDTO.from(result));
+        return ResponseEntity.status(status).body(result);
     }
 }
