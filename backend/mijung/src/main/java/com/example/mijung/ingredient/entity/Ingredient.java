@@ -51,6 +51,9 @@ public class Ingredient {
     @Column(name = "is_priced", nullable = false)
     private Boolean isPriced;
 
+    @Column
+    private String colorHex;
+
     @OneToMany(mappedBy = "ingredient")
     private List<Material> materials = new ArrayList<>();
 
