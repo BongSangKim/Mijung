@@ -72,7 +72,7 @@ services:
       - mijung_net
     container_name: mijung_backend
 
-  fastApi:
+  fast_api:
     build:
       context: ./fastapi
       target: builder
