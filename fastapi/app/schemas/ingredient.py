@@ -22,7 +22,7 @@ class Ingredient(Base):
     retail_unit = Column(String(10))
     retail_unitsize = Column(String(10))
     product_rank_code = Column(String(3), nullable=False)
-    image = Column(String)
+    image = Column(String(255))
     is_priced = Column(Boolean, nullable=False)
 
     ingredientinfo = relationship("IngredientInfo", back_populates="ingredient") # back_populates는 db 이름이랑 맞아야됨

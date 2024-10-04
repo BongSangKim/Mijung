@@ -34,6 +34,7 @@ async def lifespan(app: FastAPI):
         scheduler.shutdown()
 
 app = FastAPI(lifespan=lifespan)
+add_exception_handlers(app)
 
 app.include_router(recommend_router, prefix="/fastapi/v1")
 origins = settings.CORS_ORIGIN.split(', ')
