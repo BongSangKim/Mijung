@@ -29,7 +29,7 @@ public class MaterialDto {
                 .name(material.getName())
                 .capacity(material.getCapacity())
                 .type(material.getType())
-                .ingredientId(material.getIngredient().getId())
+                .ingredientId(material.getIngredient() != null ? material.getIngredient().getId() : null)
                 .build();
     }
 }
