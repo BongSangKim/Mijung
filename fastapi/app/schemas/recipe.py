@@ -1,6 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, Integer, String, Enum, ForeignKey
+from sqlalchemy import TEXT, Column, Integer, String, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 import enum
@@ -58,14 +58,14 @@ class Recipe(Base):
     __tablename__ = 'recipe'
 
     recipe_id: int = Column(Integer, primary_key=True, nullable=False)
-    name: Optional[str] = Column(String, nullable=True)
+    name: Optional[str] = Column(TEXT, nullable=True)
     hit: Optional[int] = Column(Integer, nullable=True)
     scrap_count: Optional[int] = Column(Integer, nullable=True)
     kind: Optional[Kind] = Column(Enum(Kind), nullable=True)
     inbun: Optional[Inbun] = Column(Enum(Inbun), nullable=True)
     level: Optional[Level] = Column(Enum(Level), nullable=True)
     cooking_time: Optional[CookingTime] = Column(Enum(CookingTime), nullable=True)
-    image: Optional[str] = Column(String, nullable=True)
+    image: Optional[str] = Column(String(255), nullable=True)
 
     material = relationship("Material", back_populates="recipe")  # Adjyust as per your actual model
 
