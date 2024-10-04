@@ -72,6 +72,21 @@ services:
       - mijung_net
     container_name: mijung_backend
 
+  fastApi:
+    build:
+      context: ./fastapi
+      target: builder
+    environment:
+      PORT: 8000
+    ports:
+      - "8000:8000"
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - mijung_net
+    container_name: mijung_fastapi
+
 volumes:
   mysql_data:
 
