@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
+from sqlalchemy import TEXT, Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -8,9 +8,9 @@ class Material(Base):
     __tablename__ = 'material'
     
     material_id: int = Column(Integer, primary_key=True, nullable=False)
-    name: str = Column(String, nullable=False)
-    capacity: Optional[str] = Column(String, nullable=True)
-    type: str = Column(String, nullable=False)
+    name: str = Column(TEXT, nullable=False)
+    capacity: Optional[str] = Column(TEXT, nullable=True)
+    type: str = Column(TEXT, nullable=False)
     analyzed: bool = Column(Boolean, nullable=False)
 
     recipe_id: int = Column(Integer, ForeignKey('recipe.recipe_id'), nullable=False)
