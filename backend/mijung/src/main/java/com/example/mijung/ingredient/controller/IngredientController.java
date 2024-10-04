@@ -3,10 +3,7 @@ package com.example.mijung.ingredient.controller;
 import com.example.mijung.common.dto.PaginationAndFilteringDto;
 import com.example.mijung.common.dto.RecipeListResponse;
 import com.example.mijung.common.dto.ResponseDTO;
-import com.example.mijung.ingredient.dto.IngredientInfoViewResponse;
-import com.example.mijung.ingredient.dto.IngredientPriceGraphViewResponse;
-import com.example.mijung.ingredient.dto.IngredientSearchResponse;
-import com.example.mijung.ingredient.dto.IngredientSiseRequest;
+import com.example.mijung.ingredient.dto.*;
 import com.example.mijung.ingredient.service.IngredientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -149,4 +146,14 @@ public class IngredientController {
         return ResponseEntity.status(status).body(ResponseDTO.from(result));
     }
 
+    @GetMapping("/{ingredientId}/network-graph")
+    public ResponseEntity<ResponseDTO<List<IngredientCosineResponse>>> getTopCosineIngredients(
+            @PathVariable("ingredientId") Integer ingredientId) {
+
+        List<IngredientCosineResponse> result = ingredientService.getTop100CosineIngredients(ingredientId);
+
+        HttpStatus status = result.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
+
+        return ResponseEntity.status(status).body(ResponseDTO.from(result));
+    }
 }

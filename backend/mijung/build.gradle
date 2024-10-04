@@ -44,6 +44,8 @@ dependencies {
 
     // Logback for SLF4J binding
     implementation 'ch.qos.logback:logback-classic:1.4.11'
+    //CSV 읽어오기
+    implementation 'com.opencsv:opencsv:5.5.2'
 }
 
 tasks.named('test') {
