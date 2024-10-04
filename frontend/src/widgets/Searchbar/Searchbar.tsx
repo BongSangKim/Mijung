@@ -81,7 +81,7 @@ const Searchbar = ({
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-black"
         placeholder={type === 'ingredients' ? '식재료 검색' : '레시피 검색'}
       />
       {isDropdownOpen && suggestions && suggestions.length > 0 && (
