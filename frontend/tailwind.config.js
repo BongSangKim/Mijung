@@ -7,5 +7,6 @@ module.exports = {
   theme: {
     extend: {},
   },
+  darkMode: 'class',
   plugins: [require('daisyui')], // daisyUI 플러그인 추가
 };
