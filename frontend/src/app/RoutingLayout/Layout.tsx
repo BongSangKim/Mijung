@@ -23,10 +23,7 @@ const Layout = () => {
         <main className="flex-grow">
           <Outlet />
         </main>
-        <RightSideLayout
-          isTasteSuggestOpen={isTasteSuggestOpen}
-          onCloseTasteSuggest={() => setIsTasteSuggestOpen(false)}
-        />
+        <RightSideLayout />
       </div>
       {isMobile && (
         <>

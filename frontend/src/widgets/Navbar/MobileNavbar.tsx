@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FaSearch, FaBook, FaHeart, FaBars } from 'react-icons/fa';
 
 interface MobileNavbarProps {
