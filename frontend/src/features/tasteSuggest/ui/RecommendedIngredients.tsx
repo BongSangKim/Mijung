@@ -19,7 +19,10 @@ export const RecommendedIngredients = ({
             key={ingredient.ingredientId}
             className="flex justify-between items-center bg-gray-100 p-2 rounded"
           >
-            <Link to={`/ingredients/${ingredient.ingredientId}`} className="text-gray-800 hover:text-coral transition-colors duration-300">
+            <Link
+              to={`/ingredients/${ingredient.ingredientId}`}
+              className="text-gray-800 hover:text-coral transition-colors duration-300"
+            >
               {ingredient.name}
             </Link>
             <button
