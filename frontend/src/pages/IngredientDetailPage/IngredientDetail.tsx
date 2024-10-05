@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import LeftSideLayout from '../../app/RoutingLayout/LeftSideLayout';
 import MainLayout from '../../app/RoutingLayout/MainLayout';
 import RightSideLayout from '../../app/RoutingLayout/RightSideLayout';
 import Searchbar from '../../widgets/Searchbar/Searchbar';
@@ -24,7 +23,6 @@ const IngredientDetailPage = () => {
 
   return (
     <div className="grid grid-cols-10">
-      <LeftSideLayout />
       <MainLayout>
         <Searchbar type="ingredients" onSearch={handleSearch} />
         <div className="container mx-auto px-4 py-8">

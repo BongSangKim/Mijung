@@ -1,4 +1,3 @@
-import LeftSideLayout from '@/app/RoutingLayout/LeftSideLayout';
 import MainLayout from '@/app/RoutingLayout/MainLayout';
 import RightSideLayout from '@/app/RoutingLayout/RightSideLayout';
 import { RecipeList } from '@/features/recipeList/ui/RecipeList';
@@ -19,7 +18,6 @@ export const RecipeListPage = () => {
 
   return (
     <div className="grid grid-cols-10 h-screen">
-      <LeftSideLayout />
       <MainLayout>
         <div className="w-full h-full flex flex-col justify-center">
           <RecipeSearchBar
