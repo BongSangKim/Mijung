@@ -14,7 +14,7 @@ const MobileTasteSuggest = () => {
   const isMobile = useIsMobile();
   return isMobile ? (
     <div className="w-full h-full bg-white p-4">
-      <TasteSuggest />
+      <TasteSuggest isOpen={true} onClose={() => {}} />
     </div>
   ) : null;
 };

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import LeftSideLayout from '../../app/RoutingLayout/LeftSideLayout';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MainLayout from '../../app/RoutingLayout/MainLayout';
 import RightSideLayout from '../../app/RoutingLayout/RightSideLayout';
 import Searchbar from '../../widgets/Searchbar/Searchbar';
@@ -17,9 +17,21 @@ const categories = [
 ];
 
 const IngredientListPage = () => {
+  const navigate = useNavigate();
   const [category, setCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [keyword, setKeyword] = useState<string | null>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const keywordParam = searchParams.get('keyword');
+    if (keywordParam) {
+      setKeyword(keywordParam);
+      setCategory('all');
+    }
+  }, [location.search]);
+
   const { data, isLoading, error } = useIngredients(
     currentPage,
     10,
@@ -41,15 +53,22 @@ const IngredientListPage = () => {
     setCategory('all');
   };
 
+  const handleItemSelect = (item: { id: number; name: string }) => {
+    navigate(`/ingredients/${item.id}`);
+  };
+
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
 
   return (
     <div className="grid grid-cols-10">
-      <LeftSideLayout />
       <MainLayout>
-        <Searchbar type="ingredients" onSearch={handleSearch} />
+        <Searchbar
+          type="ingredients"
+          onSearch={handleSearch}
+          onItemSelect={handleItemSelect}
+        />
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold mb-6">재료 목록</h1>
           <div className="flex space-x-2 mb-4">
