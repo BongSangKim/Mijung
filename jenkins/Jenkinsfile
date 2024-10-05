@@ -140,6 +140,10 @@ pipeline {
                                             docker compose stop backend
                                             docker compose rm -f backend
                                             docker rmi vaaastlake/${BACKEND_IMG}
+
+                                            docker compose stop fast_api
+                                            docker compose rm -f fast_api
+                                            docker rmi mijung-fast_api
                                         '
                                     """
                                 } 
@@ -157,6 +161,7 @@ pipeline {
                                         cd ./S11P21D107
                                         docker compose up -d --no-deps backend
                                         docker compose restart webserver
+                                        docker compose up -d --no-deps fast_api
                                     '
                                 """
                             }
