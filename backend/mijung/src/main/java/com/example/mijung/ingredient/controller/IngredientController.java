@@ -37,7 +37,7 @@ public class IngredientController {
     @ApiResponse(responseCode = "200", description = "성공")
     public ResponseEntity<ResponseDTO<?>> getIngredientList(@Valid @ModelAttribute PaginationAndFilteringDto dto) {
 
-        ResponseDTO<List<IngredientInfoViewResponse>> result = ingredientService.getIngredientList(dto);
+        ResponseDTO<List<IngredientViewResponse>> result = ingredientService.getIngredientList(dto);
 
         HttpStatus status = result.getData().isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
 
@@ -57,7 +57,7 @@ public class IngredientController {
     @ApiResponse(responseCode = "200", description = "성공")
     public ResponseEntity<ResponseDTO<?>> getIngredientSiseList(@Valid @ModelAttribute IngredientSiseRequest request) {
 
-        List<IngredientInfoViewResponse> result = ingredientService.getIngredientSiseList(request);
+        List<IngredientViewResponse> result = ingredientService.getIngredientSiseList(request);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.from(result));
     }

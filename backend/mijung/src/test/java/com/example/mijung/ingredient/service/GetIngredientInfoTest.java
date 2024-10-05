@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.mijung.ingredient.dto.IngredientInfoViewResponse;
 import com.example.mijung.ingredient.dto.IngredientSiseRequest;
+import com.example.mijung.ingredient.dto.IngredientViewResponse;
 import com.example.mijung.ingredient.entity.Ingredient;
 import com.example.mijung.ingredient.entity.IngredientInfo;
 import com.example.mijung.ingredient.entity.IngredientRate;
@@ -234,7 +235,7 @@ public class GetIngredientInfoTest {
         when(mockJpaQuery.fetch()).thenReturn(List.of(mockTuple));
 
         // When
-        List<IngredientInfoViewResponse> result = ingredientService.getIngredientSiseList(request);
+        List<IngredientViewResponse> result = ingredientService.getIngredientSiseList(request);
 
         // Then
         assertFalse(result.isEmpty());

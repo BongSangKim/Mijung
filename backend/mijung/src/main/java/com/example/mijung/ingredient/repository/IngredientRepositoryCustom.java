@@ -2,6 +2,7 @@ package com.example.mijung.ingredient.repository;
 
 import com.example.mijung.ingredient.dto.IngredientInfoViewResponse;
 import com.example.mijung.ingredient.dto.IngredientSiseRequest;
+import com.example.mijung.ingredient.dto.IngredientViewResponse;
 import com.example.mijung.ingredient.entity.Ingredient;
 import com.example.mijung.ingredient.entity.QIngredient;
 import com.example.mijung.ingredient.entity.QIngredientInfo;
@@ -23,8 +24,7 @@ public class IngredientRepositoryCustom {
 
   private final JPAQueryFactory queryFactory;
 
-  public List<IngredientInfoViewResponse> ingredientInfoViewResponseList(
-      IngredientSiseRequest ingredientSiseRequest) {
+  public List<IngredientViewResponse> ingredientViewResponseList(IngredientSiseRequest ingredientSiseRequest) {
 
     String period = ingredientSiseRequest.getPeriod();
     String change = ingredientSiseRequest.getChange();
@@ -58,11 +58,11 @@ public class IngredientRepositoryCustom {
         .fetch();
 
     return results.stream()
-        .map(this::mapToIngredientInfoViewResponse)
+        .map(this::mapToIngredientViewResponse)
         .collect(Collectors.toList());
   }
 
-  private IngredientInfoViewResponse mapToIngredientInfoViewResponse(Tuple tuple) {
+  private IngredientViewResponse mapToIngredientViewResponse(Tuple tuple) {
     Ingredient ingredient = tuple.get(0, Ingredient.class);
     Integer price = tuple.get(1, Integer.class);
     Float changeRate = tuple.get(2, Float.class);
@@ -71,7 +71,7 @@ public class IngredientRepositoryCustom {
     if (ingredient == null) {
       return null;  // 또는 로그를 남기고 null 반환
     }
-    return IngredientInfoViewResponse.of(ingredient, price, changeRate, changePrice);
+    return IngredientViewResponse.of(ingredient, price, changeRate, changePrice);
   }
 
   private NumberExpression<Integer> getPriceField(String period, QIngredientRate ingredientRate) {
