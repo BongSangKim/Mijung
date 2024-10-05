@@ -53,18 +53,4 @@ public class IngredientInfoViewResponse {
                 .colorHex(ingredient.getColorHex())
                 .build();
     }
-
-    public static IngredientInfoViewResponse of(Ingredient ingredient, Integer price, Float changeRate,
-                                            Integer changePrice) {
-        return IngredientInfoViewResponse.builder()
-                .ingredientId(ingredient.getId())
-                .name(ingredient.getItemName())
-                .retailUnit(ingredient.getRetailUnit())
-                .retailUnitsize(ingredient.getRetailUnitsize())
-                .image(ingredient.getImage())
-                .price(price)
-                .changeRate(changeRate)
-                .changePrice(changePrice)
-                .build();
-    }
 }
