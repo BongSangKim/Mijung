@@ -27,10 +27,10 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   const { data: recommendedRecipes, refetch: refetchRecipes } =
     useRecipeRecommendations(ingredients.map((i) => i.id));
 
-  const handleGetRecommendations = () => {
-    refetchIngredients();
-    refetchRecipes();
-  };
+  // const handleGetRecommendations = () => {
+  //   refetchIngredients();
+  //   refetchRecipes();
+  // };
 
   const handleSearch = (keyword: string) => {
     console.log('검색어:', keyword);
@@ -54,12 +54,12 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
           onRemove={removeIngredient}
           onClear={clearIngredients}
         />
-        <button
+        {/* <button
           onClick={handleGetRecommendations}
           className="mt-4 bg-blue-500 text-white px-6 py-3 rounded-full uppercase font-bold text-sm hover:bg-blue-600 transition-colors duration-300 shadow-md hover:shadow-lg"
         >
           추천 받기
-        </button>
+        </button> */}
         <div className="flex mt-4">
           <button
             className={`flex-1 py-2 ${activeTab === 'ingredients' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
