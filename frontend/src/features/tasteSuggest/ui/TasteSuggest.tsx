@@ -22,19 +22,12 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   const { ingredients, addIngredient, removeIngredient, clearIngredients } =
     useMyIngredientsStore();
 
-  const { data: recommendedIngredients, refetch: refetchIngredients } =
-    useIngredientRecommendations(ingredients.map((i) => i.id));
-  const { data: recommendedRecipes, refetch: refetchRecipes } =
-    useRecipeRecommendations(ingredients.map((i) => i.id));
-
-  // const handleGetRecommendations = () => {
-  //   refetchIngredients();
-  //   refetchRecipes();
-  // };
-
-  const handleSearch = (keyword: string) => {
-    console.log('검색어:', keyword);
-  };
+  const { data: recommendedIngredients } = useIngredientRecommendations(
+    ingredients.map((i) => i.id)
+  );
+  const { data: recommendedRecipes } = useRecipeRecommendations(
+    ingredients.map((i) => i.id)
+  );
 
   const handleSuggestItemClick = (item: { id: number; name: string }) => {
     addIngredient(item.id, item.name);
@@ -45,7 +38,7 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
       <div className="p-6 flex flex-col h-full">
         <Searchbar
           type="ingredients"
-          onSearch={handleSearch}
+          onSearch={() => {}}
           isSuggestSearch={true}
           onSuggestItemClick={handleSuggestItemClick}
         />
@@ -54,12 +47,6 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
           onRemove={removeIngredient}
           onClear={clearIngredients}
         />
-        {/* <button
-          onClick={handleGetRecommendations}
-          className="mt-4 bg-blue-500 text-white px-6 py-3 rounded-full uppercase font-bold text-sm hover:bg-blue-600 transition-colors duration-300 shadow-md hover:shadow-lg"
-        >
-          추천 받기
-        </button> */}
         <div className="flex mt-4">
           <button
             className={`flex-1 py-2 ${activeTab === 'ingredients' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}

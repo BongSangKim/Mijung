@@ -13,8 +13,11 @@ const IngredientDetailPage = () => {
   const { data: ingredient, isLoading, error } = useIngredientInfo(Number(id));
 
   const handleSearch = (keyword: string) => {
-    // 검색 결과 페이지로 이동
-    navigate(`/search/ingredients?keyword=${encodeURIComponent(keyword)}`);
+    navigate(`/ingredients?keyword=${encodeURIComponent(keyword)}`);
+  };
+
+  const handleItemSelect = (item: { id: number; name: string }) => {
+    navigate(`/ingredients/${item.id}`);
   };
 
   if (isLoading) return <div>로딩 중...</div>;
@@ -24,7 +27,11 @@ const IngredientDetailPage = () => {
   return (
     <div className="grid grid-cols-10">
       <MainLayout>
-        <Searchbar type="ingredients" onSearch={handleSearch} />
+        <Searchbar
+          type="ingredients"
+          onSearch={handleSearch}
+          onItemSelect={handleItemSelect}
+        />
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold mb-6">
             {ingredient.name} 상세 정보
