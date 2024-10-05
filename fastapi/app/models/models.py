@@ -22,9 +22,12 @@ def initialize_models():
         # Spark 초기화
         #.master("local[*]") \
         #.master("spark://3.35.55.230:7077") \
+        
+        #    .master("local[*]") \ 백업용 (원래 코드)
+        
         spark = SparkSession.builder \
             .appName("MySparkApp") \
-            .master("local[*]") \
+            .master("spark://3.36.68.89:7077") \
             .config("spark.ui.port", "5050") \
             .getOrCreate()
         logging.info("Spark 세션이 성공적으로 초기화되었습니다.")
@@ -38,7 +41,8 @@ def initialize_models():
         logging.info("Recipe KeyedVectors 모델이 성공적으로 로드되었습니다.")
 
         # exploded_df 생성
-        df = spark.read.csv("app/embedding/soyeon3.csv", header=True, inferSchema=True)
+        # df = spark.read.csv("app/embedding/soyeon3.csv", header=True, inferSchema=True) 백업용
+        df = spark.read.csv("hdfs://3.36.68.89:9000/soyeon3.csv", header=True, inferSchema=True)
         convert_udf = udf(lambda x: ast.literal_eval(x), ArrayType(StringType()))
         df_with_list = df.withColumn("Numbers", convert_udf(col("Numbers from href")))
         exploded_df = df_with_list.select("RCP_SNO", explode(col("Numbers")).alias("Number"))
