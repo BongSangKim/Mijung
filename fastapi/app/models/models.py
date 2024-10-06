@@ -28,7 +28,7 @@ def initialize_models():
         spark = SparkSession.builder \
             .appName("MySparkApp") \
             .master("local[*]")\
-            .config("spark.hadoop.fs.defaultFS", "hdfs://localhost:8000") \
+            .config("spark.hadoop.fs.defaultFS", "hdfs://localhost:9000") \
             .config("spark.ui.port", "5050") \
                 .config("spark.hadoop.fs.socket.timeout", "10000") \
             .getOrCreate()
@@ -44,7 +44,7 @@ def initialize_models():
 
         # exploded_df 생성
         # df = spark.read.csv("app/embedding/soyeon3.csv", header=True, inferSchema=True) 백업용
-        df = spark.read.csv("hdfs://localhost:8000/soyeon3.csv", header=True, inferSchema=True)
+        df = spark.read.csv("hdfs://localhost:9000/soyeon3.csv", header=True, inferSchema=True)
         convert_udf = udf(lambda x: ast.literal_eval(x), ArrayType(StringType()))
         df_with_list = df.withColumn("Numbers", convert_udf(col("Numbers from href")))
         exploded_df = df_with_list.select("RCP_SNO", explode(col("Numbers")).alias("Number"))
