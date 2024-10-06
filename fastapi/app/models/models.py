@@ -29,7 +29,7 @@ def initialize_models():
             .appName("MySparkApp") \
             .master("local[*]")\
             .config("spark.hadoop.fs.defaultFS", "hdfs://172.26.3.102:9000") \
-            .config("spark.ui.port", "5050") \
+            .config("spark.ui.enabled", "false") \
                 .config("spark.hadoop.fs.socket.timeout", "10000") \
             .getOrCreate()
         logging.info("Spark 세션이 성공적으로 초기화되었습니다.")
