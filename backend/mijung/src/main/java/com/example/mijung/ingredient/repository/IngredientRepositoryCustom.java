@@ -1,6 +1,7 @@
 package com.example.mijung.ingredient.repository;
 
-import com.example.mijung.ingredient.dto.IngredientInfoViewResponse;
+import static com.example.mijung.ingredient.enums.IngredientMassage.SEARCH_CONDITION_NOT_FOUND;
+
 import com.example.mijung.ingredient.dto.IngredientSiseRequest;
 import com.example.mijung.ingredient.dto.IngredientViewResponse;
 import com.example.mijung.ingredient.entity.Ingredient;
@@ -16,7 +17,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.server.ResponseStatusException;
 
 @Repository
 @RequiredArgsConstructor
@@ -35,7 +38,7 @@ public class IngredientRepositoryCustom {
 
     List<Tuple> results = queryFactory
         .select(
-            ingredient,             //수정중
+            ingredient,
             ingredientInfo.price,
             getRateField(period, ingredientRate),
             getPriceField(period, ingredientRate)
@@ -79,7 +82,7 @@ public class IngredientRepositoryCustom {
       case "year" -> ingredientRate.yearIncreasePrice;
       case "month" -> ingredientRate.monthIncreasePrice;
       case "week" -> ingredientRate.weekIncreasePrice;
-      default -> throw new IllegalArgumentException("Invalid period specified");
+      default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, SEARCH_CONDITION_NOT_FOUND.getMessage());
     };
   }
 
@@ -88,8 +91,9 @@ public class IngredientRepositoryCustom {
       case "year" -> ingredientRate.yearIncreaseRate;
       case "month" -> ingredientRate.monthIncreaseRate;
       case "week" -> ingredientRate.weekIncreaseRate;
-      default -> throw new IllegalArgumentException("Invalid period specified");
+      default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, SEARCH_CONDITION_NOT_FOUND.getMessage());
     };
+
   }
 
   private BooleanExpression getRateCondition(String period, String change,
