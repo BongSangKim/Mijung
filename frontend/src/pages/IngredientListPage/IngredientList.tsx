@@ -64,30 +64,40 @@ const IngredientListPage = () => {
   return (
     <div className="grid grid-cols-10">
       <MainLayout>
-        <Searchbar
-          type="ingredients"
-          onSearch={handleSearch}
-          onItemSelect={handleItemSelect}
-        />
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold mb-6">재료 목록</h1>
-          <div className="flex space-x-2 mb-4">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                className={`px-4 py-2 rounded ${
-                  category === cat.id ? 'bg-blue-500 text-white' : 'bg-gray-200'
-                }`}
-                onClick={() => handleCategoryChange(cat.id)}
-              >
-                {cat.name}
-              </button>
-            ))}
+          <h1 className="text-3xl font-bold mb-6">식재료 목록</h1>
+          <Searchbar
+            type="ingredients"
+            onSearch={handleSearch}
+            onItemSelect={handleItemSelect}
+          />
+          <div className="mt-6 mb-8">
+            <h2 className="text-xl font-semibold mb-3">카테고리</h2>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  className={`px-4 py-2 rounded-full transition-colors duration-300 ${
+                    category === cat.id
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                  onClick={() => handleCategoryChange(cat.id)}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
           </div>
           {isLoading ? (
-            <p>로딩 중...</p>
+            <div className="flex justify-center items-center h-64">
+              <p className="text-xl text-gray-600">로딩 중...</p>
+            </div>
           ) : error ? (
-            <p>오류가 발생했습니다.</p>
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <strong className="font-bold">오류 발생!</strong>
+              <span className="block sm:inline"> 데이터를 불러오는 데 실패했습니다. 다시 시도해 주세요.</span>
+            </div>
           ) : (
             <IngredientList
               ingredients={data?.ingredients || []}
