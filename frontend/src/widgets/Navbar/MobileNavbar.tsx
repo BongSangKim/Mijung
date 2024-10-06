@@ -25,12 +25,12 @@ const MobileNavbar = ({
 
   const getButtonClass = (path: string) => `
     flex flex-col items-center
-    ${isActive(path) ? 'text-blue-500' : 'text-gray-500'}
+    ${isActive(path) ? 'text-coral' : 'text-text-light'}
   `;
 
   return (
     <nav
-      className={`bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-50 ${
+      className={`bg-background-light border-t border-peach fixed bottom-0 left-0 right-0 z-50 ${
         isTasteSuggestOpen ? 'bg-opacity-90' : ''
       }`}
     >
@@ -66,7 +66,7 @@ const MobileNavbar = ({
         <button
           onClick={onToggleTasteSuggest}
           className={`flex flex-col items-center ${
-            isTasteSuggestOpen ? 'text-blue-500' : 'text-gray-500'
+            isTasteSuggestOpen ? 'text-coral' : 'text-text-light'
           }`}
         >
           <FaBars className="text-2xl" />
