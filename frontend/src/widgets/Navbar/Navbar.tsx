@@ -11,19 +11,19 @@ const Navbar = () => {
   const getLinkClass = (path: string) =>
     `py-4 px-2 ${
       isActive(path)
-        ? 'text-blue-500 font-semibold'
-        : 'text-gray-600 hover:text-blue-500 transition duration-300'
+        ? 'text-coral font-semibold border-b-2 border-coral'
+        : 'text-text-light hover:text-coral transition-colors duration-300'
     }`;
 
   return (
-    <nav className="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
+    <nav className="bg-background-light fixed top-0 left-0 right-0 z-50 border-b border-peach">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between">
           <div className="flex space-x-7">
             <div>
               <Link to="/" className="flex items-center py-4 px-2">
                 <img src="/icons/logo.svg" alt="로고" className="h-8 w-8" />
-                <span className="font-semibold text-gray-500 text-lg ml-2">
+                <span className="font-semibold text-coral text-lg ml-2">
                   미정(味定)
                 </span>
               </Link>
@@ -46,7 +46,7 @@ const Navbar = () => {
           </div>
           {/* 모바일 메뉴 버튼 */}
           <div className="md:hidden flex items-center">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-500">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-coral">
               <FaBars className="w-6 h-6" />
             </button>
           </div>
@@ -54,26 +54,14 @@ const Navbar = () => {
       </div>
       {/* 모바일 메뉴 */}
       {isOpen && (
-        <div className="md:hidden">
-          <Link
-            to="/ingredients"
-            className="block py-2 px-4 text-sm text-gray-500 hover:bg-gray-100"
-          >
-            <FaSearch className="inline-block mr-2" />
+        <div className="md:hidden bg-background-light">
+          <Link to="/ingredients" className="block py-2 px-4 text-sm hover:bg-peach-light">
             식재료 찾기
           </Link>
-          <Link
-            to="/recipes"
-            className="block py-2 px-4 text-sm text-gray-500 hover:bg-gray-100"
-          >
-            <FaBook className="inline-block mr-2" />
+          <Link to="/recipes" className="block py-2 px-4 text-sm hover:bg-peach-light">
             레시피 찾기
           </Link>
-          <Link
-            to="/recipes/jjim"
-            className="block py-2 px-4 text-sm text-gray-500 hover:bg-gray-100"
-          >
-            <FaHeart className="inline-block mr-2" />
+          <Link to="/recipes/jjim" className="block py-2 px-4 text-sm hover:bg-peach-light">
             찜한 레시피
           </Link>
         </div>

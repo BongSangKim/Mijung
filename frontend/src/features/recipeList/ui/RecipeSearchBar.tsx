@@ -2,6 +2,8 @@ import { useSearchSuggestion } from '../api/useSearchSuggestion';
 import { Recipe } from '@/shared/api/recipeTypes';
 import { Error } from '@/shared/components';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { Button } from '@/shared/components/Button';
+import { FaSearch } from 'react-icons/fa';
 
 interface Props {
   keyword: string;
@@ -108,20 +110,20 @@ export const RecipeSearchBar = ({
       <form className="flex items-center" onSubmit={(e) => handleSubmit(e)}>
         <input
           type="text"
-          placeholder="Search..."
+          placeholder="레시피 검색"
           value={keyword}
           onChange={(e) => onKeywordChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={handleInputFocus}
-          className="w-full px-4 py-2 text-gray-700 bg-white border rounded-l-lg focus:outline-none focus:border-blue-500"
+          className="w-full px-4 py-2 text-text-dark bg-background-light border border-peach rounded-l-full focus:outline-none focus:ring-2 focus:ring-coral focus:border-transparent"
         />
-        <button className="px-4 py-2 bg-blue-500 text-white rounded-r-lg">
-          Search
-        </button>
+        <Button type="submit" variant="primary" className="rounded-l-none">
+          <FaSearch />
+        </Button>
       </form>
       {suggestions && suggestions.length > 0 && (
         <ul
-          className={`absolute z-20 w-full mt-2 bg-white border rounded-lg shadow-lg ${
+          className={`absolute z-20 w-full mt-2 bg-background-light border border-peach rounded-lg shadow-lg ${
             showSuggestions ? 'opacity-100 visible' : 'opacity-0 invisible'
           }`}
           aria-hidden={!showSuggestions}
@@ -129,8 +131,8 @@ export const RecipeSearchBar = ({
           {suggestions.map((suggestion: Recipe, index: number) => (
             <li
               key={index}
-              className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${
-                index === selectedIndex ? 'bg-gray-200' : ''
+              className={`px-4 py-2 hover:bg-peach-light cursor-pointer ${
+                index === selectedIndex ? 'bg-peach-light' : ''
               }`}
               onClick={() => handleSuggestionClick(suggestion)}
             >
