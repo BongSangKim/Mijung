@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import MainPage from '@/pages/MainPage/MainPage';
 import IngredientListPage from '@/pages/IngredientListPage/IngredientList';
 import IngredientDetailPage from '@/pages/IngredientDetailPage/IngredientDetail';
@@ -9,6 +9,8 @@ import { Error } from '@/shared/components';
 import { RecipeListPage } from '@/pages/RecipeListPage';
 import { TasteSuggest } from '@/features/tasteSuggest/ui/TasteSuggest';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
+import LandingPage from '@/pages/LandingPage/LandingPage';
+import { shouldShowLanding } from '@/shared/utils/landingPageUtils';
 
 const MobileTasteSuggest = () => {
   const isMobile = useIsMobile();
@@ -19,7 +21,15 @@ const MobileTasteSuggest = () => {
   ) : null;
 };
 
+const MainPageWrapper = () => {
+  return shouldShowLanding() ? <Navigate to="/landing" replace /> : <MainPage />;
+};
+
 export const router = createBrowserRouter([
+  {
+    path: '/landing',
+    element: <LandingPage />,
+  },
   {
     path: '/',
     element: <Layout />,
@@ -27,7 +37,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <MainPage />,
+        element: <MainPageWrapper />,
       },
       {
         path: 'ingredients',
