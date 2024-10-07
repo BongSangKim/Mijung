@@ -18,9 +18,8 @@ exploded_df = None
 
 def initialize_models():
     global spark, embedding_model, recipe_model, exploded_df
-    if not settings.IS_LOCAL:
-        if spark is not None:
-            spark.sparkContext.setLogLevel("DEBUG")
+    if settings.IS_LOCAL != 'local':
+        spark.sparkContext.setLogLevel("DEBUG")
     logging.info("IS_LOCAL: %s", settings.IS_LOCAL)
         
     try:
