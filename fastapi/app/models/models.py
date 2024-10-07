@@ -18,9 +18,7 @@ exploded_df = None
 
 def initialize_models():
     global spark, embedding_model, recipe_model, exploded_df
-    if not settings.IS_LOCAL:
-        if spark is not None:
-            spark.sparkContext.setLogLevel("DEBUG")
+    
     logging.info("IS_LOCAL: %s", settings.IS_LOCAL)
         
     try:
@@ -51,7 +49,8 @@ def initialize_models():
 
         spark = builder.getOrCreate()
         logging.info("Spark 세션이 성공적으로 초기화되었습니다.")
-
+        if settings.IS_LOCAL != 'local':
+            spark.sparkContext.setLogLevel("DEBUG")
 
         # 임베딩 모델 로드
         embedding_model = Word2Vec.load(settings.BASIC_PATH + settings.EMBEDDING_MODEL)
