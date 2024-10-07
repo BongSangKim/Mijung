@@ -10,6 +10,7 @@ public class StepDto {
     private final Integer stepId;
     private final String content;
     private final String image;
+    private final Integer stepNumber;
 
 
     public static StepDto of(Integer stepId) {
@@ -19,11 +20,12 @@ public class StepDto {
                 .image("https://picsum.photos/200/200?random=1")
                 .build();
     }
-    public static StepDto of(Step step) {
+    public static StepDto of(Step step, Integer stepNumber) {
         return StepDto.builder()
                 .stepId(step.getId())
                 .content(step.getContent())
                 .image(step.getImage())
+                .stepNumber(stepNumber)
                 .build();
     }
 }
