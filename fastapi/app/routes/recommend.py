@@ -158,7 +158,7 @@ async def getRecipeRecommend(
         return ResponseDTO.from_(data=result)
 
     except (IntegrityError, SQLAlchemyError) as e:
-        print(f"Database error occurred: {e}")  # 두 에러를 한 번의 메시지 출력으로 통합
+       logging.error(f"Database error occurred: {e}")  # 두 에러를 한 번의 메시지 출력으로 통합
 
     except Exception as e:
         raise

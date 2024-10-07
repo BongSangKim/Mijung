@@ -91,6 +91,11 @@ public class IngredientService {
         * 데이터가 완전해지면 위의 로직을 실행하면 됨
         * */
         List<IngredientViewResponse> list = ingredientRepositoryCustom.ingredientViewResponseList(request);
+        if(list == null || list.isEmpty())
+        {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, INGREDIENT_NOT_FOUND.getMessage());
+        }
+
         List<IngredientViewResponse> result = new ArrayList<>();
         Set<String> names = new HashSet<>();
         int size = request.getCount();

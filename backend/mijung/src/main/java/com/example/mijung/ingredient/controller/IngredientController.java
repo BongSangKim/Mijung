@@ -55,6 +55,8 @@ public class IngredientController {
     @GetMapping("/price")
     @Operation(summary = "식재료 시세 조회", description = "기간과 등락에 맞는  count 수 만큼 식재료 목록을 포함하는 ResponseEntity 객체를 반환합니다. 식재료 시세 조회에 실패하면 에러 코드를 담은 ResponseEntity를 반환합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
+    @ApiResponse(responseCode = "400", description = "식재료 가격 정보 조회 실패", content = @Content)
+    @ApiResponse(responseCode = "204", description = "식재료 시세 조회 성공 - 시세 정보 없음", content = @Content)
     public ResponseEntity<ResponseDTO<?>> getIngredientSiseList(@Valid @ModelAttribute IngredientSiseRequest request) {
 
         List<IngredientViewResponse> result = ingredientService.getIngredientSiseList(request);
