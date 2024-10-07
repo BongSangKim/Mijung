@@ -1,4 +1,3 @@
-import LeftSideLayout from '@/app/RoutingLayout/LeftSideLayout';
 import MainLayout from '@/app/RoutingLayout/MainLayout';
 import RightSideLayout from '@/app/RoutingLayout/RightSideLayout';
 import { useRecipeStore } from '@/shared/stores/jjimStore';
