@@ -9,6 +9,7 @@ import {
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
 import Searchbar from '@/widgets/Searchbar/Searchbar';
+import { Button } from '@/shared/components/Button';
 
 interface TasteSuggestProps {
   isOpen: boolean;
@@ -34,10 +35,14 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   };
 
   const content = (
-    <div className="bg-white rounded-2xl overflow-hidden transition-shadow duration-500 h-full">
+    <div className="bg-background rounded-2xl overflow-hidden transition-shadow duration-500 h-full">
       <div className="p-6 flex flex-col h-full">
-        <h2 className="text-2xl font-bold mb-4">나만의 요리 도우미</h2>
-        <p className="text-gray-600 mb-4">가지고 있는 재료나 사고 싶은 재료를 추가해보세요</p>
+        <h2 className="text-3xl font-bold mb-4 text-blueberry">
+          나만의 요리 도우미
+        </h2>
+        <p className="text-text-light mb-4">
+          가지고 있는 재료나 사고 싶은 재료를 추가해보세요
+        </p>
         <Searchbar
           type="ingredients"
           onSearch={() => {}}
@@ -50,26 +55,20 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
           onClear={clearIngredients}
         />
         <div className="flex mt-4">
-          <button
-            className={`flex-1 py-2 rounded-full ${
-              activeTab === 'ingredients'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-600'
-            } transition-colors duration-300`}
+          <Button
             onClick={() => setActiveTab('ingredients')}
+            variant={activeTab === 'ingredients' ? 'primary' : 'secondary'}
+            className="flex-1 mr-2"
           >
             어울리는 재료
-          </button>
-          <button
-            className={`flex-1 py-2 rounded-full ml-2 ${
-              activeTab === 'recipes'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-600'
-            } transition-colors duration-300`}
+          </Button>
+          <Button
             onClick={() => setActiveTab('recipes')}
+            variant={activeTab === 'recipes' ? 'primary' : 'secondary'}
+            className="flex-1 ml-2"
           >
             추천 레시피
-          </button>
+          </Button>
         </div>
         {activeTab === 'ingredients' && recommendedIngredients && (
           <RecommendedIngredients
@@ -103,7 +102,7 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   }
 
   return (
-    <div className="fixed top-16 right-0 w-full lg:w-1/5 bg-white shadow-lg overflow-y-auto h-[calc(100vh-4rem)]">
+    <div className="fixed top-16 right-0 w-full lg:w-[30%] bg-background shadow-lg overflow-y-auto h-[calc(100vh-4rem)]">
       {content}
     </div>
   );

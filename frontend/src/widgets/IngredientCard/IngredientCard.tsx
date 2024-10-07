@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Ingredient, IngredientSise } from '../../shared/api/ingredientTypes';
 import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
+import { Button } from '@/shared/components/Button';
 
 interface IngredientCardProps {
   ingredient: Ingredient | IngredientSise;
@@ -29,42 +30,34 @@ const IngredientCard = ({ ingredient, disableNavigation = false }: IngredientCar
     }
   };
 
-  const formatPrice = (price: string | number | undefined) => {
-    if (price === undefined) return '가격 정보 없음';
+  const formatPrice = (price: string | number | undefined | null) => {
+    if (price === undefined || price === null) return '가격 정보 없음';
     return `${Number(price).toLocaleString()}원`;
   };
 
+  // const getPriceChangeColor = (changeRate: number | undefined | null) => {
+  //   if (changeRate === undefined || changeRate === null) return 'text-gray-400';
+  //   return changeRate >= 0 ? 'text-red-500' : 'text-blue-500';
+  // };
+
   return (
     <div
-      className={`bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg flex flex-col h-[300px] group ${!disableNavigation ? 'cursor-pointer' : ''}`}
+      className="bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-[300px] group"
       onClick={handleCardClick}
     >
-      <div className="relative h-1/2 overflow-hidden">
-        {ingredient?.image ? (
-          <img
-            src={ingredient.image}
-            alt={ingredient.name ?? '재료 이미지'}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
-            이미지 없음
-          </div>
-        )}
+      <div className="relative h-40 overflow-hidden">
+        <img
+          src={ingredient.image || '/default-ingredient.jpg'}
+          alt={ingredient.name}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+        />
       </div>
       <div className="p-4 flex-grow flex flex-col justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 truncate">
-            {ingredient?.name || '식재료 정보 없음'}
-          </h3>
-          {ingredient?.retailUnit && ingredient?.retailUnitsize && (
-            <p className="text-sm text-gray-500">
-              {ingredient.retailUnitsize}{ingredient.retailUnit}
-            </p>
-          )}
+          <h3 className="text-lg font-semibold text-text-dark mb-2">{ingredient.name}</h3>
           {ingredient?.price ? (
-            <p className="text-xl font-bold text-gray-800 mt-2">
-              {formatPrice(ingredient.price)}
+            <p className="text-xl font-bold text-black-500 mt-2">
+              {formatPrice(ingredient.price)} / {ingredient.retailUnit}
             </p>
           ) : (
             <p className="text-lg text-gray-400 mt-2">가격정보 없음</p>
@@ -76,16 +69,14 @@ const IngredientCard = ({ ingredient, disableNavigation = false }: IngredientCar
             </p>
           )}
         </div>
-        <button
-          className={`mt-2 ${
-            isInMyIngredients
-              ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-              : 'bg-blue-500 text-white hover:bg-blue-600'
-          } px-3 py-1 rounded-full text-sm transition-colors duration-300`}
+        <Button
+          variant={isInMyIngredients ? "secondary" : "primary"}
+          size="sm"
           onClick={handleAddOrRemove}
+          className="mt-2 w-full"
         >
           {isInMyIngredients ? '장바구니에서 제거' : '장바구니에 추가'}
-        </button>
+        </Button>
       </div>
     </div>
   );

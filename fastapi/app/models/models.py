@@ -41,28 +41,29 @@ def initialize_models():
         builder = SparkSession.builder.appName("MySparkApp")
         if settings.IS_LOCAL == 'local':
             builder = builder.master("local[*]")
-            csv_path = "app/embedding/soyeon3.csv"  # 로컬 경로
+            csv_path =  settings.BASIC_PATH + settings.CSV_FILE  # 로컬 경로
         else:
-            builder = builder.master("spark://3.36.68.89:7077")\
-                     .config("spark.hadoop.fs.defaultFS", "hdfs://172.26.3.102:9000")\
+            builder = builder.master(settings.SPARK_URL)\
+                     .config("spark.hadoop.fs.defaultFS", settings.HADOOP_URL)\
                      .config("spark.hadoop.fs.socket.timeout", "10000")\
                      .config("spark.ui.enabled", "false")
-            csv_path = "hdfs://172.26.3.102:9000/app/embedding/soyeon3.csv"  # HDFS 경로
+            csv_path = settings.HADOOP_URL+'/'+settings.CSV_FILE  # HDFS 경로
 
         spark = builder.getOrCreate()
         logging.info("Spark 세션이 성공적으로 초기화되었습니다.")
 
 
         # 임베딩 모델 로드
-        embedding_model = Word2Vec.load("app/embedding/embedding.model")
+        embedding_model = Word2Vec.load(settings.BASIC_PATH + settings.EMBEDDING_MODEL)
         logging.info("Word2Vec 모델이 성공적으로 로드되었습니다.")
 
         # 레시피 모델 로드
-        recipe_model = KeyedVectors.load("app/embedding/recipe_embeddings.kv")
+        recipe_model = KeyedVectors.load(settings.BASIC_PATH + settings.RECIPE_MODEL)
         logging.info("Recipe KeyedVectors 모델이 성공적으로 로드되었습니다.")
 
         # exploded_df 생성
         # df = spark.read.csv("app/embedding/soyeon3.csv", header=True, inferSchema=True) 백업용
+
         df = spark.read.csv(csv_path, header=True, inferSchema=True)
         convert_udf = udf(lambda x: ast.literal_eval(x), ArrayType(StringType()))
         df_with_list = df.withColumn("Numbers", convert_udf(col("Numbers from href")))

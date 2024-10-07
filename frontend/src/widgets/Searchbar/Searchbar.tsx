@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, KeyboardEvent } from 'react';
 import { useIngredientAutoComplete } from '../../features/ingredient/api/useIngredients';
+import { useSearchParams } from 'react-router-dom';
 
 interface SearchbarProps {
   type: 'ingredients' | 'recipes';
@@ -7,6 +8,7 @@ interface SearchbarProps {
   isSuggestSearch?: boolean;
   onSuggestItemClick?: (item: { id: number; name: string }) => void;
   onItemSelect?: (item: { id: number; name: string }) => void;
+  initialValue?: string;
 }
 
 const Searchbar = ({
@@ -15,15 +17,18 @@ const Searchbar = ({
   isSuggestSearch = false,
   onSuggestItemClick,
   onItemSelect,
+  initialValue = '',
 }: SearchbarProps) => {
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState(initialValue);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [userInteracted, setUserInteracted] = useState(false);
 
   const { data: ingredientSuggestions } = useIngredientAutoComplete(
-    type === 'ingredients' ? keyword : ''
+    type === 'ingredients' && userInteracted ? keyword : ''
   );
 
   const suggestions =
@@ -32,6 +37,14 @@ const Searchbar = ({
       : console.log('recipeSuggestions');
 
   useEffect(() => {
+    setKeyword(initialValue);
+    setUserInteracted(false);
+    setIsDropdownOpen(false);
+  }, [initialValue]);
+
+  useEffect(() => {
+    if (!userInteracted) return;
+
     if (keyword.length > 0) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
@@ -45,7 +58,7 @@ const Searchbar = ({
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [keyword]);
+  }, [keyword, userInteracted]);
 
   const handleSearch = () => {
     if (isSuggestSearch && suggestions && suggestions.length > 0) {
@@ -56,9 +69,12 @@ const Searchbar = ({
       });
     } else {
       onSearch(keyword);
+      searchParams.set('keyword', keyword);
+      searchParams.set('page', '1');
+      setSearchParams(searchParams);
     }
     setIsDropdownOpen(false);
-    setKeyword('');
+    setUserInteracted(false);
   };
 
   const handleItemClick = (item: { id: number; name: string }) => {
@@ -69,6 +85,10 @@ const Searchbar = ({
     } else {
       setKeyword(item.name);
       onSearch(item.name);
+      // URL 파라미터 업데이트
+      searchParams.set('keyword', item.name);
+      searchParams.set('page', '1');
+      setSearchParams(searchParams);
     }
     setIsDropdownOpen(false);
   };
@@ -111,7 +131,11 @@ const Searchbar = ({
         ref={inputRef}
         type="text"
         value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
+        onChange={(e) => {
+          setKeyword(e.target.value);
+          setUserInteracted(true);
+        }}
+        onFocus={() => setUserInteracted(true)}
         onKeyDown={handleKeyDown}
         className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800"
         placeholder={type === 'ingredients' ? '식재료 검색' : '레시피 검색'}
