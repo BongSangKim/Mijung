@@ -54,3 +54,9 @@ export interface IngredientInfo {
   changePrice: number;
   colorHex?: string; // 아직 옵셔널로 둡니다
 }
+
+export interface IngredientCosineResponse {
+  ingredientId: number;
+  itemName: string;
+  cosine: number; // 코사인 유사도
+}
