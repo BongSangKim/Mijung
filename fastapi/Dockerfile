@@ -6,6 +6,14 @@ FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim AS builder
 RUN apt-get update && apt-get install -y openjdk-17-jdk
 ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
 
+# Install Hadoop client
+ENV HADOOP_VERSION 3.3.4
+RUN wget https://downloads.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
+    && tar -xzf hadoop-${HADOOP_VERSION}.tar.gz -C /opt/ \
+    && rm hadoop-${HADOOP_VERSION}.tar.gz
+ENV HADOOP_HOME /opt/hadoop-${HADOOP_VERSION}
+ENV PATH $PATH:$HADOOP_HOME/bin
+
 WORKDIR /app
 
 COPY requirements.txt ./
