@@ -74,10 +74,6 @@ const RecipeCard = ({
           onClick={handleSave}
           className="absolute top-2 left-2 p-1 bg-white rounded-full shadow-md"
         >
-          {/* <Heart
-            size={20}
-            className={isSaved ? 'text-red-500 fill-current' : 'text-gray-400'}
-          /> */}
           {isSaved ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
         </button>
       </div>
