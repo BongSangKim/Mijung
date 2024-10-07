@@ -44,11 +44,11 @@ def initialize_models():
 
         # exploded_df 생성
         # df = spark.read.csv("app/embedding/soyeon3.csv", header=True, inferSchema=True) 백업용
-        df = spark.read.csv("hdfs://172.26.3.102:9000/soyeon3.csv", header=True, inferSchema=True)
-        convert_udf = udf(lambda x: ast.literal_eval(x), ArrayType(StringType()))
-        df_with_list = df.withColumn("Numbers", convert_udf(col("Numbers from href")))
-        exploded_df = df_with_list.select("RCP_SNO", explode(col("Numbers")).alias("Number"))
-        logging.info("Exploded DataFrame이 성공적으로 생성되었습니다.")
+        # df = spark.read.csv("hdfs://172.26.3.102:9000/soyeon3.csv", header=True, inferSchema=True)
+        # convert_udf = udf(lambda x: ast.literal_eval(x), ArrayType(StringType()))
+        # df_with_list = df.withColumn("Numbers", convert_udf(col("Numbers from href")))
+        # exploded_df = df_with_list.select("RCP_SNO", explode(col("Numbers")).alias("Number"))
+        # logging.info("Exploded DataFrame이 성공적으로 생성되었습니다.")
 
     except Exception as e:
         logging.error(f"모델 초기화 중 오류 발생: {e}")
