@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -71,19 +72,17 @@ public class RecipeService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, RecipeMassage.RECIPE_NOT_FOUND.getMessage()));
 
-
         List<MaterialDto> materials = recipe.getMaterials().stream()
                 .map(MaterialDto::of)
                 .collect(Collectors.toList());
-
 
         List<EtcDto> etcs = recipe.getEtcs().stream()
                 .map(EtcDto::of)
                 .collect(Collectors.toList());
 
 
-        List<StepDto> steps = recipe.getSteps().stream()
-                .map(StepDto::of)
+        List<StepDto> steps = IntStream.range(0, recipe.getSteps().size())
+                .mapToObj(i -> StepDto.of(recipe.getSteps().get(i), i + 1))
                 .collect(Collectors.toList());
 
         return RecipeViewResponse.of(recipe, materials, etcs, steps);
