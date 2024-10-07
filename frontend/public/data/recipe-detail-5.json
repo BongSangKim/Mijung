@@ -7,7 +7,7 @@
     "inbun": "2인분",
     "level": "아무나",
     "time": "15분이내",
-    "material": [
+    "materials": [
       {
         "materialId": 1,
         "name": "밥",
