@@ -5,6 +5,7 @@ from functools import lru_cache
 load_dotenv()
 os.environ['HADOOP_USER_NAME'] = 'ubuntu'
 class Settings():
+  IS_LOCAL = os.environ.get('SPARK_ENV')
   DB_USERNAME = os.environ.get("MYSQL_USER")
   DB_HOST = os.environ.get("MYSQL_HOST")
   DB_PASSWORD = os.environ.get("MYSQL_PASSWORD")

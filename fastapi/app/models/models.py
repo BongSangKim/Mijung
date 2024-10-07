@@ -6,6 +6,7 @@ from pyspark.sql.functions import col, explode, udf
 from pyspark.sql.types import StringType, ArrayType
 import findspark
 import logging
+from app.common.config import settings
 
 findspark.init()
 
@@ -17,7 +18,11 @@ exploded_df = None
 
 def initialize_models():
     global spark, embedding_model, recipe_model, exploded_df
-    
+    if not settings.IS_LOCAL:
+        if spark is not None:
+            spark.sparkContext.setLogLevel("DEBUG")
+    logging.info("IS_LOCAL: %s", settings.IS_LOCAL)
+        
     try:
         # Spark 초기화
         #.master("local[*]") \
@@ -25,14 +30,28 @@ def initialize_models():
         
         #    .master("local[*]") \ 백업용 (원래 코드)
         #   .master("spark://3.36.68.89:7077") \
-        spark = SparkSession.builder \
-            .appName("MySparkApp") \
-            .master("local[*]")\
-            .config("spark.hadoop.fs.defaultFS", "hdfs://172.26.3.102:9000") \
-            .config("spark.ui.enabled", "false") \
-                .config("spark.hadoop.fs.socket.timeout", "10000") \
-            .getOrCreate()
+        # spark = SparkSession.builder \
+        #     .appName("MySparkApp") \
+        #     .master("local[*]")\
+        #     .config("spark.hadoop.fs.defaultFS", "hdfs://172.26.3.102:9000") \
+        #     .config("spark.ui.enabled", "false") \
+        #         .config("spark.hadoop.fs.socket.timeout", "10000") \
+        #     .getOrCreate()
+        # logging.info("Spark 세션이 성공적으로 초기화되었습니다.")
+        builder = SparkSession.builder.appName("MySparkApp")
+        if settings.IS_LOCAL == 'local':
+            builder = builder.master("local[*]")
+            csv_path = "app/embedding/soyeon3.csv"  # 로컬 경로
+        else:
+            builder = builder.master("spark://3.36.68.89:7077")\
+                     .config("spark.hadoop.fs.defaultFS", "hdfs://172.26.3.102:9000")\
+                     .config("spark.hadoop.fs.socket.timeout", "10000")\
+                     .config("spark.ui.enabled", "false")
+            csv_path = "hdfs://172.26.3.102:9000/app/embedding/soyeon3.csv"  # HDFS 경로
+
+        spark = builder.getOrCreate()
         logging.info("Spark 세션이 성공적으로 초기화되었습니다.")
+
 
         # 임베딩 모델 로드
         embedding_model = Word2Vec.load("app/embedding/embedding.model")
@@ -44,7 +63,7 @@ def initialize_models():
 
         # exploded_df 생성
         # df = spark.read.csv("app/embedding/soyeon3.csv", header=True, inferSchema=True) 백업용
-        df = spark.read.csv("hdfs://172.26.3.102:9000/soyeon3.csv", header=True, inferSchema=True)
+        df = spark.read.csv(csv_path, header=True, inferSchema=True)
         convert_udf = udf(lambda x: ast.literal_eval(x), ArrayType(StringType()))
         df_with_list = df.withColumn("Numbers", convert_udf(col("Numbers from href")))
         exploded_df = df_with_list.select("RCP_SNO", explode(col("Numbers")).alias("Number"))
