@@ -13,7 +13,11 @@ interface Props {
 export const RecipeList = ({ keyword }: Props) => {
   const [page, setPage] = useState<number>(1);
   const [rotation, setRotation] = useState<number>(0);
-  const { data, isFetching, error } = useRecipeList({ page, keyword });
+  const { data, isFetching, error } = useRecipeList({
+    page,
+    keyword,
+    perPage: 7,
+  });
 
   // keyword 변경 시 페이지 1로 초기화
   useEffect(() => {
