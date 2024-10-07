@@ -11,29 +11,29 @@ export const RecommendedIngredients = ({
   onAdd,
 }: RecommendedIngredientsProps) => {
   return (
-    <div className="mt-6">
-      <h2 className="text-2xl font-bold mb-3 text-mint uppercase">추천 식재료</h2>
-      <ul className="space-y-2">
+    <div className="mt-4">
+      <h3 className="text-lg font-semibold mb-2 text-mint">추천 식재료</h3>
+      <div className="flex flex-wrap gap-2">
         {ingredients.map((ingredient) => (
-          <li
+          <div
             key={ingredient.ingredientId}
-            className="flex justify-between items-center bg-background-light p-2 rounded"
+            className="flex items-center bg-background-light p-1 rounded"
           >
             <Link
               to={`/ingredients/${ingredient.ingredientId}`}
-              className="text-text-dark hover:text-mint transition-colors duration-300"
+              className="text-sm text-text-dark hover:text-mint transition-colors duration-300 mr-2"
             >
               {ingredient.name}
             </Link>
             <button
               onClick={() => onAdd(ingredient.ingredientId, ingredient.name)}
-              className="text-coral hover:text-coral-dark transition-colors duration-300"
+              className="text-xs text-coral hover:text-coral-dark transition-colors duration-300"
             >
               추가
             </button>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

@@ -138,7 +138,7 @@ const Searchbar = ({
         onFocus={() => setUserInteracted(true)}
         onKeyDown={handleKeyDown}
         className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800"
-        placeholder={type === 'ingredients' ? '식재료 검색' : '레시피 검색'}
+        placeholder={type === 'ingredients' ? '식재료 찾아보기' : '레시피 검색'}
       />
       {isDropdownOpen && suggestions && suggestions.length > 0 && (
         <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-2xl shadow-lg">
