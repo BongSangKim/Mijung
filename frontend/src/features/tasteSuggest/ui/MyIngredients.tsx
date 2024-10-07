@@ -13,24 +13,24 @@ export const MyIngredients = ({
 }: MyIngredientsProps) => {
   return (
     <div className="mb-6">
-      <h2 className="text-2xl font-bold mb-3 text-mint uppercase">나의 식재료</h2>
-      <ul className="space-y-2">
+      {/* <h2 className="text-2xl font-bold mb-3 text-mint uppercase">나의 식재료</h2> */}
+      <div className="flex flex-wrap gap-2">
         {ingredients.map((ingredient) => (
-          <li
+          <div
             key={ingredient.id}
-            className="flex justify-between items-center bg-peach-light p-2 rounded"
+            className="flex items-center bg-peach-light p-2 rounded"
           >
-            <span className="text-text-dark">{ingredient.name}</span>
+            <span className="text-text-dark mr-2">{ingredient.name}</span>
             <Button
               onClick={() => onRemove(ingredient.id)}
               variant="secondary"
               size="sm"
             >
-              삭제
+              X
             </Button>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
       {ingredients.length > 0 && (
         <Button
           onClick={onClear}
