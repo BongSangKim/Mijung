@@ -105,6 +105,7 @@ services:
       RECIPE_MODEL: ${RECIPE_MODEL}
     networks:
       - mijung_net
+      - host
     container_name: mijung_fastapi
 
 volumes:
