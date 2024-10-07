@@ -67,7 +67,6 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       FPGROWTH_MODEL_PATH: ${FPGROWTH_MODEL_PATH}
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS}
     expose:
       - "8080"
     networks:
