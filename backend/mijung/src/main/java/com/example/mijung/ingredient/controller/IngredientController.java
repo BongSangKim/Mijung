@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +55,8 @@ public class IngredientController {
     @GetMapping("/price")
     @Operation(summary = "식재료 시세 조회", description = "기간과 등락에 맞는  count 수 만큼 식재료 목록을 포함하는 ResponseEntity 객체를 반환합니다. 식재료 시세 조회에 실패하면 에러 코드를 담은 ResponseEntity를 반환합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
+    @ApiResponse(responseCode = "400", description = "식재료 가격 정보 조회 실패", content = @Content)
+    @ApiResponse(responseCode = "204", description = "식재료 시세 조회 성공 - 시세 정보 없음", content = @Content)
     public ResponseEntity<ResponseDTO<?>> getIngredientSiseList(@Valid @ModelAttribute IngredientSiseRequest request) {
 
         List<IngredientViewResponse> result = ingredientService.getIngredientSiseList(request);
@@ -143,13 +145,19 @@ public class IngredientController {
     }
 
     @GetMapping("/{ingredientId}/network-graph")
-    public ResponseEntity<List<IngredientCosineResponse>> getTopCosineIngredients(
+    @Operation(summary = "식재료 네트워크 그래프", description = "코사인 유사도가 높은 식재료 리스트를 반환합니다. 유사한 식재료가 없을 경우 204 응답을 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "식재료 상세보기(네트워크 그래프) 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "식재료 상세보기(네트워크 그래프) 조회  실패", content = @Content)
+    })
+    public ResponseEntity<ResponseDTO<?>> getTopCosineIngredients(
             @PathVariable("ingredientId") Integer ingredientId,
             @RequestParam(defaultValue = "100") int count) {
 
         List<IngredientCosineResponse> result = ingredientService.getTopCosineIngredients(ingredientId, count);
 
         HttpStatus status = result.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
-        return ResponseEntity.status(status).body(result);
+
+        return ResponseEntity.status(status).body(ResponseDTO.from(result));
     }
 }

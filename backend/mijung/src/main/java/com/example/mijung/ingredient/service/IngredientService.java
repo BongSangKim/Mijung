@@ -14,7 +14,7 @@ import com.example.mijung.ingredient.repository.IngredientRepository;
 import com.example.mijung.ingredient.repository.IngredientRepositoryCustom;
 import com.example.mijung.recipe.entity.Recipe;
 import com.example.mijung.recipe.repository.RecipeRepository;
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,6 +91,11 @@ public class IngredientService {
         * 데이터가 완전해지면 위의 로직을 실행하면 됨
         * */
         List<IngredientViewResponse> list = ingredientRepositoryCustom.ingredientViewResponseList(request);
+        if(list == null || list.isEmpty())
+        {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, INGREDIENT_NOT_FOUND.getMessage());
+        }
+
         List<IngredientViewResponse> result = new ArrayList<>();
         Set<String> names = new HashSet<>();
         int size = request.getCount();
@@ -210,13 +215,14 @@ public class IngredientService {
 
     @Transactional
     public List<IngredientCosineResponse> getTopCosineIngredients(Integer ingredientId, int count) {
+        Ingredient ingredient = getIngredient(ingredientId);
+
         Pageable pageable = PageRequest.of(0, count);
         List<IngredientCosine> cosines = ingredientCosineRepository.findByIngredientId1OrderByCosineDesc(ingredientId, pageable);
 
         return cosines.stream()
                 .map(cosine -> {
-                    Ingredient ingredient2 = ingredientRepository.findById(cosine.getIngredientId2())
-                            .orElseThrow(() -> new RuntimeException("Ingredient not found for id: " + cosine.getIngredientId2()));
+                    Ingredient ingredient2 = getIngredient(cosine.getIngredientId2());
 
                     return IngredientCosineResponse.of(
                             cosine.getIngredientId2(),

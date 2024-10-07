@@ -6,7 +6,7 @@ type MainLayoutProps = React.HTMLAttributes<HTMLElement> & {
 const MainLayout = ({ children, className, ...props }: MainLayoutProps) => {
   return (
     <main
-      className={`col-span-10 m-5 lg:col-span-8 flex flex-col p-4 sm:p-6 md:p-8 ${className}`}
+      className={`col-span-10 m-5 lg:col-span-7 flex flex-col p-4 sm:p-6 md:p-8 ${className}`}
       {...props}
     >
       {children}
