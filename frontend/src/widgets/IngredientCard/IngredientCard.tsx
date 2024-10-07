@@ -1,22 +1,24 @@
 import { useNavigate } from 'react-router-dom';
 import { Ingredient, IngredientSise } from '../../shared/api/ingredientTypes';
 import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
+import { Button } from '@/shared/components/Button';
 
 interface IngredientCardProps {
   ingredient: Ingredient | IngredientSise;
+  disableNavigation?: boolean; // 네비게이션 비활성화 여부를 결정하는 prop
 }
 
-const IngredientCard = ({ ingredient }: IngredientCardProps): JSX.Element => {
+const IngredientCard = ({ ingredient, disableNavigation = false }: IngredientCardProps): JSX.Element => {
   const navigate = useNavigate();
-  const { ingredients, addIngredient, removeIngredient } =
-    useMyIngredientsStore();
+  const { ingredients, addIngredient, removeIngredient } = useMyIngredientsStore();
 
-  const isInMyIngredients = ingredients.some(
-    (i) => i.id === ingredient.ingredientId
-  );
+  const isInMyIngredients = ingredients.some((i) => i.id === ingredient.ingredientId);
 
   const handleCardClick = () => {
-    navigate(`/ingredients/${ingredient.ingredientId}`);
+    // disableNavigation이 false일 때만 상세 페이지로 이동
+    if (!disableNavigation) {
+      navigate(`/ingredients/${ingredient.ingredientId}`);
+    }
   };
 
   const handleAddOrRemove = (e: React.MouseEvent) => {
@@ -28,88 +30,53 @@ const IngredientCard = ({ ingredient }: IngredientCardProps): JSX.Element => {
     }
   };
 
-  const formatChange = (value: number | undefined) => {
-    if (value === undefined) return '가격 등락 정보 없음';
-    const absValue = Math.abs(value).toFixed(1);
-    return `${absValue}%`;
-  };
-
-  const formatPrice = (price: string | number | undefined) => {
-    if (price === undefined) return '가격 정보 없음';
+  const formatPrice = (price: string | number | undefined | null) => {
+    if (price === undefined || price === null) return '가격 정보 없음';
     return `${Number(price).toLocaleString()}원`;
   };
 
+  // const getPriceChangeColor = (changeRate: number | undefined | null) => {
+  //   if (changeRate === undefined || changeRate === null) return 'text-gray-400';
+  //   return changeRate >= 0 ? 'text-red-500' : 'text-blue-500';
+  // };
+
   return (
     <div
-      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transition-transform hover:scale-105 flex flex-col h-[300px]"
+      className="bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-[300px] group"
       onClick={handleCardClick}
     >
-      {ingredient?.image ? (
+      <div className="relative h-40 overflow-hidden">
         <img
-          src={ingredient.image}
-          alt={ingredient.name ?? '재료 이미지'}
-          className="w-full h-2/5 object-cover"
+          src={ingredient.image || '/default-ingredient.jpg'}
+          alt={ingredient.name}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
         />
-      ) : (
-        <div className="w-full h-2/5 bg-gray-200 flex items-center justify-center text-gray-500">
-          이미지 없음
-        </div>
-      )}
-      <div className="p-2 flex-grow flex flex-col justify-between">
+      </div>
+      <div className="p-4 flex-grow flex flex-col justify-between">
         <div>
-          <h3 className="text-sm font-semibold mb-1 truncate">
-            {ingredient?.name ? (
-              <>
-                {ingredient.name}{' '}
-                {ingredient?.retailUnit && ingredient?.retailUnitsize ? (
-                  `(${ingredient.retailUnitsize}${ingredient.retailUnit})`
-                ) : (
-                  <span className="text-gray-500 text-xs">
-                    {/* (Dev:단위 정보 없음) */}
-                    {/* UX 관점에서는, 단위없으면 아예 생략 고려 */}
-                  </span>
-                )}
-              </>
-            ) : (
-              '식재료 정보 없음'
-            )}
-          </h3>
+          <h3 className="text-lg font-semibold text-text-dark mb-2">{ingredient.name}</h3>
           {ingredient?.price ? (
-            <>
-              <p className="text-lg font-bold mb-1">
-                {formatPrice(ingredient.price)}
-              </p>
-              {ingredient?.changeRate !== undefined &&
-                ingredient?.changePrice !== undefined && (
-                  <div
-                    className={`text-xs flex items-center ${ingredient.changeRate >= 0 ? 'text-red-500' : 'text-blue-500'}`}
-                  >
-                    <span className="mr-1">
-                      {ingredient.changeRate >= 0 ? '▲' : '▼'}
-                    </span>
-                    <span>{formatChange(ingredient.changeRate)}</span>
-                    <span className="ml-1">
-                      ({formatPrice(Math.abs(ingredient.changePrice))})
-                    </span>
-                  </div>
-                )}
-            </>
+            <p className="text-xl font-bold text-black-500 mt-2">
+              {formatPrice(ingredient.price)} / {ingredient.retailUnit}
+            </p>
           ) : (
-            <p className="text-lg font-bold mb-1 text-gray-500">
-              가격정보 없음
+            <p className="text-lg text-gray-400 mt-2">가격정보 없음</p>
+          )}
+          {ingredient?.changeRate !== undefined && ingredient?.changePrice !== undefined && (
+            <p className={`text-sm ${ingredient.changeRate >= 0 ? 'text-red-500' : 'text-blue-500'} mt-1`}>
+              {ingredient.changeRate >= 0 ? '▲' : '▼'} {Math.abs(ingredient.changeRate).toFixed(1)}%
+              ({formatPrice(Math.abs(ingredient.changePrice))})
             </p>
           )}
         </div>
-        <button
-          className={`mt-2 ${
-            isInMyIngredients
-              ? 'bg-red-500 hover:bg-red-600'
-              : 'bg-blue-500 hover:bg-blue-600'
-          } text-white px-2 py-1 rounded text-xs w-full`}
+        <Button
+          variant={isInMyIngredients ? "secondary" : "primary"}
+          size="sm"
           onClick={handleAddOrRemove}
+          className="mt-2 w-full"
         >
-          {isInMyIngredients ? '식탁에서 제거' : '식탁에 추가'}
-        </button>
+          {isInMyIngredients ? '장바구니에서 제거' : '장바구니에 추가'}
+        </Button>
       </div>
     </div>
   );

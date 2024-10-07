@@ -1,16 +1,14 @@
 package com.example.mijung.ingredient.dto;
 
 import com.example.mijung.ingredient.entity.Ingredient;
-import com.example.mijung.ingredient.entity.IngredientInfo;
-import com.example.mijung.ingredient.entity.IngredientRate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-@Schema(description = "식재료 정보 응답")
-public class IngredientInfoViewResponse {
+@Schema(description = "식재료 가격 정보 응답")
+public class IngredientViewResponse {
 
     @Schema(description = "식재료 ID", example = "1")
     private final Integer ingredientId;
@@ -28,29 +26,27 @@ public class IngredientInfoViewResponse {
     private final Float changeRate;
     @Schema(description = "변동 가격", example = "9")
     private final Integer changePrice;
-    @Schema(description = "배너 색", example = "#FFFFFF, #FFFFFF, #FFFFFF")
-    private final String colorHex;
 
-    public static IngredientInfoViewResponse of(Ingredient ingredient) {
-        return IngredientInfoViewResponse.builder()
+
+    public static IngredientViewResponse of(Ingredient ingredient) {
+        return IngredientViewResponse.builder()
                 .ingredientId(ingredient.getId())
                 .name(ingredient.getItemName())
                 .image(ingredient.getImage())
-                .colorHex(ingredient.getColorHex())
                 .build();
     }
 
-    public static IngredientInfoViewResponse of(Ingredient ingredient, IngredientInfo ingredientInfo, IngredientRate ingredientRate) {
-        return IngredientInfoViewResponse.builder()
+    public static IngredientViewResponse of(Ingredient ingredient, Integer price, Float changeRate,
+                                                Integer changePrice) {
+        return IngredientViewResponse.builder()
                 .ingredientId(ingredient.getId())
                 .name(ingredient.getItemName())
                 .retailUnit(ingredient.getRetailUnit())
                 .retailUnitsize(ingredient.getRetailUnitsize())
                 .image(ingredient.getImage())
-                .price(ingredientInfo == null ? null : ingredientInfo.getPrice())
-                .changeRate(ingredientRate == null ? null : ingredientRate.getWeekIncreaseRate())
-                .changePrice(ingredientRate == null ? null : ingredientRate.getWeekIncreasePrice())
-                .colorHex(ingredient.getColorHex())
+                .price(price)
+                .changeRate(changeRate)
+                .changePrice(changePrice)
                 .build();
     }
 }

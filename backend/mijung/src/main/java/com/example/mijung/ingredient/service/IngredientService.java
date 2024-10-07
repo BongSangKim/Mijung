@@ -42,7 +42,7 @@ public class IngredientService {
     private final IngredientRepositoryCustom ingredientRepositoryCustom;
 
     @Transactional
-    public ResponseDTO<List<IngredientInfoViewResponse>> getIngredientList(PaginationAndFilteringDto dto) {
+    public ResponseDTO<List<IngredientViewResponse>> getIngredientList(PaginationAndFilteringDto dto) {
 
         Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getPerPage());
 
@@ -53,16 +53,16 @@ public class IngredientService {
                 pageable
         );
 
-        List<IngredientInfoViewResponse> data = new ArrayList<>();
+        List<IngredientViewResponse> data = new ArrayList<>();
 
         for (Ingredient ingredient : ingredientsPage.getContent()) {
             if (!ingredient.getIsPriced()) {
-                data.add(IngredientInfoViewResponse.of(ingredient));
+                data.add(IngredientViewResponse.of(ingredient));
             } else {
                 IngredientInfo ingredientInfo = ingredient.getLatestIngredientInfo();
                 IngredientRate ingredientRate = ingredient.getLatestIngredientRate();
 
-                data.add(IngredientInfoViewResponse.of(
+                data.add(IngredientViewResponse.of(
                         ingredient,
                         ingredientInfo != null ? ingredientInfo.getPrice() : null,
                         ingredientRate != null ? ingredientRate.getWeekIncreaseRate() : null,
@@ -80,21 +80,21 @@ public class IngredientService {
     }
 
     @Transactional
-    public List<IngredientInfoViewResponse> getIngredientSiseList(IngredientSiseRequest request) {
+    public List<IngredientViewResponse> getIngredientSiseList(IngredientSiseRequest request) {
         if(!isValidIngredientRequest(request)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, INGREDIENT_NOT_FOUND.getMessage());
         }
-        //return ingredientRepositoryCustom.ingredientInfoViewResponseList(request)
+        //return ingredientRepositoryCustom.ingredientViewResponseList(request)
 
         /*
         * ingredient_id가 다른데 재료 이름이 같은 데이터가 있어서 임시방편으로 마련함.
         * 데이터가 완전해지면 위의 로직을 실행하면 됨
         * */
-        List<IngredientInfoViewResponse> list = ingredientRepositoryCustom.ingredientInfoViewResponseList(request);
-        List<IngredientInfoViewResponse> result = new ArrayList<>();
+        List<IngredientViewResponse> list = ingredientRepositoryCustom.ingredientViewResponseList(request);
+        List<IngredientViewResponse> result = new ArrayList<>();
         Set<String> names = new HashSet<>();
         int size = request.getCount();
-        for (IngredientInfoViewResponse ingredient : list) {
+        for (IngredientViewResponse ingredient : list) {
             if(result.size()==size) break;
             if (names.contains(ingredient.getName())) continue;
             names.add(ingredient.getName());
@@ -127,7 +127,7 @@ public class IngredientService {
         IngredientInfo ingredientInfo = ingredient.getLatestIngredientInfo();
         IngredientRate ingredientRate = ingredient.getLatestIngredientRate();
 
-        return IngredientInfoViewResponse.of(ingredient, ingredientInfo.getPrice(), ingredientRate.getWeekIncreaseRate(), ingredientRate.getWeekIncreasePrice());
+        return IngredientInfoViewResponse.of(ingredient, ingredientInfo, ingredientRate);
     }
 
     @Transactional

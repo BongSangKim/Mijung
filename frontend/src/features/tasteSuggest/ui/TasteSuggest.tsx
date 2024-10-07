@@ -9,39 +9,39 @@ import {
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
 import Searchbar from '@/widgets/Searchbar/Searchbar';
+import { Button } from '@/shared/components/Button';
 
-export const TasteSuggest = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+interface TasteSuggestProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
+  const [activeTab, setActiveTab] = useState('ingredients');
   const isMobile = useIsMobile();
 
   const { ingredients, addIngredient, removeIngredient, clearIngredients } =
     useMyIngredientsStore();
 
-  const { data: recommendedIngredients, refetch: refetchIngredients } =
-    useIngredientRecommendations(ingredients.map((i) => i.id));
-  const { data: recommendedRecipes, refetch: refetchRecipes } =
-    useRecipeRecommendations(ingredients.map((i) => i.id));
-
-  const handleGetRecommendations = () => {
-    refetchIngredients();
-    refetchRecipes();
-  };
-
-  const handleSearch = (keyword: string) => {
-    console.log('검색어:', keyword);
-    // 이 함수는 사용되지 않지만, Searchbar prop으로 필요합니다.
-  };
+  const { data: recommendedIngredients } = useIngredientRecommendations(
+    ingredients.map((i) => i.id)
+  );
+  const { data: recommendedRecipes } = useRecipeRecommendations(
+    ingredients.map((i) => i.id)
+  );
 
   const handleSuggestItemClick = (item: { id: number; name: string }) => {
     addIngredient(item.id, item.name);
   };
 
   const content = (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-shadow duration-500 hover:shadow-xl">
-      <div className="p-6">
+    <div className="bg-background rounded-2xl overflow-hidden transition-shadow duration-500 h-full">
+      <div className="p-6 flex flex-col h-full">
+        <h2 className="text-3xl font-bold mb-4 text-blueberry">나만의 요리 도우미</h2>
+        <p className="text-text-light mb-4">가지고 있는 재료나 사고 싶은 재료를 추가해보세요</p>
         <Searchbar
           type="ingredients"
-          onSearch={handleSearch}
+          onSearch={() => {}}
           isSuggestSearch={true}
           onSuggestItemClick={handleSuggestItemClick}
         />
@@ -50,19 +50,29 @@ export const TasteSuggest = () => {
           onRemove={removeIngredient}
           onClear={clearIngredients}
         />
-        <button
-          onClick={handleGetRecommendations}
-          className="mt-4 bg-blue-500 text-white px-6 py-3 rounded-full uppercase font-bold text-sm hover:bg-blue-600 transition-colors duration-300 shadow-md hover:shadow-lg"
-        >
-          추천 받기
-        </button>
-        {recommendedIngredients && (
+        <div className="flex mt-4">
+          <Button
+            onClick={() => setActiveTab('ingredients')}
+            variant={activeTab === 'ingredients' ? 'primary' : 'secondary'}
+            className="flex-1 mr-2"
+          >
+            어울리는 재료
+          </Button>
+          <Button
+            onClick={() => setActiveTab('recipes')}
+            variant={activeTab === 'recipes' ? 'primary' : 'secondary'}
+            className="flex-1 ml-2"
+          >
+            추천 레시피
+          </Button>
+        </div>
+        {activeTab === 'ingredients' && recommendedIngredients && (
           <RecommendedIngredients
             ingredients={recommendedIngredients}
             onAdd={addIngredient}
           />
         )}
-        {recommendedRecipes && (
+        {activeTab === 'recipes' && recommendedRecipes && (
           <RecommendedRecipes recipes={recommendedRecipes} />
         )}
       </div>
@@ -72,16 +82,10 @@ export const TasteSuggest = () => {
   if (isMobile) {
     return (
       <>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="fixed bottom-4 right-4 z-50 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition-colors duration-300"
-        >
-          추천
-        </button>
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-white z-50 overflow-auto">
+        {isOpen && (
+          <div className="fixed inset-0 bg-white z-40 overflow-auto pt-16 pb-20">
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={onClose}
               className="absolute top-4 left-4 text-3xl text-gray-600 hover:text-gray-800"
             >
               &times;
@@ -94,7 +98,7 @@ export const TasteSuggest = () => {
   }
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-shadow duration-500 hover:shadow-xl">
+    <div className="fixed top-16 right-0 w-full lg:w-1/5 bg-white shadow-lg overflow-y-auto h-[calc(100vh-4rem)]">
       {content}
     </div>
   );

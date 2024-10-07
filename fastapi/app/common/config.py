@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from functools import lru_cache
 
 load_dotenv()
-
+os.environ['HADOOP_USER_NAME'] = 'ubuntu'
 class Settings():
   DB_USERNAME = os.environ.get("MYSQL_USER")
   DB_HOST = os.environ.get("MYSQL_HOST")
@@ -13,6 +13,7 @@ class Settings():
   KAMIS_KEY = os.environ.get("KAMIS_KEY")
   KAMIS_ID = os.environ.get("KAMIS_ID")
   CORS_ORIGIN = os.environ.get("CORS_URL")
+
 @lru_cache
 def get_settings():
     return Settings()

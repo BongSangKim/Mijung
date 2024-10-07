@@ -1,7 +1,7 @@
 # Import necessary modules
 from typing import List
 from fastapi import HTTPException, Query
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -87,9 +87,7 @@ class RecipeItem(BaseModel):
     kind: str
     image: str
     
-    model_config = {
-        "from_attributes": True,  # ORM 모델에서 속성을 검사하기 위한 설정
-    }
+    model_config = ConfigDict(from_attributes=True)
 
 class RecipeResponse(BaseModel):
     data: List[RecipeItem]
