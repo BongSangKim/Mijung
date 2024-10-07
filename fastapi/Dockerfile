@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
 
 # Install Hadoop client
-ENV HADOOP_VERSION 3.3.4
+ENV HADOOP_VERSION 3.3.6
 RUN wget https://downloads.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
     && tar -xzf hadoop-${HADOOP_VERSION}.tar.gz -C /opt/ \
     && rm hadoop-${HADOOP_VERSION}.tar.gz
