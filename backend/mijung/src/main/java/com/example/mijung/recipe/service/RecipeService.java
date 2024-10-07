@@ -12,7 +12,7 @@ import com.example.mijung.recipe.dto.StepDto;
 import com.example.mijung.recipe.entity.Recipe;
 import com.example.mijung.recipe.enums.RecipeMassage;
 import com.example.mijung.recipe.repository.RecipeRepository;
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

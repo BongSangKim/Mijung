@@ -8,7 +8,7 @@ import com.example.mijung.recipe.dto.RecipeViewResponse;
 import com.example.mijung.recipe.service.RecipeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
