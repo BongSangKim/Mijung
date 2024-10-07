@@ -4,6 +4,7 @@ import {
   IngredientSiseRequest,
   IngredientSiseResponse,
   IngredientInfo,
+  IngredientCosineResponse,
 } from './ingredientTypes';
 
 // 실제 API와 통신하는 클라이언트 클래스
@@ -47,6 +48,15 @@ export default class IngredientClient {
     const endpoint = `${this.baseURL}/ingredients/search/${search}`;
     console.log('API 요청 엔드포인트:', endpoint);
     return axios.get(endpoint);
+  }
+
+  // 네트워크 그래프 데이터를 가져오는 메서드 추가
+  async getNetworkGraphData(
+    ingredientId: number
+  ): Promise<AxiosResponse<IngredientCosineResponse[]>> {
+    return axios.get<IngredientCosineResponse[]>(
+      `${this.baseURL}/ingredients/${ingredientId}/network-graph`
+    );
   }
 
   async searchIngredients(params: {

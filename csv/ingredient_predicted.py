@@ -3,7 +3,7 @@ import mysql.connector
 from mysql.connector import Error
 
 # 엑셀 파일 읽기
-excel_file = "C:/Users/SSAFY/Desktop/all_items_predictions_2024.xlsx"
+excel_file = "C:/Users/SSAFY/Desktop/livestoke_predicted.xlsx"
 df = pd.read_excel(excel_file)
 
 # MySQL 연결 매개변수 설정

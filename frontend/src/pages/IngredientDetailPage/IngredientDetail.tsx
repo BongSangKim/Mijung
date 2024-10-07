@@ -49,9 +49,9 @@ const IngredientDetailPage = () => {
               />
               <NetworkGraphCard
                 graphId={ingredient.ingredientId ?? 0}
-                title={`${ingredient.name ?? '알 수 없음'} 관련 네트워크`}
-                width={500}
-                height={200}
+                // title={`${ingredient.name ?? '알 수 없음'}`}
+                width={700}
+                height={700}
               />
             </div>
           </div>

@@ -53,3 +53,9 @@ export interface IngredientInfo {
   changeRate: number;
   changePrice: number;
 }
+
+export interface IngredientCosineResponse {
+  ingredientId: number;
+  itemName: string;
+  cosine: number; // 코사인 유사도
+}
