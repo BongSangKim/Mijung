@@ -96,8 +96,7 @@ services:
       CORS_URL: ${CORS_URL}
       JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
     networks:
-      mijung_net:
-        ipv4_address: 172.20.0.5
+      - mijung_net
     container_name: mijung_fastapi
 
 volumes:
@@ -106,7 +105,3 @@ volumes:
 networks:
   mijung_net:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-          gateway: 172.20.0.1
