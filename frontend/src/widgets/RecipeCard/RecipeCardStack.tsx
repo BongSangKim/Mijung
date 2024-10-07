@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Recipe } from '@/shared/api/recipeTypes';
 import { defaultRecipeImg } from '@/shared/url/defualtImage';
 import { useNavigate } from 'react-router-dom';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { useRecipeStore } from '@/shared/stores/jjimStore';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -18,6 +20,18 @@ const RecipeCard = ({
   onClick,
 }: RecipeCardProps) => {
   const navigate = useNavigate();
+  const { addRecipe, removeRecipe, isRecipeSaved } = useRecipeStore();
+  const isSaved = isRecipeSaved(recipe.recipeId);
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isSaved) {
+      removeRecipe(recipe.recipeId);
+    } else {
+      addRecipe(recipe);
+    }
+  };
+
   return (
     <motion.div
       className={`
@@ -56,6 +70,16 @@ const RecipeCard = ({
       <div className="p-2">
         <h3 className="text-sm font-semibold">{recipe.name}</h3>
         <p className="text-xs text-gray-600">{recipe.kind}</p>
+        <button
+          onClick={handleSave}
+          className="absolute top-2 left-2 p-1 bg-white rounded-full shadow-md"
+        >
+          {/* <Heart
+            size={20}
+            className={isSaved ? 'text-red-500 fill-current' : 'text-gray-400'}
+          /> */}
+          {isSaved ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
+        </button>
       </div>
     </motion.div>
   );
