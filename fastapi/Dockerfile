@@ -3,7 +3,10 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim AS builder
 
 # Install Java and set JAVA_HOME
-RUN apt-get update && apt-get install -y openjdk-17-jdk
+RUN apt-get update && apt-get install -y \
+     openjdk-17-jdk \
+     wget
+
 ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
 
 # Install Hadoop client
