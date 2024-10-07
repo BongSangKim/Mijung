@@ -5,6 +5,7 @@ import RightSideLayout from '../../app/RoutingLayout/RightSideLayout';
 import Searchbar from '../../widgets/Searchbar/Searchbar';
 import { IngredientList } from '@/features/ingredient/ui/IngredientList';
 import { useIngredients } from '@/features/ingredient/api/useIngredients';
+import { Button } from '@/shared/components/Button';
 
 const categories = [
   { id: 'all', name: '전체' },
@@ -62,39 +63,36 @@ const IngredientListPage = () => {
   };
 
   return (
-    <div className="grid grid-cols-10">
+    <div className="grid grid-cols-10 bg-background">
       <MainLayout>
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold mb-6">식재료 목록</h1>
+          <h1 className="text-3xl font-bold mb-6 text-blueberry">식재료 목록</h1>
           <Searchbar
             type="ingredients"
             onSearch={handleSearch}
             onItemSelect={handleItemSelect}
           />
           <div className="mt-6 mb-8">
-            <h2 className="text-xl font-semibold mb-3">카테고리</h2>
+            <h2 className="text-xl font-semibold mb-3 text-coral">카테고리</h2>
             <div className="flex flex-wrap gap-2">
               {categories.map((cat) => (
-                <button
+                <Button
                   key={cat.id}
-                  className={`px-4 py-2 rounded-full transition-colors duration-300 ${
-                    category === cat.id
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
                   onClick={() => handleCategoryChange(cat.id)}
+                  variant={category === cat.id ? "primary" : "secondary"}
+                  className="rounded-full"
                 >
                   {cat.name}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
-              <p className="text-xl text-gray-600">로딩 중...</p>
+              <p className="text-xl text-text-light">로딩 중...</p>
             </div>
           ) : error ? (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <div className="bg-peach-light border border-coral text-text-dark px-4 py-3 rounded relative" role="alert">
               <strong className="font-bold">오류 발생!</strong>
               <span className="block sm:inline"> 데이터를 불러오는 데 실패했습니다. 다시 시도해 주세요.</span>
             </div>
@@ -105,6 +103,24 @@ const IngredientListPage = () => {
               onPageChange={handlePageChange}
             />
           )}
+          <div className="mt-4 flex justify-center">
+            <Button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              variant="secondary"
+              className="mr-2"
+            >
+              이전
+            </Button>
+            <Button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={!data?.pagination.hasNextPage}
+              variant="secondary"
+              className="ml-2"
+            >
+              다음
+            </Button>
+          </div>
         </div>
       </MainLayout>
       <RightSideLayout />
