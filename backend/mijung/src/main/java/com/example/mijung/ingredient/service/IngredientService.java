@@ -215,13 +215,14 @@ public class IngredientService {
 
     @Transactional
     public List<IngredientCosineResponse> getTopCosineIngredients(Integer ingredientId, int count) {
+        Ingredient ingredient = getIngredient(ingredientId);
+
         Pageable pageable = PageRequest.of(0, count);
         List<IngredientCosine> cosines = ingredientCosineRepository.findByIngredientId1OrderByCosineDesc(ingredientId, pageable);
 
         return cosines.stream()
                 .map(cosine -> {
-                    Ingredient ingredient2 = ingredientRepository.findById(cosine.getIngredientId2())
-                            .orElseThrow(() -> new RuntimeException("Ingredient not found for id: " + cosine.getIngredientId2()));
+                    Ingredient ingredient2 = getIngredient(cosine.getIngredientId2());
 
                     return IngredientCosineResponse.of(
                             cosine.getIngredientId2(),

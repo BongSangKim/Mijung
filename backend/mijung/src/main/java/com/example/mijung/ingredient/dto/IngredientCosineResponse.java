@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor(staticName = "of")
 public class IngredientCosineResponse {
-    private Integer ingredientId2;
+    private Integer ingredientId;
     private String itemName;
     private Double cosine;
 }
