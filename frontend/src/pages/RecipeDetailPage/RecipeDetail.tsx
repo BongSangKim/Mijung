@@ -30,7 +30,8 @@ export const RecipeDetailPage = () => {
         'Vertical thickness': 0.7,
         'Cross thickness': 0.7,
       };
-      createQRCode(url, params).then(setQrCode);
+      const logoUrl = '/icons/android-chrome-192x192.png'; // 로고 이미지 경로 지정
+      createQRCode(url, params, logoUrl).then(setQrCode);
     }
   }, [recipe]);
 
@@ -132,13 +133,6 @@ export const RecipeDetailPage = () => {
               <div
                 className="w-full h-full flex items-center justify-center"
                 dangerouslySetInnerHTML={{ __html: qrCode }}
-                style={{
-                  ['& svg' as string]: {
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                  },
-                }}
               />
             </div>
             {/* QR Box End */}

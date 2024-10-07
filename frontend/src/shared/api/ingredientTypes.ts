@@ -52,4 +52,5 @@ export interface IngredientInfo {
   price: string;
   changeRate: number;
   changePrice: number;
+  colorHex?: string; // 아직 옵셔널로 둡니다
 }

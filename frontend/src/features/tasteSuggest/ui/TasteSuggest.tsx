@@ -9,7 +9,6 @@ import {
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
 import Searchbar from '@/widgets/Searchbar/Searchbar';
-import { Button } from '@/shared/components/Button';
 
 interface TasteSuggestProps {
   isOpen: boolean;
@@ -34,9 +33,50 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
     addIngredient(item.id, item.name);
   };
 
+  const tabContent = (
+    <div className="flex-grow overflow-auto">
+      {activeTab === 'ingredients' && recommendedIngredients && (
+        <RecommendedIngredients
+          ingredients={recommendedIngredients}
+          onAdd={addIngredient}
+        />
+      )}
+      {activeTab === 'recipes' && recommendedRecipes && (
+        <RecommendedRecipes recipes={recommendedRecipes} />
+      )}
+    </div>
+  );
+
+  const tabBar = (
+    <div className="flex justify-around items-center bg-white border-t border-gray-200 p-2 rounded-t-2xl shadow-lg">
+      <button
+        onClick={() => setActiveTab('ingredients')}
+        className={`flex-1 py-2 px-4 text-center relative ${
+          activeTab === 'ingredients' ? 'text-mint font-bold' : 'text-gray-500'
+        }`}
+      >
+        어울리는 재료
+        {activeTab === 'ingredients' && (
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-mint"></div>
+        )}
+      </button>
+      <button
+        onClick={() => setActiveTab('recipes')}
+        className={`flex-1 py-2 px-4 text-center relative ${
+          activeTab === 'recipes' ? 'text-mint font-bold' : 'text-gray-500'
+        }`}
+      >
+        추천 레시피
+        {activeTab === 'recipes' && (
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-mint"></div>
+        )}
+      </button>
+    </div>
+  );
+
   const content = (
-    <div className="bg-background rounded-2xl overflow-hidden transition-shadow duration-500 h-full">
-      <div className="p-6 flex flex-col h-full">
+    <div className="bg-background rounded-2xl overflow-hidden transition-shadow duration-500 h-full flex flex-col h-full">
+      <div className="p-6 flex-grow overflow-auto h-full">
         <h2 className="text-3xl font-bold mb-4 text-blueberry">
           나만의 요리 도우미
         </h2>
@@ -54,32 +94,9 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
           onRemove={removeIngredient}
           onClear={clearIngredients}
         />
-        <div className="flex mt-4">
-          <Button
-            onClick={() => setActiveTab('ingredients')}
-            variant={activeTab === 'ingredients' ? 'primary' : 'secondary'}
-            className="flex-1 mr-2"
-          >
-            어울리는 재료
-          </Button>
-          <Button
-            onClick={() => setActiveTab('recipes')}
-            variant={activeTab === 'recipes' ? 'primary' : 'secondary'}
-            className="flex-1 ml-2"
-          >
-            추천 레시피
-          </Button>
-        </div>
-        {activeTab === 'ingredients' && recommendedIngredients && (
-          <RecommendedIngredients
-            ingredients={recommendedIngredients}
-            onAdd={addIngredient}
-          />
-        )}
-        {activeTab === 'recipes' && recommendedRecipes && (
-          <RecommendedRecipes recipes={recommendedRecipes} />
-        )}
+        {tabContent}
       </div>
+      {tabBar}
     </div>
   );
 
@@ -87,7 +104,7 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
     return (
       <>
         {isOpen && (
-          <div className="fixed inset-0 bg-white z-40 overflow-auto pt-16 pb-20">
+          <div className="fixed inset-0 bg-white z-40 flex flex-col pt-16 pb-20">
             <button
               onClick={onClose}
               className="absolute top-4 left-4 text-3xl text-gray-600 hover:text-gray-800"
@@ -102,7 +119,7 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   }
 
   return (
-    <div className="fixed top-16 right-0 w-full lg:w-[30%] bg-background shadow-lg overflow-y-auto h-[calc(100vh-4rem)]">
+    <div className="fixed top-16 right-0 w-full lg:w-[30%] bg-background shadow-lg h-[calc(100vh-4rem)] flex flex-col">
       {content}
     </div>
   );
