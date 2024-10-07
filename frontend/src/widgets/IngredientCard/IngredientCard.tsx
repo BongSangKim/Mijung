@@ -48,6 +48,14 @@ const IngredientCard = ({
     return `${Number(price).toLocaleString()}원`;
   };
 
+  const formatUnit = (retailUnitsize: string, retailUnit: string) => {
+    const size = Number(retailUnitsize);
+    if (size > 1) {
+      return `${size}${retailUnit}`;
+    }
+    return retailUnit;
+  };
+
   return (
     <div
       className="bg-white shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-[300px] group cursor-pointer rounded-t-2xl"
@@ -78,7 +86,8 @@ const IngredientCard = ({
         <div>
           {ingredient?.price ? (
             <p className="text-xl font-bold text-black-500">
-              {formatPrice(ingredient.price)}/{ingredient.retailUnit}
+              {formatPrice(ingredient.price)}/
+              {formatUnit(ingredient.retailUnitsize, ingredient.retailUnit)}
             </p>
           ) : (
             <p className="text-lg text-gray-400">가격정보 없음</p>
