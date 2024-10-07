@@ -6,4 +6,4 @@ ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} app.jar
 ENV TZ=Asia/Seoul
 ENV SPRING_PROFILES_ACTIVE=${PROFILE}
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","--add-exports", "java.base/sun.nio.ch=ALL-UNNAMED", "-jar","/app.jar"]
