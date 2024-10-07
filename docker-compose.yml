@@ -95,6 +95,13 @@ services:
       KAMIS_ID: ${KAMIS_ID}
       CORS_URL: ${CORS_URL}
       JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+      SPARK_ENV: ${SPARK_ENV}
+      SPARK_URL: ${SPARK_URL}
+      HADOOP_URL: ${HADOOP_URL}
+      BASIC_PATH: ${BASIC_PATH}
+      CSV_FILE: ${CSV_FILE}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL}
+      RECIPE_MODEL: ${RECIPE_MODEL}
     networks:
       - mijung_net
     container_name: mijung_fastapi

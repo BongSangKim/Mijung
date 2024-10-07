@@ -5,12 +5,17 @@ import { useRecipeDetail } from '@/features/recipeList/api/useRecipeDetail';
 import { Error } from '@/shared/components';
 import { createQRCode } from '@/shared/lib/qrcode';
 import { useEffect, useState } from 'react';
+import { GoPerson } from 'react-icons/go';
+import { LuChefHat } from 'react-icons/lu';
+import { MdOutlineTimer } from 'react-icons/md';
+import { defaultRecipeImg } from '@/shared/url/defualtImage';
 
 export const RecipeDetailPage = () => {
   const { id = '' } = useParams<{ id: string }>();
   const { data: recipe, isLoading, error } = useRecipeDetail(id);
   const [qrCode, setQrCode] = useState<string>('');
 
+  // Create QR Box
   useEffect(() => {
     if (recipe) {
       const url = `https://mijung.store/recipes/${recipe.recipeId}`;
@@ -36,43 +41,107 @@ export const RecipeDetailPage = () => {
     <div className="grid grid-cols-10">
       <MainLayout>
         {recipe && (
-          <div className="container mx-auto px-4 py-8 relative">
+          <div className="container mx-4 my-8 relative">
+            {/* Recipe Title start */}
+            <h1 className="text-3xl font-bold mb-4">
+              {recipe.name || '레시피 이름 없음'}
+            </h1>
+            {/* Recipe Title end */}
+
+            {/* Recipe Info start */}
             <div className="flex justify-between items-start mb-6">
-              <h1 className="text-3xl font-bold">{recipe.name}</h1>
-              <div className="bg-white shadow-md rounded-lg p-2 w-24 h-24 flex-shrink-0 overflow-hidden">
-                <div
-                  className="w-full h-full flex items-center justify-center"
-                  dangerouslySetInnerHTML={{ __html: qrCode }}
-                  style={{
-                    ['& svg' as string]: {
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                    },
-                  }}
-                />
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-gray-600">
+                  {recipe.kind || '종류 미지정'}
+                </span>
+                <div className="flex space-x-4">
+                  <span className="flex items-center">
+                    <GoPerson className="mr-1" size={16} />{' '}
+                    {recipe.inbun || '인분 정보 없음'}
+                  </span>
+                  <span className="flex items-center">
+                    <LuChefHat className="mr-1" size={16} />{' '}
+                    {recipe.level || '난이도 정보 없음'}
+                  </span>
+                  <span className="flex items-center">
+                    <MdOutlineTimer className="mr-1" size={16} />{' '}
+                    {recipe.time || '시간 정보 없음'}
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-2xl font-semibold mb-4">재료</h2>
-              <ul className="list-disc list-inside text-gray-700 mb-6">
-                {recipe.materials?.map((material, index) => (
-                  <li key={index}>{material.name}</li>
-                ))}
-              </ul>
+            {/* Recipe INfo end */}
 
-              <h2 className="text-2xl font-semibold mb-4">조리 방법</h2>
-              <ol className="list-decimal list-inside text-gray-700 mb-6">
-                {recipe.steps?.map((step, index) => (
-                  <li key={index}>{step.content}</li>
-                ))}
-              </ol>
+            <img
+              src={recipe.image || defaultRecipeImg}
+              alt={recipe.name}
+              className="w-full h-64 object-cover rounded-lg mb-4"
+            />
 
-              <div className="flex justify-between text-gray-600">
-                <p>조리 시간: {recipe.time}</p>
-                <p>난이도: {recipe.level}</p>
+            {/* Recipe materials start */}
+            <div className="bg-white rounded-lg shadow-md mb-4 p-4">
+              <h2 className="text-xl font-semibold mb-2">재료</h2>
+              <div className="grid grid-cols-2 gap-24">
+                {recipe.materials &&
+                  recipe.materials.map((material) => (
+                    <div
+                      key={material.materialId}
+                      className="flex justify-between"
+                    >
+                      <span>{material.name}</span>
+                      <span className="text-gray-600">{material.capacity}</span>
+                    </div>
+                  ))}
               </div>
             </div>
+
+            <div className="bg-white rounded-lg shadow-md mb-4 p-4">
+              <h2 className="text-xl font-semibold mb-2">기타 재료 및 도구</h2>
+              <div className="grid grid-cols-2 gap-24">
+                {recipe.etc &&
+                  recipe.etc.map((item) => (
+                    <div key={item.etcId} className="flex justify-between">
+                      <span>{item.name}</span>
+                      <span className="text-gray-600">{item.capacity}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-4">
+              <h2 className="text-xl font-semibold mb-2">조리 순서</h2>
+              {recipe.steps &&
+                recipe.steps.map((step) => (
+                  <div key={step.stepId} className="mb-4">
+                    <h3 className="font-semibold mb-2">Step {step.stepId}</h3>
+                    <p>{step.content}</p>
+                    {step.image && (
+                      <img
+                        src={step.image}
+                        alt={`Step ${step.stepId}`}
+                        className="mt-2 w-full h-40 object-cover rounded"
+                      />
+                    )}
+                  </div>
+                ))}
+            </div>
+            {/* Recipe materials end */}
+
+            {/* QR Box Start */}
+            <div className="absolute top-0 right-0 bg-white shadow-md rounded-lg p-2 w-24 h-24 flex-shrink-0 overflow-hidden">
+              <div
+                className="w-full h-full flex items-center justify-center"
+                dangerouslySetInnerHTML={{ __html: qrCode }}
+                style={{
+                  ['& svg' as string]: {
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                  },
+                }}
+              />
+            </div>
+            {/* QR Box End */}
           </div>
         )}
       </MainLayout>

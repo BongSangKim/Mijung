@@ -7,7 +7,7 @@
     "inbun": "3인분",
     "level": "보통",
     "time": "1시간이내",
-    "material": [
+    "materials": [
       {
         "materialId": 1,
         "name": "소고기",
