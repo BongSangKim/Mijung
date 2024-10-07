@@ -1,7 +1,14 @@
+buildscript {
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.3'
-    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.springframework.boot' version '2.7.10'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.example'
@@ -17,6 +24,10 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    querydsl.extendsFrom compileClasspath
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }
 
 repositories {
@@ -31,43 +42,48 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
 
     //sql connector
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    implementation 'org.codehaus.janino:commons-compiler:3.1.9'
+    implementation 'org.codehaus.janino:janino:3.1.9'
+
     // Spark 관련 (SLF4J 관련 종속성 제외)
-    implementation ('org.apache.spark:spark-core_2.13:3.5.1') {
-        exclude group: 'org.slf4j'
-        exclude group: 'org.apache.logging.log4j'
-    }
-    // QueryDSL 의존성 추가
-    implementation 'com.querydsl:querydsl-apt:5.0.0'
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    implementation 'com.querydsl:querydsl-core:5.0.0'
+    implementation("org.apache.spark:spark-core_2.12:3.5.3")
+    implementation("org.apache.spark:spark-sql_2.12:3.5.3")
+    implementation("org.apache.spark:spark-mllib_2.12:3.5.3")
 
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
 
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-
-    // Logback for SLF4J binding
-    implementation 'ch.qos.logback:logback-classic:1.4.11'
-
-
-    // querydsl 추가 query dsl 버전 명시해야 jakarta사용 (javax X)
-    implementation 'com.querydsl:querydsl-apt:5.0.0'
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    implementation 'com.querydsl:querydsl-core:5.0.0'
-
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
-
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-    // query dsl 추가 끝
+    // query dsl
+    implementation "com.querydsl:querydsl-jpa:${dependencyManagement.importedProperties['querydsl.version']}"
+    implementation "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}"
 
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+/*
+ * queryDSL 설정 추가
+ */
+// querydsl에서 사용할 경로 설정
+def querydslDir = "$buildDir/generated/querydsl"
+// JPA 사용 여부와 사용할 경로를 설정
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+// build 시 사용할 sourceSet 추가
+sourceSets {
+    main.java.srcDir querydslDir
+}
+// querydsl 컴파일시 사용할 옵션 설정
+compileQuerydsl{
+    options.annotationProcessorPath = configurations.querydsl
 }
