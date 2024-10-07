@@ -114,7 +114,9 @@ export const RecipeDetailPage = () => {
               {recipe.steps &&
                 recipe.steps.map((step) => (
                   <div key={step.stepId} className="mb-4">
-                    <h3 className="font-semibold mb-2">Step {step.stepId}</h3>
+                    <h3 className="font-semibold mb-2">
+                      Step {step.stepNumber}
+                    </h3>
                     <p>{step.content}</p>
                     {step.image && (
                       <img
