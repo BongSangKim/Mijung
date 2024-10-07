@@ -52,6 +52,7 @@ export interface RecipeDetailStep {
   stepId: number;
   content: string;
   image: string;
+  stepNumber: number;
 }
 
 export interface RecipeDetailResponse {
