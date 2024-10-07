@@ -145,13 +145,19 @@ public class IngredientController {
     }
 
     @GetMapping("/{ingredientId}/network-graph")
-    public ResponseEntity<List<IngredientCosineResponse>> getTopCosineIngredients(
+    @Operation(summary = "식재료 네트워크 그래프", description = "코사인 유사도가 높은 식재료 리스트를 반환합니다. 유사한 식재료가 없을 경우 204 응답을 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "식재료 상세보기(네트워크 그래프) 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "식재료 상세보기(네트워크 그래프) 조회  실패", content = @Content)
+    })
+    public ResponseEntity<ResponseDTO<?>> getTopCosineIngredients(
             @PathVariable("ingredientId") Integer ingredientId,
             @RequestParam(defaultValue = "100") int count) {
 
         List<IngredientCosineResponse> result = ingredientService.getTopCosineIngredients(ingredientId, count);
 
         HttpStatus status = result.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
-        return ResponseEntity.status(status).body(result);
+
+        return ResponseEntity.status(status).body(ResponseDTO.from(result));
     }
 }
