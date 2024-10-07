@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<String> handleResponseStatusException(ResponseStatusException e) {
         log.error("Response Status Error : " + e.getMessage());
-        return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
+        return ResponseEntity.status(e.getStatus()).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

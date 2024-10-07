@@ -1,7 +1,7 @@
 package com.example.mijung.ingredient.entity;
 
 import com.example.mijung.material.entity.Material;
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;

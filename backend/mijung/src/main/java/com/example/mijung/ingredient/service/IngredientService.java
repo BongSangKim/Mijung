@@ -14,7 +14,7 @@ import com.example.mijung.ingredient.repository.IngredientRepository;
 import com.example.mijung.ingredient.repository.IngredientRepositoryCustom;
 import com.example.mijung.recipe.entity.Recipe;
 import com.example.mijung.recipe.repository.RecipeRepository;
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
