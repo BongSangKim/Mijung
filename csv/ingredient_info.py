@@ -23,6 +23,9 @@ try:
             cursor.execute("SELECT ingredient_id FROM ingredient WHERE item_code = %s", (row['item_code'],))
             result = cursor.fetchone()
 
+            # 이전 결과를 명확히 하기 위해 사용 (모든 결과를 읽음)
+            cursor.fetchall()  # 읽지 않은 결과가 남지 않도록 처리
+
             if result:
                 ingredient_id = result[0]
 

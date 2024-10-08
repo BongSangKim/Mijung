@@ -180,7 +180,7 @@ finally:
 
 ### ingredient_cosine 삽입하는법 
   ```mysql
-  mysql -umijung -pmijungmijungmijung --default-character-set=utf8mb4 -hlocalhost mijung < {파일경로}\insertingredient.sql
+  mysql -umijung -pmijungmijungmijung --default-character-set=utf8mb4 -hlocalhost mijung < {파일경로}\mijung.sql
   ```
 
 ### update_ingredient_color.sql 삽입하는법 
