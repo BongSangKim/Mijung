@@ -112,4 +112,19 @@ export default class FakeIngredientClient {
       },
     };
   }
+
+  // //이 메서드는 fakeAPI 쪽은 작동하지 않습니다.
+  async getIngredientRecommendRecipes(ingredientId: number) {
+    const response = await axios.get(
+      `${this.baseUrl}public/data/ingredient-recommend-recipes.json`
+    );
+    const recommendedRecipes = response.data.data.filter(
+      (recipe: any) => recipe.ingredientId === ingredientId
+    );
+    return {
+      data: {
+        data: recommendedRecipes,
+      },
+    };
+  }
 }

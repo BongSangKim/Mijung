@@ -5,6 +5,7 @@ import {
   IngredientSiseResponse,
   IngredientInfo,
   IngredientCosineResponse,
+  RecommendedRecipe,
 } from './ingredientTypes';
 
 // 실제 API와 통신하는 클라이언트 클래스
@@ -53,8 +54,8 @@ export default class IngredientClient {
   // 네트워크 그래프 데이터를 가져오는 메서드 추가
   async getNetworkGraphData(
     ingredientId: number
-  ): Promise<AxiosResponse<IngredientCosineResponse[]>> {
-    return axios.get<IngredientCosineResponse[]>(
+  ): Promise<AxiosResponse<{ data: IngredientCosineResponse[] }>> {
+    return axios.get<{ data: IngredientCosineResponse[] }>(
       `${this.baseURL}/ingredients/${ingredientId}/network-graph`
     );
   }
@@ -66,5 +67,14 @@ export default class IngredientClient {
     keyword: string | null;
   }) {
     return axios.get(`${this.baseURL}/ingredients/search`, { params });
+  }
+
+  // 추천 레시피를 가져오는 메서드 추가
+  async getIngredientRecommendRecipes(
+    ingredientId: number
+  ): Promise<AxiosResponse<RecommendedRecipe[]>> {
+    return axios.get<RecommendedRecipe[]>(
+      `${this.baseURL}/ingredients/${ingredientId}/recommend-recipes`
+    );
   }
 }

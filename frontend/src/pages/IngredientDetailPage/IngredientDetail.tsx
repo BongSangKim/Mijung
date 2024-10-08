@@ -5,6 +5,10 @@ import RightSideLayout from '../../app/RoutingLayout/RightSideLayout';
 import PriceGraphCard from '../../widgets/PriceGraphCard/PriceGraphCard';
 import NetworkGraphCard from '../../widgets/NetworkGraphCard/NetworkGraphCard';
 import { useIngredientInfo } from '../../features/ingredient/api/useIngredients';
+import {
+  useIngredientRecommendRecipes,
+  RecommendedRecipe,
+} from '../../features/ingredient/api/useIngredientRecommendRecipes';
 import { FaArrowLeft } from 'react-icons/fa';
 
 // 배경색에 따라 텍스트 색상을 결정하는 함수
@@ -34,6 +38,10 @@ const toPastelColor = (hexColor: string) => {
   return `#${pastelR.toString(16).padStart(2, '0')}${pastelG.toString(16).padStart(2, '0')}${pastelB.toString(16).padStart(2, '0')}`;
 };
 
+// interface IngredientRecommendRecipeResponse {
+//   data: RecommendedRecipe[];
+// }
+
 const IngredientDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -42,6 +50,8 @@ const IngredientDetailPage = () => {
     isLoading,
     error,
   } = useIngredientInfo(Number(id));
+  const { data: recommendedRecipesResponse, isLoading: isLoadingRecipes } =
+    useIngredientRecommendRecipes(Number(id));
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -151,8 +161,23 @@ const IngredientDetailPage = () => {
               />
             </div>
             <div className="mt-8 bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-2xl font-semibold mb-4">추가 정보</h2>
-              {/* 추가 정보가 있다면 여기에 표시할 수 있습니다 */}
+              <h2 className="text-2xl font-semibold mb-4">추천 레시피</h2>
+              {isLoadingRecipes ? (
+                <p>레시피 로딩 중...</p>
+              ) : recommendedRecipesResponse?.data &&
+                recommendedRecipesResponse.data.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {recommendedRecipesResponse.data.map((recipe) => (
+                    <RecipeCard
+                      key={recipe.recipeId}
+                      recipe={recipe}
+                      onClick={() => navigate(`/recipes/${recipe.recipeId}`)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p>추천 레시피가 없습니다.</p>
+              )}
             </div>
           </div>
         </MainLayout>
@@ -163,3 +188,29 @@ const IngredientDetailPage = () => {
 };
 
 export default IngredientDetailPage;
+
+// RecipeCard 컴포넌트
+const RecipeCard = ({
+  recipe,
+  onClick,
+}: {
+  recipe: RecommendedRecipe;
+  onClick: () => void;
+}) => {
+  return (
+    <div
+      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transition-transform hover:scale-105"
+      onClick={onClick}
+    >
+      <img
+        src={recipe.image || '/default-recipe-image.png'}
+        alt={recipe.name}
+        className="w-full h-40 object-cover"
+      />
+      <div className="p-4">
+        <h3 className="text-lg font-semibold mb-2">{recipe.name}</h3>
+        <p className="text-sm text-gray-600">{recipe.kind}</p>
+      </div>
+    </div>
+  );
+};

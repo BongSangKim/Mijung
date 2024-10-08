@@ -98,4 +98,10 @@ export default class IngredientApi {
       throw error;
     }
   }
+
+  async getIngredientRecommendRecipes(ingredientId: number) {
+    const response =
+      await this.client.getIngredientRecommendRecipes(ingredientId);
+    return response.data;
+  }
 }

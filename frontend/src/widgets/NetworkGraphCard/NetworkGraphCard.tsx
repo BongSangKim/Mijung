@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { IngredientCosineResponse } from '../../shared/api/ingredientTypes';
 import IngredientClient from '../../shared/api/ingredientClient';
 import { useNavigate } from 'react-router-dom';
 import * as d3 from 'd3';
+import { PulseLoader } from 'react-spinners';
 
 interface NetworkGraphCardProps {
   graphId: number;
@@ -23,14 +24,13 @@ interface Link {
   target: number;
   value: number;
 }
-
-const NetworkGraphCard: React.FC<NetworkGraphCardProps> = ({
+const NetworkGraphCard = ({
   graphId,
   title,
   width = 600,
   height = 400,
-  fontSizes = { center: 30, depth1: 20, depth2: 15 }, // 기본 폰트 크기
-}) => {
+  fontSizes = { center: 30, depth1: 20, depth2: 15 },
+}: NetworkGraphCardProps) => {
   const [data, setData] = useState<{ nodes: Node[]; links: Link[] } | null>(
     null
   );
@@ -48,11 +48,14 @@ const NetworkGraphCard: React.FC<NetworkGraphCardProps> = ({
 
         const centerResponse =
           await ingredientClient.getIngredientInfo(graphId);
+        console.log('중심 재료 정보 응답:', centerResponse.data);
+
         const depth1Response =
           await ingredientClient.getNetworkGraphData(graphId);
+        console.log('1단계 연관 재료 응답:', depth1Response.data);
 
         const center = centerResponse.data.data;
-        const depth1 = depth1Response.data
+        const depth1 = depth1Response.data.data
           .filter((item: IngredientCosineResponse) => item.cosine < 1)
           .sort(
             (a: IngredientCosineResponse, b: IngredientCosineResponse) =>
@@ -70,17 +73,17 @@ const NetworkGraphCard: React.FC<NetworkGraphCardProps> = ({
 
         // Add depth 1 nodes
         for (const item of depth1) {
-          if (!addedNodeIds.has(item.ingredientId2)) {
+          if (!addedNodeIds.has(item.ingredientId)) {
             nodes.push({
-              id: item.ingredientId2,
+              id: item.ingredientId,
               name: item.itemName,
               group: 2,
             });
-            addedNodeIds.add(item.ingredientId2);
+            addedNodeIds.add(item.ingredientId);
           }
           links.push({
             source: center.ingredientId,
-            target: item.ingredientId2,
+            target: item.ingredientId,
             value: item.cosine,
           });
         }
@@ -88,14 +91,16 @@ const NetworkGraphCard: React.FC<NetworkGraphCardProps> = ({
         // Fetch and add depth 2 data
         for (const d1Item of depth1) {
           const depth2Response = await ingredientClient.getNetworkGraphData(
-            d1Item.ingredientId2
+            d1Item.ingredientId
           );
-          const depth2 = depth2Response.data
+          console.log('2단계 연관 재료 응답:', depth2Response.data);
+
+          const depth2 = depth2Response.data.data
             .filter(
               (item: IngredientCosineResponse) =>
                 item.cosine < 1 &&
-                !addedNodeIds.has(item.ingredientId2) &&
-                item.ingredientId2 !== center.ingredientId
+                !addedNodeIds.has(item.ingredientId) &&
+                item.ingredientId !== center.ingredientId
             )
             .sort(
               (a: IngredientCosineResponse, b: IngredientCosineResponse) =>
@@ -104,16 +109,16 @@ const NetworkGraphCard: React.FC<NetworkGraphCardProps> = ({
             .slice(0, 2);
 
           for (const d2Item of depth2) {
-            if (!addedNodeIds.has(d2Item.ingredientId2)) {
+            if (!addedNodeIds.has(d2Item.ingredientId)) {
               nodes.push({
-                id: d2Item.ingredientId2,
+                id: d2Item.ingredientId,
                 name: d2Item.itemName,
                 group: 3,
               });
-              addedNodeIds.add(d2Item.ingredientId2);
+              addedNodeIds.add(d2Item.ingredientId);
               links.push({
-                source: d1Item.ingredientId2,
-                target: d2Item.ingredientId2,
+                source: d1Item.ingredientId,
+                target: d2Item.ingredientId,
                 value: d2Item.cosine,
               });
             }
@@ -121,13 +126,10 @@ const NetworkGraphCard: React.FC<NetworkGraphCardProps> = ({
         }
 
         setData({ nodes, links });
-        setLoading(false);
       } catch (err) {
-        console.error('Error fetching data:', err);
-        setError(
-          '데이터를 가져오는데 실패했습니다: ' +
-            (err instanceof Error ? err.message : String(err))
-        );
+        setError('데이터를 불러오는 중 오류가 발생했습니다.');
+        console.error('Error fetching network graph data:', err);
+      } finally {
         setLoading(false);
       }
     };
@@ -218,7 +220,7 @@ const NetworkGraphCard: React.FC<NetworkGraphCardProps> = ({
         .style('-ms-user-select', 'none')
         .style('pointer-events', 'none');
 
-      nodeGroup.on('click', (d: Node) => {
+      nodeGroup.on('click', (_event: any, d: Node) => {
         if (d.id !== graphId) {
           navigate(`/ingredients/${d.id}`);
         }
@@ -268,35 +270,50 @@ const NetworkGraphCard: React.FC<NetworkGraphCardProps> = ({
       simulation.alpha(0.3).alphaDecay(0.02).velocityDecay(0.3);
     }
   }, [data, width, height, navigate, graphId, fontSizes]);
-  if (loading)
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full">
+          <PulseLoader color="#4A90E2" size={15} margin={2} />
+          <p className="mt-4 text-gray-600">
+            네트워크 그래프를 생성하고 있습니다...
+          </p>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="flex justify-center items-center h-full text-red-500">
+          {error}
+        </div>
+      );
+    }
+
+    if (!data) {
+      return (
+        <div className="flex justify-center items-center h-full text-gray-500">
+          데이터가 없습니다.
+        </div>
+      );
+    }
+
     return (
-      <div className="flex justify-center items-center h-full">
-        데이터를 불러오는 중입니다...
-      </div>
+      <svg
+        ref={svgRef}
+        width={width}
+        height={height}
+        style={{ maxWidth: '100%', height: 'auto', userSelect: 'none' }}
+      />
     );
-  if (error)
-    return (
-      <div className="flex justify-center items-center h-full">
-        오류가 발생했습니다: {error}
-      </div>
-    );
-  if (!data)
-    return (
-      <div className="flex justify-center items-center h-full">
-        데이터가 없습니다.
-      </div>
-    );
+  };
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full bg-white rounded-lg shadow-md p-4">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
       <div className="w-full h-full flex items-center justify-center">
-        <svg
-          ref={svgRef}
-          width={width}
-          height={height}
-          style={{ maxWidth: '100%', height: 'auto', userSelect: 'none' }}
-        />
+        {renderContent()}
       </div>
     </div>
   );
