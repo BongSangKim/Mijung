@@ -12,8 +12,8 @@ interface IngredientListProps {
 
 export const IngredientList = ({
   ingredients,
-  pagination,
-  onPageChange,
+  // pagination,
+  // onPageChange,
 }: IngredientListProps) => {
   if (ingredients.length === 0) return <div>데이터가 없습니다.</div>;
 
@@ -26,7 +26,7 @@ export const IngredientList = ({
           </li>
         ))}
       </ul>
-      {pagination && (
+      {/* {pagination && (
         <div className="mt-4 flex justify-between items-center">
           <span>
             총 {pagination.total} 중 {pagination.page} 페이지
@@ -50,7 +50,7 @@ export const IngredientList = ({
             </button>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 };
