@@ -25,10 +25,11 @@ const MainPage = () => {
   });
 
   if (isWeeklyError || isMonthlyError || isMainError) {
-    console.error('데이터 로딩 오류');
-    console.log('weeklyError msg', weeklyError?.message);
-    console.log('monthlyError msg', monthlyError?.message);
-    console.log('mainError msg', mainError?.message);
+    console.error('데이터 로딩 오류', {
+      weeklyError,
+      monthlyError,
+      mainError,
+    });
   }
 
   return (
