@@ -92,7 +92,7 @@ const IngredientListPage = () => {
               className={
                 page === number
                   ? 'bg-mint text-white'
-                  : 'bg-white text-[#4DB6AC] border border-mint hover:bg-mint hover:text-white'
+                  : 'bg-white text-[#4db6ac] border border-mint hover:bg-mint hover:text-white'
               }
             >
               {number}
