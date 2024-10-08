@@ -90,26 +90,26 @@ const IngredientDetailPage = () => {
         className="w-full py-8 px-4 mb-8 relative"
         style={{ backgroundColor: pastelColor, color: textColor }}
       >
-        <div className="container mx-auto flex items-center">
-          <button
-            onClick={handleGoBack}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 rounded-full p-2 transition-all duration-200"
-            style={{ color: textColor }}
-          >
-            <FaArrowLeft size={24} />
-          </button>
-          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md mr-6 flex-shrink-0 ml-16">
+        <button
+          onClick={handleGoBack}
+          className="absolute left-4 top-4 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 rounded-full p-2 transition-all duration-200"
+          style={{ color: textColor }}
+        >
+          <FaArrowLeft size={24} />
+        </button>
+        <div className="container mx-auto flex flex-col sm:flex-row items-center">
+          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md mb-4 sm:mb-0 sm:mr-6 flex-shrink-0">
             <img
               src={image ?? '/default-image.png'}
               alt={name ?? '식재료 이미지'}
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="flex-grow">
+          <div className="flex-grow text-center sm:text-left">
             <h1 className="text-4xl font-bold mb-4">
               {name ?? '알 수 없는 식재료'}
             </h1>
-            <div className="flex justify-between items-end">
+            <div className="flex flex-col sm:flex-row justify-between items-center sm:items-end">
               <div>
                 <p className="text-3xl font-semibold mb-2">
                   {price != null
@@ -123,7 +123,7 @@ const IngredientDetailPage = () => {
                   </p>
                 )}
               </div>
-              <div className="text-right">
+              <div className="text-center sm:text-right mt-4 sm:mt-0">
                 {changeRate != null && (
                   <p
                     className={`text-2xl font-bold ${changeRate >= 0 ? 'text-red-500' : 'text-blue-500'}`}
@@ -166,18 +166,16 @@ const IngredientDetailPage = () => {
                   <p>추천 레시피가 없습니다.</p>
                 )}
               </div>
-              <NetworkGraphCard
-                graphId={ingredientId}
-                title={`${name ?? '식재료'} 관련 네트워크 그래프`}
-                width={800}
-                height={500}
-              />
+              <div className="w-full max-w-4xl">
+                <NetworkGraphCard
+                  graphId={ingredientId}
+                  title={`${name ?? '식재료'} 관련 네트워크 그래프`}
+                />
+              </div>
               <div className="w-full max-w-4xl">
                 <PriceGraphCard
                   graphId={ingredientId}
                   title={`${name ?? '식재료'} 가격 추이`}
-                  width={800}
-                  height={300}
                 />
               </div>
             </div>
