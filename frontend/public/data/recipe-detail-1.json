@@ -21,20 +21,62 @@
         "capacity": "150g",
         "type": "재료",
         "ingredientId": 2
-      }
-    ],
-    "etc": [
-      {
-        "etcId": 1,
-        "name": "고춧가루",
-        "capacity": "1큰술",
-        "type": "양념"
       },
       {
-        "etcId": 2,
-        "name": "냄비",
-        "capacity": "",
-        "type": "조리도구"
+        "materialId": 3,
+        "name": "두부",
+        "capacity": "1모",
+        "type": "재료",
+        "ingredientId": 3
+      },
+      {
+        "materialId": 4,
+        "name": "양파",
+        "capacity": "1/2개",
+        "type": "재료",
+        "ingredientId": 4
+      },
+      {
+        "materialId": 5,
+        "name": "대파",
+        "capacity": "1대",
+        "type": "재료",
+        "ingredientId": 5
+      },
+      {
+        "materialId": 6,
+        "name": "청양고추",
+        "capacity": "2개",
+        "type": "재료",
+        "ingredientId": 6
+      },
+      {
+        "materialId": 7,
+        "name": "다진 마늘",
+        "capacity": "1큰술",
+        "type": "재료",
+        "ingredientId": 7
+      },
+      {
+        "materialId": 8,
+        "name": "참기름",
+        "capacity": "1작은술",
+        "type": "재료",
+        "ingredientId": 8
+      },
+      {
+        "materialId": 9,
+        "name": "고추장",
+        "capacity": "1큰술",
+        "type": "재료",
+        "ingredientId": 9
+      },
+      {
+        "materialId": 10,
+        "name": "물",
+        "capacity": "2컵",
+        "type": "재료",
+        "ingredientId": 10
       }
     ],
     "steps": [

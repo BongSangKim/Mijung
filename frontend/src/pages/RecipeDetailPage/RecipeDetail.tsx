@@ -8,12 +8,27 @@ import { useEffect, useState } from 'react';
 import { GoPerson } from 'react-icons/go';
 import { LuChefHat } from 'react-icons/lu';
 import { MdOutlineTimer } from 'react-icons/md';
-import { defaultRecipeImg } from '@/shared/url/defualtImage';
+import { defaultRecipeImgGrey } from '@/shared/url/defualtImage';
 
 export const RecipeDetailPage = () => {
   const { id = '' } = useParams<{ id: string }>();
   const { data: recipe, isLoading, error } = useRecipeDetail(id);
   const [qrCode, setQrCode] = useState<string>('');
+
+  const baseStyles = `
+    relative 
+    inline-block
+    pb-2
+    before:content-[''] 
+    before:absolute 
+    before:bottom-0 
+    before:left-0 
+    before:w-full 
+    before:h-px 
+  `;
+
+  const dtStyle = 'before:bg-black';
+  const ddStyle = 'before:bg-gray-300';
 
   // Create QR Box
   useEffect(() => {
@@ -50,11 +65,11 @@ export const RecipeDetailPage = () => {
             {/* Recipe Title end */}
 
             {/* Recipe Info start */}
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex flex-col justify-between items-start mb-6">
+              <div className="text-gray-600 mb-1">
+                {recipe.kind || '종류 미지정'}
+              </div>
               <div className="flex justify-between items-center mb-4">
-                <span className="text-gray-600">
-                  {recipe.kind || '종류 미지정'}
-                </span>
                 <div className="flex space-x-4">
                   <span className="flex items-center">
                     <GoPerson className="mr-1" size={16} />{' '}
@@ -74,57 +89,55 @@ export const RecipeDetailPage = () => {
             {/* Recipe INfo end */}
 
             <img
-              src={recipe.image || defaultRecipeImg}
+              src={recipe.image || defaultRecipeImgGrey}
               alt={recipe.name}
-              className="w-full h-64 object-cover rounded-lg mb-4"
+              className="w-full h-64 object-fill rounded-lg mb-4"
             />
 
             {/* Recipe materials start */}
             <div className="bg-white rounded-lg shadow-md mb-4 p-4">
-              <h2 className="text-xl font-semibold mb-2">재료</h2>
-              <div className="grid grid-cols-2 gap-24">
-                {recipe.materials &&
-                  recipe.materials.map((material) => (
-                    <div
-                      key={material.materialId}
-                      className="flex justify-between"
-                    >
-                      <span>{material.name}</span>
-                      <span className="text-gray-600">{material.capacity}</span>
-                    </div>
-                  ))}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md mb-4 p-4">
-              <h2 className="text-xl font-semibold mb-2">기타 재료 및 도구</h2>
-              <div className="grid grid-cols-2 gap-24">
-                {recipe.etc &&
-                  recipe.etc.map((item) => (
-                    <div key={item.etcId} className="flex justify-between">
-                      <span>{item.name}</span>
-                      <span className="text-gray-600">{item.capacity}</span>
-                    </div>
-                  ))}
-              </div>
+              <dl className="space-y-4">
+                <dt
+                  className={`text-xl font-semibold mb-2 w-full ${baseStyles} ${dtStyle}`}
+                >
+                  재료
+                </dt>
+                <dd>
+                  <ul className="grid grid-cols-2 gap-4">
+                    {recipe.materials.map((materials) => (
+                      <li
+                        key={materials.materialId}
+                        className={`flex justify-between items-center ${baseStyles} ${ddStyle}`}
+                      >
+                        <div className="text-gray-800">{materials.name}</div>
+                        <div className="text-gray-600">
+                          {materials.capacity}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </dl>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-4">
               <h2 className="text-xl font-semibold mb-2">조리 순서</h2>
               {recipe.steps &&
                 recipe.steps.map((step) => (
-                  <div key={step.stepId} className="mb-4">
-                    <h3 className="font-semibold mb-2">
-                      Step {step.stepNumber}
-                    </h3>
-                    <p>{step.content}</p>
-                    {step.image && (
+                  <div key={step.stepId} className="flex mb-4">
+                    <div className="w-3/4">
+                      <h3 className="font-semibold mb-2">
+                        Step {step.stepNumber}
+                      </h3>
+                      <p>{step.content}</p>
+                    </div>
+                    <div className="w-1/4">
                       <img
-                        src={step.image}
+                        src={step.image || defaultRecipeImgGrey}
                         alt={`Step ${step.stepId}`}
-                        className="mt-2 w-full h-40 object-cover rounded"
+                        className="mt-2 w-full h-40 object-contain rounded"
                       />
-                    )}
+                    </div>
                   </div>
                 ))}
             </div>
