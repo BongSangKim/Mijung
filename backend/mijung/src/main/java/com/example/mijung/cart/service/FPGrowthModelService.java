@@ -1,5 +1,6 @@
 package com.example.mijung.cart.service;
 
+import static org.apache.spark.sql.types.DataTypes.IntegerType;
 import static org.apache.spark.sql.types.DataTypes.StringType;
 import static org.apache.spark.sql.types.DataTypes.createArrayType;
 import static org.apache.spark.sql.types.Metadata.empty;
@@ -43,21 +44,20 @@ public class FPGrowthModelService {
 
     @PostConstruct
     public void initialize() {
-        try {
-            this.sparkSession = SparkSession.builder()
-                    .appName("IngredientRecommend")
-                    .master("local[*]")
-                    .getOrCreate();
-        } catch (Exception e) {
-            log.error("Failed to initialize SparkSession", e);
-            throw new RuntimeException("Failed to initialize Spark", e);
-        }
+        this.sparkSession = createSparkSession();
 
         if (modelExists()) {
             loadModel();
         } else {
             trainAndSaveModel();
         }
+    }
+
+    private SparkSession createSparkSession() {
+        return SparkSession.builder()
+                .appName("IngredientRecommend")
+                .master("local[*]") // #spark://3.35.55.230:7077
+                .getOrCreate();
     }
 
     private boolean modelExists() {
@@ -85,39 +85,34 @@ public class FPGrowthModelService {
                 .setMinConfidence(0.5)
                 .fit(transactions);
 
+        saveModel();
+    }
+
+    private void saveModel() {
         try {
-            fpGrowthModel.save(modelPath);
-            System.out.println("FPGrowth model trained and saved successfully.");
+            fpGrowthModel.write().overwrite().save(modelPath);
+            log.info("FPGrowth model trained and saved successfully.");
         } catch (IOException e) {
             log.error("Error saving FPGrowth model: {}", e.getMessage());
         }
     }
 
     private Dataset<Row> convertToTransactions(List<Material> materials) {
-        Map<Integer, List<Integer>> recipeIngredients = new HashMap<>();
-
-        for (Material material : materials) {
-            if (material.getIngredient() == null) {
-                continue;
-            }
-
-            recipeIngredients
-                    .computeIfAbsent(material.getRecipe().getId(), k -> new ArrayList<>())
-                    .add(material.getIngredient().getId());
-        }
+        Map<Integer, List<Integer>> recipeIngredients = materials.stream()
+                .filter(material -> material.getIngredient() != null)
+                .collect(Collectors.groupingBy(
+                        material -> material.getRecipe().getId(),
+                        Collectors.mapping(material -> material.getIngredient().getId(), Collectors.toList())
+                ));
 
         List<Row> rows = recipeIngredients.values().stream()
-                .map(ingredients -> {
-                    List<String> stringIngredients = ingredients.stream()
-                            .distinct()
-                            .map(String::valueOf)
-                            .collect(Collectors.toList());
-                    return org.apache.spark.sql.RowFactory.create((Object) stringIngredients);
-                })
+                .map(ingredients -> org.apache.spark.sql.RowFactory.create((Object) ingredients.stream()
+                        .distinct()
+                        .toArray(Integer[]::new)))
                 .collect(Collectors.toList());
 
         return sparkSession.createDataFrame(rows, new StructType(
-                new StructField[]{new StructField("items", createArrayType(StringType), false, empty())}));
+                new StructField[]{new StructField("items", createArrayType(IntegerType), false, empty())}));
     }
 
     public FPGrowthModel getModel() {
