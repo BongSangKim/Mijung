@@ -57,6 +57,7 @@ export interface IngredientInfo {
 
 export interface IngredientCosineResponse {
   ingredientId: number;
+  ingredientId2: number;
   itemName: string;
   cosine: number; // 코사인 유사도
 }
