@@ -21,20 +21,62 @@
         "capacity": "1/2모",
         "type": "재료",
         "ingredientId": 4
-      }
-    ],
-    "etc": [
-      {
-        "etcId": 1,
-        "name": "대파",
-        "capacity": "1대",
-        "type": "재료"
       },
       {
-        "etcId": 2,
-        "name": "냄비",
-        "capacity": "",
-        "type": "조리도구"
+        "materialId": 3,
+        "name": "애호박",
+        "capacity": "1/2개",
+        "type": "재료",
+        "ingredientId": 5
+      },
+      {
+        "materialId": 4,
+        "name": "양파",
+        "capacity": "1/4개",
+        "type": "재료",
+        "ingredientId": 6
+      },
+      {
+        "materialId": 5,
+        "name": "대파",
+        "capacity": "1대",
+        "type": "재료",
+        "ingredientId": 7
+      },
+      {
+        "materialId": 6,
+        "name": "청고추",
+        "capacity": "1개",
+        "type": "재료",
+        "ingredientId": 8
+      },
+      {
+        "materialId": 7,
+        "name": "다진 마늘",
+        "capacity": "1작은술",
+        "type": "재료",
+        "ingredientId": 9
+      },
+      {
+        "materialId": 8,
+        "name": "멸치 다시마 육수",
+        "capacity": "3컵",
+        "type": "재료",
+        "ingredientId": 10
+      },
+      {
+        "materialId": 9,
+        "name": "고춧가루",
+        "capacity": "1/2큰술",
+        "type": "재료",
+        "ingredientId": 11
+      },
+      {
+        "materialId": 10,
+        "name": "버섯",
+        "capacity": "2~3개",
+        "type": "재료",
+        "ingredientId": 12
       }
     ],
     "steps": [

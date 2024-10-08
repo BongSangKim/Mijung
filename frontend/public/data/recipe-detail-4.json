@@ -21,6 +21,62 @@
         "capacity": "3큰술",
         "type": "재료",
         "ingredientId": 8
+      },
+      {
+        "materialId": 3,
+        "name": "설탕",
+        "capacity": "2큰술",
+        "type": "재료",
+        "ingredientId": 9
+      },
+      {
+        "materialId": 4,
+        "name": "다진 마늘",
+        "capacity": "1큰술",
+        "type": "재료",
+        "ingredientId": 10
+      },
+      {
+        "materialId": 5,
+        "name": "참기름",
+        "capacity": "1큰술",
+        "type": "재료",
+        "ingredientId": 11
+      },
+      {
+        "materialId": 6,
+        "name": "후추",
+        "capacity": "1/4작은술",
+        "type": "재료",
+        "ingredientId": 12
+      },
+      {
+        "materialId": 7,
+        "name": "양파",
+        "capacity": "1/2개",
+        "type": "재료",
+        "ingredientId": 13
+      },
+      {
+        "materialId": 8,
+        "name": "당근",
+        "capacity": "1/4개",
+        "type": "재료",
+        "ingredientId": 14
+      },
+      {
+        "materialId": 9,
+        "name": "대파",
+        "capacity": "1대",
+        "type": "재료",
+        "ingredientId": 15
+      },
+      {
+        "materialId": 10,
+        "name": "배즙",
+        "capacity": "2큰술",
+        "type": "재료",
+        "ingredientId": 16
       }
     ],
     "etc": [

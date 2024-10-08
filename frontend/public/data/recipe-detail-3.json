@@ -21,6 +21,62 @@
         "capacity": "1큰술",
         "type": "재료",
         "ingredientId": 6
+      },
+      {
+        "materialId": 3,
+        "name": "숙주나물",
+        "capacity": "1/2컵",
+        "type": "재료",
+        "ingredientId": 7
+      },
+      {
+        "materialId": 4,
+        "name": "시금치나물",
+        "capacity": "1/4컵",
+        "type": "재료",
+        "ingredientId": 8
+      },
+      {
+        "materialId": 5,
+        "name": "당근",
+        "capacity": "1/4개",
+        "type": "재료",
+        "ingredientId": 9
+      },
+      {
+        "materialId": 6,
+        "name": "오이",
+        "capacity": "1/4개",
+        "type": "재료",
+        "ingredientId": 10
+      },
+      {
+        "materialId": 7,
+        "name": "콩나물",
+        "capacity": "1/2컵",
+        "type": "재료",
+        "ingredientId": 11
+      },
+      {
+        "materialId": 8,
+        "name": "소고기",
+        "capacity": "50g",
+        "type": "재료",
+        "ingredientId": 12
+      },
+      {
+        "materialId": 9,
+        "name": "달걀",
+        "capacity": "1개",
+        "type": "재료",
+        "ingredientId": 13
+      },
+      {
+        "materialId": 10,
+        "name": "김가루",
+        "capacity": "1큰술",
+        "type": "재료",
+        "ingredientId": 14
       }
     ],
     "etc": [

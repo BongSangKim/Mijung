@@ -21,20 +21,62 @@
         "capacity": "150g",
         "type": "재료",
         "ingredientId": 1
-      }
-    ],
-    "etc": [
-      {
-        "etcId": 1,
-        "name": "식용유",
-        "capacity": "1큰술",
-        "type": "양념"
       },
       {
-        "etcId": 2,
-        "name": "프라이팬",
-        "capacity": "",
-        "type": "조리도구"
+        "materialId": 3,
+        "name": "햄",
+        "capacity": "50g",
+        "type": "재료",
+        "ingredientId": 17
+      },
+      {
+        "materialId": 4,
+        "name": "대파",
+        "capacity": "1/2대",
+        "type": "재료",
+        "ingredientId": 18
+      },
+      {
+        "materialId": 5,
+        "name": "달걀",
+        "capacity": "1개",
+        "type": "재료",
+        "ingredientId": 19
+      },
+      {
+        "materialId": 6,
+        "name": "식용유",
+        "capacity": "1큰술",
+        "type": "재료",
+        "ingredientId": 20
+      },
+      {
+        "materialId": 7,
+        "name": "참기름",
+        "capacity": "1작은술",
+        "type": "재료",
+        "ingredientId": 21
+      },
+      {
+        "materialId": 8,
+        "name": "김치국물",
+        "capacity": "1큰술",
+        "type": "재료",
+        "ingredientId": 22
+      },
+      {
+        "materialId": 9,
+        "name": "소금",
+        "capacity": "약간",
+        "type": "재료",
+        "ingredientId": 23
+      },
+      {
+        "materialId": 10,
+        "name": "후추",
+        "capacity": "약간",
+        "type": "재료",
+        "ingredientId": 24
       }
     ],
     "steps": [
