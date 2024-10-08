@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -21,4 +22,7 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Integer>
     List<IngredientInfo> findInfoByDateRange(Integer ingredientId, LocalDate oneYearAgo, LocalDate today);
     @Query("SELECT p FROM IngredientPredict p WHERE p.ingredient.id = :ingredientId AND p.date BETWEEN :today AND :oneWeekLater")
     List<IngredientPredict> findPredictByDateRange(Integer ingredientId, LocalDate today, LocalDate oneWeekLater);
+
+    @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM Ingredient i WHERE i.id IN :ids")
+    boolean existsByIdIn(@Param("ids") List<Integer> ids);
 }
