@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +38,11 @@ public class CartController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "추천 식재료 조회 성공"),
             @ApiResponse(responseCode = "204", description = "추천 식재료 조회 성공 - 추천 식재료가 없는 경우", content = @Content),
-            @ApiResponse(responseCode = "404", description = "추천 식재료 조회 성공", content = @Content)
+            @ApiResponse(responseCode = "400", description = "추천 식재료 조회 실패 - 잘못된 요청", content = @Content),
+            @ApiResponse(responseCode = "404", description = "추천 식재료 조회 실패", content = @Content)
     })
     public ResponseEntity<ResponseDTO<?>> getRecommendIngredientList(
-            @ModelAttribute RecommendIngredientListRequest dto) {
+            @Valid @ModelAttribute RecommendIngredientListRequest dto) {
 
         List<RecommendIngredientListResponse> result = cartService.getRecommendIngredientList(dto);
 
