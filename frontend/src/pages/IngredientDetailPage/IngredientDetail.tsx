@@ -146,38 +146,40 @@ const IngredientDetailPage = () => {
       <div className="grid grid-cols-10">
         <MainLayout>
           <div className="container mx-auto px-4">
-            <div className="flex flex-col gap-8">
-              <PriceGraphCard
-                graphId={ingredientId}
-                title={`${name ?? '식재료'} 가격 추이`}
-                width={500}
-                height={200}
-              />
+            <div className="flex flex-col items-center gap-8">
+              <div className="w-full max-w-4xl mt-8 bg-white shadow-md rounded-lg p-6">
+                <h2 className="text-2xl font-semibold mb-4">추천 레시피</h2>
+                {isLoadingRecipes ? (
+                  <p>레시피 로딩 중...</p>
+                ) : recommendedRecipesResponse?.data &&
+                  recommendedRecipesResponse.data.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {recommendedRecipesResponse.data.map((recipe) => (
+                      <RecipeCard
+                        key={recipe.recipeId}
+                        recipe={recipe}
+                        onClick={() => navigate(`/recipes/${recipe.recipeId}`)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p>추천 레시피가 없습니다.</p>
+                )}
+              </div>
               <NetworkGraphCard
                 graphId={ingredientId}
-                title={`${name ?? '식재료'} 관련 네트워크`}
-                width={500}
-                height={200}
+                title={`${name ?? '식재료'} 관련 네트워크 그래프`}
+                width={800}
+                height={500}
               />
-            </div>
-            <div className="mt-8 bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-2xl font-semibold mb-4">추천 레시피</h2>
-              {isLoadingRecipes ? (
-                <p>레시피 로딩 중...</p>
-              ) : recommendedRecipesResponse?.data &&
-                recommendedRecipesResponse.data.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {recommendedRecipesResponse.data.map((recipe) => (
-                    <RecipeCard
-                      key={recipe.recipeId}
-                      recipe={recipe}
-                      onClick={() => navigate(`/recipes/${recipe.recipeId}`)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <p>추천 레시피가 없습니다.</p>
-              )}
+              <div className="w-full max-w-4xl">
+                <PriceGraphCard
+                  graphId={ingredientId}
+                  title={`${name ?? '식재료'} 가격 추이`}
+                  width={800}
+                  height={300}
+                />
+              </div>
             </div>
           </div>
         </MainLayout>
