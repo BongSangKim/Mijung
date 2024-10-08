@@ -88,13 +88,14 @@ const NetworkGraphCard = ({
           });
         }
 
-        // Fetch and add depth 2 data
-        for (const d1Item of depth1) {
-          const depth2Response = await ingredientClient.getNetworkGraphData(
-            d1Item.ingredientId
-          );
-          console.log('2단계 연관 재료 응답:', depth2Response.data);
+        // Fetch depth 2 data
+        const depth2Promises = depth1.map((d1Item) =>
+          ingredientClient.getNetworkGraphData(d1Item.ingredientId)
+        );
+        const depth2Responses = await Promise.all(depth2Promises);
 
+        depth2Responses.forEach((depth2Response, index) => {
+          console.log('2단계 연관 재료 응답:', depth2Response.data);
           const depth2 = depth2Response.data.data
             .filter(
               (item: IngredientCosineResponse) =>
@@ -117,13 +118,13 @@ const NetworkGraphCard = ({
               });
               addedNodeIds.add(d2Item.ingredientId);
               links.push({
-                source: d1Item.ingredientId,
+                source: depth1[index].ingredientId,
                 target: d2Item.ingredientId,
                 value: d2Item.cosine,
               });
             }
           }
-        }
+        });
 
         setData({ nodes, links });
       } catch (err) {
