@@ -4,7 +4,7 @@ import { Ingredient, IngredientSise } from '../../shared/api/ingredientTypes';
 import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
 import { Button } from '@/shared/components/Button';
 import { FaSpinner } from 'react-icons/fa';
-import checkKorean from '@/shared/utils/checkKorean';
+import { checkKoreanRo } from '@/shared/utils/checkKorean';
 import { defaultRecipeImg } from '@/shared/url/defualtImage';
 
 interface IngredientCardProps {
@@ -112,7 +112,7 @@ const IngredientCard = ({
       >
         {isInMyIngredients
           ? '목록에서 제거'
-          : `${ingredient.name}${checkKorean(ingredient.name)} 추천받기`}
+          : `${ingredient.name}${checkKoreanRo(ingredient.name)} 추천받기`}
       </Button>
     </div>
   );

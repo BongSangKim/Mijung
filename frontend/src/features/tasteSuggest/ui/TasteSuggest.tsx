@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MyIngredients } from './MyIngredients';
 import { RecommendedIngredients } from './RecommendedIngredients';
 import { RecommendedRecipes } from './RecommendedRecipes';
@@ -9,6 +9,7 @@ import {
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
 import Searchbar from '@/widgets/Searchbar/Searchbar';
+import { checkKoreanIga } from '@/shared/utils/checkKorean';
 
 interface TasteSuggestProps {
   isOpen: boolean;
@@ -30,10 +31,38 @@ export const TasteSuggest = ({ isOpen }: TasteSuggestProps) => {
   );
 
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [addedIngredient, setAddedIngredient] = useState<string | null>(null);
+  const [showClearAlert, setShowClearAlert] = useState(false);
+
+  useEffect(() => {
+    if (addedIngredient) {
+      const timer = setTimeout(() => {
+        setAddedIngredient(null);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [addedIngredient]);
+
+  useEffect(() => {
+    if (showClearAlert) {
+      const timer = setTimeout(() => {
+        setShowClearAlert(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showClearAlert]);
 
   const handleSuggestItemClick = (item: { id: number; name: string }) => {
     addIngredient(item.id, item.name);
     setSearchKeyword(''); // 검색어 초기화
+    setAddedIngredient(item.name);
+  };
+
+  const handleClearIngredients = () => {
+    clearIngredients();
+    setShowClearAlert(true);
   };
 
   const tabContent = (
@@ -93,11 +122,22 @@ export const TasteSuggest = ({ isOpen }: TasteSuggestProps) => {
           value={searchKeyword}
           onChange={setSearchKeyword}
         />
+        {addedIngredient && (
+          <div className="mt-2 text-green-600 font-semibold">
+            {addedIngredient}
+            {checkKoreanIga(addedIngredient)} 추가되었습니다.
+          </div>
+        )}
         <MyIngredients
           ingredients={ingredients}
           onRemove={removeIngredient}
-          onClear={clearIngredients}
+          onClear={handleClearIngredients}
         />
+        {showClearAlert && (
+          <div className="mt-2 text-red-600 font-semibold">
+            모든 재료가 삭제되었습니다.
+          </div>
+        )}
         {tabContent}
       </div>
       {tabBar}
@@ -109,12 +149,6 @@ export const TasteSuggest = ({ isOpen }: TasteSuggestProps) => {
       <>
         {isOpen && (
           <div className="fixed inset-0 bg-white z-40 flex flex-col pb-16">
-            {/* <button
-              onClick={onClose}
-              className="absolute top-4 left-4 text-3xl text-gray-600 hover:text-gray-800"
-            >
-              &times;
-            </button> */}
             {content}
           </div>
         )}
