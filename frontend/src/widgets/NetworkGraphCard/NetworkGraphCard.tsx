@@ -4,6 +4,7 @@ import IngredientClient from '../../shared/api/ingredientClient';
 import { useNavigate } from 'react-router-dom';
 import * as d3 from 'd3';
 import { PulseLoader } from 'react-spinners';
+import { FaInfoCircle } from 'react-icons/fa';
 
 interface NetworkGraphCardProps {
   graphId: number;
@@ -39,6 +40,7 @@ const NetworkGraphCard = ({
   const svgRef = useRef<SVGSVGElement | null>(null);
   const navigate = useNavigate();
   const ingredientClient = new IngredientClient();
+  const [showTip, setShowTip] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -272,6 +274,24 @@ const NetworkGraphCard = ({
     }
   }, [data, width, height, navigate, graphId, fontSizes]);
 
+  const toggleTip = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setShowTip(!showTip);
+  };
+
+  const closeTip = () => {
+    setShowTip(false);
+  };
+
+  useEffect(() => {
+    if (showTip) {
+      document.addEventListener('click', closeTip);
+    }
+    return () => {
+      document.removeEventListener('click', closeTip);
+    };
+  }, [showTip]);
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -311,11 +331,36 @@ const NetworkGraphCard = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full bg-white rounded-lg shadow-md p-4">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
+    <div className="relative flex flex-col w-full h-full bg-white rounded-lg shadow-md p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+        <button
+          onClick={toggleTip}
+          className="text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <FaInfoCircle size={20} />
+        </button>
+      </div>
       <div className="w-full h-full flex items-center justify-center">
         {renderContent()}
       </div>
+      {showTip && (
+        <div className="absolute top-12 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-10 max-w-sm">
+          <p className="text-sm text-gray-600 whitespace-pre-line">
+            {`안녕하세요! 이 멋진 그래프, 어떻게 만들어졌는지 궁금하셨죠? 😊
+
+• 가운데 큰 동그라미는 여러분이 고른 재료예요.
+• 주변의 동그라미들은 이 재료와 찰떡궁합인 재료들이에요.
+• 선이 짧을수록 더 자주 함께 쓰이는 재료랍니다.
+
+이 모든 정보는 수많은 레시피 데이터를 분석해서 만들었어요.
+코사인 유사도 분석으로 재료 간 관계를 계산했답니다!
+
+새로운 요리 조합을 찾고 계셨다면, 이 그래프로 쉽게 찾을 수 있을 거예요.
+맛있는 요리 만드세요! 🍳✨`}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
