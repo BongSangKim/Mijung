@@ -9,6 +9,8 @@ interface SearchbarProps {
   onSuggestItemClick?: (item: { id: number; name: string }) => void;
   onItemSelect?: (item: { id: number; name: string }) => void;
   initialValue?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 const Searchbar = ({
@@ -18,8 +20,9 @@ const Searchbar = ({
   onSuggestItemClick,
   onItemSelect,
   initialValue = '',
+  value,
 }: SearchbarProps) => {
-  const [keyword, setKeyword] = useState(initialValue);
+  const [keyword, setKeyword] = useState(value || initialValue);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -67,6 +70,7 @@ const Searchbar = ({
         id: firstSuggestion.ingredientId,
         name: firstSuggestion.name,
       });
+      setKeyword(''); // 검색어 초기화
     } else {
       onSearch(keyword);
       searchParams.set('keyword', keyword);
@@ -118,6 +122,7 @@ const Searchbar = ({
         } else {
           handleSearch();
         }
+        setKeyword(''); // Enter 키를 눌렀을 때 검색어 초기화
         break;
       case 'Escape':
         setIsDropdownOpen(false);
