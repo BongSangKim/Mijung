@@ -17,9 +17,9 @@ import lombok.Setter;
 public class RecommendIngredientListRequest {
 
     @Schema(description = "식재료 리스트")
-    @NotNull(message = "empty ingredients")
-    @Size(min = 2, message = "ingredients must be greater than 1")
-    List<Integer> ingredients = new ArrayList<>();
+    @NotNull(message = "empty ingredients.")
+    @Size(min = 2, message = "ingredients must be greater than 1.")
+    private List<Integer> ingredients = new ArrayList<>();
 
     @Schema(description = "응답 데이터 개수")
     @NotNull(message = "empty count.")
