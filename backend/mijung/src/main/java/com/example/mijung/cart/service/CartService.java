@@ -5,6 +5,7 @@ import static com.example.mijung.ingredient.enums.IngredientMassage.INGREDIENT_N
 
 import com.example.mijung.cart.dto.RecommendIngredientListRequest;
 import com.example.mijung.cart.dto.RecommendIngredientListResponse;
+import com.example.mijung.ingredient.entity.Ingredient;
 import com.example.mijung.ingredient.repository.IngredientRepository;
 import com.example.mijung.material.repository.MaterialRepository;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.ml.fpm.FPGrowthModel;
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
@@ -43,7 +45,7 @@ public class CartService {
         FPGrowthModel model = fpGrowthModelService.getModel();
 
         // 연관 규칙 생성
-        Dataset<Row> associationRules = model.associationRules();
+        Dataset<Row> associationRules = model.associationRules().cache();
 
         // 입력된 재료와 관련된 규칙 필터링
         Dataset<Row> filteredRules = filterRulesByIngredients(associationRules, inputIngredients);
@@ -57,30 +59,26 @@ public class CartService {
     private List<Integer> validateIngredients(List<Integer> inputIngredients) {
         List<Integer> uniqueIds = new HashSet<>(inputIngredients).stream().toList();
 
-        if (uniqueIds.size() < 2) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, INGREDIENTS_LESS_THAN_1.getMessage());
-        }
-
         if(!ingredientRepository.existsByIdIn(uniqueIds)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, INGREDIENT_NOT_FOUND.getMessage());
         }
 
-        return uniqueIds.stream().toList();
+        return uniqueIds;
     }
 
     private Dataset<Row> filterRulesByIngredients(Dataset<Row> associationRules, List<Integer> ingredients) {
-        for (Integer ingredient : ingredients) {
-            associationRules = associationRules.filter(functions.array_contains(functions.col("antecedent"), ingredient));
-        }
+        Column ingredientsArray = functions.array(ingredients.stream().map(functions::lit).toArray(Column[]::new));
 
-        return associationRules;
+        Column condition = functions.expr("size(filter(antecedent, x -> array_contains(" + ingredientsArray + ", x))) = " + ingredients.size());
+
+        return associationRules.filter(condition);
     }
 
     private List<Integer> getTopAssociatedIngredients(Dataset<Row> filteredRules, int count) {
         return filteredRules
-                .select("consequent")
-                .distinct()
-                .orderBy(functions.desc("confidence")) // 신뢰도 기준으로 정렬
+                .groupBy("consequent")
+                .agg(functions.max("confidence").as("max_confidence"))
+                .orderBy(functions.desc("max_confidence"))
                 .limit(count)
                 .select(functions.explode(functions.col("consequent")).as("associated_ingredient"))
                 .as(Encoders.INT())
@@ -88,11 +86,9 @@ public class CartService {
     }
 
     private List<RecommendIngredientListResponse> getRecommendedIngredients(List<Integer> mostAssociatedIngredients) {
-        return mostAssociatedIngredients.stream()
-                .map(itemId -> ingredientRepository.findById(itemId)
-                        .map(RecommendIngredientListResponse::from)
-                        .orElse(null))
-                .filter(Objects::nonNull)
+        List<Ingredient> ingredients = ingredientRepository.findAllById(mostAssociatedIngredients);
+        return ingredients.stream()
+                .map(RecommendIngredientListResponse::from)
                 .collect(Collectors.toList());
     }
 
