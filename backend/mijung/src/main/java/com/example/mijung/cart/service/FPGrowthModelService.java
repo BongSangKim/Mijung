@@ -54,10 +54,14 @@ public class FPGrowthModelService {
     }
 
     private SparkSession createSparkSession() {
-        return SparkSession.builder()
-                .appName("IngredientRecommend")
-                .master("local[*]") // #spark://3.35.55.230:7077
-                .getOrCreate();
+        if(sparkSession == null){
+            sparkSession = SparkSession.builder()
+                    .appName("IngredientRecommend")
+                    .master("local[*]") // #spark://3.35.55.230:7077
+                    .getOrCreate();
+        }
+
+        return sparkSession;
     }
 
     private boolean modelExists() {
