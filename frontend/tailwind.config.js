@@ -13,7 +13,11 @@ module.exports = {
           dark: '#26A69A', // 진한 민트
         },
         coral: '#6D4C41', // 브라운
-        mint: '#4DB6AC', // 티얼
+        mint: {
+          light: '#B2DFDB',
+          DEFAULT: '#4DB6AC', // 티얼
+          dark: '#00897B',
+        },
         sunflower: '#FFF9C4', // 라이트 옐로우
         blueberry: '#283593', // 네이비
         peach_fuzz: '#D7CCC8', // 베이지
@@ -27,6 +31,25 @@ module.exports = {
           DEFAULT: '#37474F',
           dark: '#263238',
         },
+      },
+      fontFamily: {
+        sans: [
+          'Pretendard',
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+          'Noto Sans',
+          'sans-serif',
+          'Apple Color Emoji',
+          'Segoe UI Emoji',
+          'Segoe UI Symbol',
+          'Noto Color Emoji',
+        ],
       },
     },
   },

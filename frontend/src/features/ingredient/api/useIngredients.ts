@@ -5,7 +5,7 @@ import { IngredientSiseRequest } from '../../../shared/api/ingredientTypes';
 
 export const useIngredients = (
   page: number = 1,
-  perPage: number = 10,
+  perPage: number = 12,
   category: string = 'all',
   keyword: string | null = null
 ) => {

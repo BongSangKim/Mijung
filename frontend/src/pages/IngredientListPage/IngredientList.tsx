@@ -5,6 +5,8 @@ import Searchbar from '../../widgets/Searchbar/Searchbar';
 import { IngredientList } from '@/features/ingredient/ui/IngredientList';
 import { useIngredients } from '@/features/ingredient/api/useIngredients';
 import { Button } from '@/shared/components/Button';
+import { PulseLoader } from 'react-spinners';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const categories = [
   { id: 'all', name: '전체' },
@@ -26,7 +28,7 @@ const IngredientListPage = () => {
 
   const { data, isLoading, error } = useIngredients(
     currentPage,
-    10,
+    12,
     category,
     keyword
   );
@@ -45,6 +47,69 @@ const IngredientListPage = () => {
 
   const handlePageChange = (newPage: number) => {
     setSearchParams({ category, page: newPage.toString(), keyword });
+  };
+
+  const renderPagination = () => {
+    if (!data?.pagination) return null;
+
+    const { page, perPage, total } = data.pagination;
+    const totalPages = Math.ceil(total / perPage);
+
+    const pageNumbers = [];
+    const maxPageButtons = 9;
+    let startPage = Math.max(1, page - Math.floor(maxPageButtons / 2));
+    const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+    if (endPage - startPage + 1 < maxPageButtons) {
+      startPage = Math.max(1, endPage - maxPageButtons + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return (
+      <div className="mt-4 flex flex-col items-center">
+        <span className="text-sm text-gray-700 mb-2">
+          총 {total}개 중 {page} 페이지 (전체 {totalPages} 페이지)
+        </span>
+        <div className="flex items-center space-x-2">
+          <Button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+            variant="secondary"
+            size="sm"
+            className="bg-mint hover:bg-mint-dark text-white"
+          >
+            <FaChevronLeft />
+          </Button>
+          {pageNumbers.map((number) => (
+            <Button
+              key={number}
+              onClick={() => handlePageChange(number)}
+              variant={page === number ? 'primary' : 'secondary'}
+              size="sm"
+              className={
+                page === number
+                  ? 'bg-mint text-white'
+                  : 'bg-white text-[#4DB6AC] border border-mint hover:bg-mint hover:text-white'
+              }
+            >
+              {number}
+            </Button>
+          ))}
+          <Button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page >= totalPages}
+            variant="secondary"
+            size="sm"
+            className="bg-mint hover:bg-mint-dark text-white"
+          >
+            <FaChevronRight />
+          </Button>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -76,8 +141,11 @@ const IngredientListPage = () => {
             </div>
           </div>
           {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <p className="text-xl text-text-light">로딩 중...</p>
+            <div className="flex flex-col justify-center items-center h-64">
+              <PulseLoader color="#4A90E2" size={15} margin={2} />
+              <p className="mt-4 text-xl text-text-light">
+                식재료 정보를 불러오는 중...
+              </p>
             </div>
           ) : error ? (
             <div
@@ -91,11 +159,14 @@ const IngredientListPage = () => {
               </span>
             </div>
           ) : (
-            <IngredientList
-              ingredients={data?.ingredients || []}
-              pagination={data?.pagination}
-              onPageChange={handlePageChange}
-            />
+            <>
+              <IngredientList
+                ingredients={data?.ingredients || []}
+                pagination={data?.pagination}
+                onPageChange={handlePageChange}
+              />
+              {renderPagination()}
+            </>
           )}
         </div>
       </MainLayout>
