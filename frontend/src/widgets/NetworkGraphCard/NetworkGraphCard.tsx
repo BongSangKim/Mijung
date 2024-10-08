@@ -1,8 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  IngredientCosineResponse,
-  Ingredient,
-} from '../../shared/api/ingredientTypes';
+import { IngredientCosineResponse } from '../../shared/api/ingredientTypes';
 import IngredientClient from '../../shared/api/ingredientClient';
 import { useNavigate } from 'react-router-dom';
 import * as d3 from 'd3';
@@ -12,6 +9,7 @@ interface NetworkGraphCardProps {
   title: string;
   width?: number;
   height?: number;
+  fontSizes?: { center: number; depth1: number; depth2: number };
 }
 
 interface Node {
@@ -163,7 +161,7 @@ const NetworkGraphCard: React.FC<NetworkGraphCardProps> = ({
       };
 
       const simulation = d3
-        .forceSimulation(data.nodes)
+        .forceSimulation(data.nodes as any)
         .force(
           'link',
           d3
@@ -220,7 +218,7 @@ const NetworkGraphCard: React.FC<NetworkGraphCardProps> = ({
         .style('-ms-user-select', 'none')
         .style('pointer-events', 'none');
 
-      nodeGroup.on('click', (event: any, d: Node) => {
+      nodeGroup.on('click', (d: Node) => {
         if (d.id !== graphId) {
           navigate(`/ingredients/${d.id}`);
         }
