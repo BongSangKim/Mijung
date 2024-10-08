@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, KeyboardEvent } from 'react';
 import { useIngredientAutoComplete } from '../../features/ingredient/api/useIngredients';
 import { useSearchParams } from 'react-router-dom';
+import { FaSearch } from 'react-icons/fa';
 
 interface SearchbarProps {
   type: 'ingredients' | 'recipes';
@@ -9,6 +10,8 @@ interface SearchbarProps {
   onSuggestItemClick?: (item: { id: number; name: string }) => void;
   onItemSelect?: (item: { id: number; name: string }) => void;
   initialValue?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 const Searchbar = ({
@@ -18,8 +21,9 @@ const Searchbar = ({
   onSuggestItemClick,
   onItemSelect,
   initialValue = '',
+  value,
 }: SearchbarProps) => {
-  const [keyword, setKeyword] = useState(initialValue);
+  const [keyword, setKeyword] = useState(value || initialValue);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -67,6 +71,7 @@ const Searchbar = ({
         id: firstSuggestion.ingredientId,
         name: firstSuggestion.name,
       });
+      setKeyword(''); // 검색어 초기화
     } else {
       onSearch(keyword);
       searchParams.set('keyword', keyword);
@@ -118,6 +123,7 @@ const Searchbar = ({
         } else {
           handleSearch();
         }
+        setKeyword(''); // Enter 키를 눌렀을 때 검색어 초기화
         break;
       case 'Escape':
         setIsDropdownOpen(false);
@@ -126,20 +132,30 @@ const Searchbar = ({
   };
 
   return (
-    <div className="relative w-full max-w-xl">
-      <input
-        ref={inputRef}
-        type="text"
-        value={keyword}
-        onChange={(e) => {
-          setKeyword(e.target.value);
-          setUserInteracted(true);
-        }}
-        onFocus={() => setUserInteracted(true)}
-        onKeyDown={handleKeyDown}
-        className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800"
-        placeholder={type === 'ingredients' ? '식재료 찾아보기' : '레시피 검색'}
-      />
+    <div className="relative w-full max-w-xl mb-4">
+      <div className="relative">
+        <input
+          ref={inputRef}
+          type="text"
+          value={keyword}
+          onChange={(e) => {
+            setKeyword(e.target.value);
+            setUserInteracted(true);
+          }}
+          onFocus={() => setUserInteracted(true)}
+          onKeyDown={handleKeyDown}
+          className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800"
+          placeholder={
+            type === 'ingredients' ? '식재료 찾아보기' : '레시피 검색'
+          }
+        />
+        <button
+          onClick={handleSearch}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+        >
+          <FaSearch />
+        </button>
+      </div>
       {isDropdownOpen && suggestions && suggestions.length > 0 && (
         <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-2xl shadow-lg">
           {suggestions.map(
