@@ -9,7 +9,8 @@ import {
   useIngredientRecommendRecipes,
   RecommendedRecipe,
 } from '../../features/ingredient/api/useIngredientRecommendRecipes';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { useRecipeStore } from '@/shared/stores/jjimStore';
 
 // 배경색에 따라 텍스트 색상을 결정하는 함수
 const getContrastColor = (hexColor: string) => {
@@ -199,9 +200,21 @@ const RecipeCard = ({
   recipe: RecommendedRecipe;
   onClick: () => void;
 }) => {
+  const { addRecipe, removeRecipe, isRecipeSaved } = useRecipeStore();
+  const isSaved = isRecipeSaved(recipe.recipeId);
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isSaved) {
+      removeRecipe(recipe.recipeId);
+    } else {
+      addRecipe(recipe);
+    }
+  };
+
   return (
     <div
-      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transition-transform hover:scale-105"
+      className="relative bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transition-transform hover:scale-105"
       onClick={onClick}
     >
       <img
@@ -213,6 +226,12 @@ const RecipeCard = ({
         <h3 className="text-lg font-semibold mb-2">{recipe.name}</h3>
         <p className="text-sm text-gray-600">{recipe.kind}</p>
       </div>
+      <button
+        onClick={handleSave}
+        className="absolute top-2 left-2 p-1 bg-white rounded-full shadow-md"
+      >
+        {isSaved ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
+      </button>
     </div>
   );
 };
