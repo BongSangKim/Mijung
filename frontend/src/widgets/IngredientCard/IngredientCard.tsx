@@ -5,7 +5,6 @@ import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
 import { Button } from '@/shared/components/Button';
 import { FaSpinner } from 'react-icons/fa';
 import { checkKoreanRo } from '@/shared/utils/checkKorean';
-import { defaultRecipeImg } from '@/shared/url/defualtImage';
 
 interface IngredientCardProps {
   ingredient: Ingredient | IngredientSise;
@@ -68,7 +67,7 @@ const IngredientCard = ({
           </div>
         )}
         <img
-          src={ingredient.image || defaultRecipeImg}
+          src={ingredient.image || '/public/images/vetables.png'}
           alt={ingredient.name}
           className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
