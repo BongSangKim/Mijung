@@ -136,7 +136,7 @@ def start_scheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(
         fetch_data_from_api,
-        CronTrigger(hour=22, minute=00, second=0, timezone=pytz.timezone('Asia/Seoul')) #실제 서비스
+        CronTrigger(hour=13, minute=00, second=0, timezone=pytz.timezone('Asia/Seoul')) #실제 서비스
         #CronTrigger(minute='*') #테스트
     )
     scheduler.start()
