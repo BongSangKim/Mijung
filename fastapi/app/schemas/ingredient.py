@@ -24,7 +24,7 @@ class Ingredient(Base):
     product_rank_code = Column(String(3), nullable=False)
     image = Column(String(255))
     is_priced = Column(Boolean, nullable=False)
-    colorHdx = Column(String(255))
+    colorHex = Column(String(255))
 
     ingredientinfo = relationship("IngredientInfo", back_populates="ingredient") # back_populates는 db 이름이랑 맞아야됨
     ingredientrate = relationship("IngredientRate", back_populates="ingredient") # 앞은 class이름과 같아야됨
@@ -44,7 +44,7 @@ class Ingredient(Base):
         self.product_rank_code = product_rank_code
         self.image = image
         self.is_priced = is_priced
-        self.colorHdx = colorHex
+        self.colorHex = colorHex
 
 
     def __str__(self):
