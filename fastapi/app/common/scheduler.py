@@ -34,18 +34,29 @@ def fetch_data_from_api():
             # 현재 날짜를 p_regday로 설정 (yyyy-mm-dd 포맷)
             
                     # 기존 데이터 삭제: ingredient_info 및 ingredient_rate 테이블에서 오늘 날짜의 데이터
+
+            if ingredient.product_rank_code != '07':    
+                # API 요청 구성
+                url = (
+                    f"http://www.kamis.or.kr/service/price/xml.do?action=ItemInfo"
+                    f"&p_productclscode=01&p_regday={today}"
+                    f"&p_itemcategorycode={ingredient.item_category_code}"
+                    f"&p_itemcode={ingredient.item_code}"
+                    f"&p_kindcode={ingredient.kind_code}"
+                    f"&p_convert_kg_yn=Y"
+                    f"&p_cert_key={settings.KAMIS_KEY}&p_cert_id={settings.KAMIS_ID}&p_returntype=xml"
+                )
+            else :
+                url=(
+                    f"http://www.kamis.or.kr/service/price/xml.do?action=EcoPriceList"
+                    f"&p_productclscode=01&p_regday={today}"
+                    f"&p_itemcategorycode={ingredient.item_category_code}"
+                    f"&p_itemcode={ingredient.item_code}"
+                    f"&p_kindcode={ingredient.kind_code}"
+                    f"&p_convert_kg_yn=Y"
+                    f"&p_cert_key={settings.KAMIS_KEY}&p_cert_id={settings.KAMIS_ID}&p_returntype=xml"
+                )
             
-            # API 요청 구성
-            url = (
-                f"http://www.kamis.or.kr/service/price/xml.do?action=ItemInfo"
-                f"&p_productclscode=01&p_regday={today}"
-                f"&p_itemcategorycode={ingredient.item_category_code}"
-                f"&p_itemcode={ingredient.item_code}"
-                f"&p_kindcode={ingredient.kind_code}"
-                f"&p_productrankcode={ingredient.product_rank_code}"
-                f"&p_convert_kg_yn=Y"
-                f"&p_cert_key={settings.KAMIS_KEY}&p_cert_id={settings.KAMIS_ID}&p_returntype=xml"
-            )
 
             try:
                 response = requests.get(url)
@@ -60,12 +71,25 @@ def fetch_data_from_api():
                 # price, weekprice, monthprice, yearprice 추출하기
                 if first_item is not None:
                     price = extract_price(first_item.find('price').text)
-                    weekprice = extract_price(first_item.find('weekprice').text)
-                    monthprice = extract_price(first_item.find('monthprice').text)
-                    yearprice = extract_price(first_item.find('yearprice').text)
+                    if ingredient.product_rank_code != '07':
+                        week_item = first_item.find('weekprice')
+                        month_item = first_item.find('monthprice')
+                        year_item = first_item.find('yearprice')
+                        if week_item is not None and month_item is not None and year_item is not None:
+                            weekprice = extract_price(week_item.text)
+                            monthprice = extract_price(month_item.text)
+                            yearprice = extract_price(year_item.text)
+                            if price ==0:
+                                price = weekprice
+                            diff_week, diff_month, diff_year = extract_rates_from_element(root)
+                        else:
+                            print("Week, month, or year price not found in the XML data for item: " + str(ingredient))
+                            continue  # 다음 반복으로 넘어갑니다.
 
-                    diff_week, diff_month, diff_year = extract_rates_from_element(root)
+                    else: 
+                        weekprice = monthprice = yearprice = price
 
+                        
                   #  preditedprice = model.predict()
                     ingredient_info = IngredientInfo(
                         date=today,
