@@ -7,7 +7,7 @@ from .base import Base
 
 # SQLAlchemy ORM 모델
 class IngredientPredict(Base):
-    __tablename__ = 'ingredientpredict'
+    __tablename__ = 'Ingredientpredict'
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     date = Column(Date, nullable=False)

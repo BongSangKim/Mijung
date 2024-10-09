@@ -7,7 +7,7 @@ from .base import Base
 
 # SQLAlchemy ORM 모델
 class IngredientRate(Base):
-    __tablename__ = 'ingredientrate'
+    __tablename__ = 'Ingredientrate'
 
     ingredient_rate_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     date = Column(Date, nullable=False)
@@ -19,7 +19,7 @@ class IngredientRate(Base):
     year_increase_price = Column(Integer, nullable=False, name="year_increase_price")
     
     # Ingredient와의 관계 설정
-    ingredient_id = Column(Integer, ForeignKey('ingredient.ingredient_id'), nullable=False)  # Foreign key
+    ingredient_id = Column(Integer, ForeignKey('Ingredient.ingredient_id'), nullable=False)  # Foreign key
     ingredient = relationship("Ingredient", back_populates="ingredientrate")  # Relationship 설정
 
     def __init__(self, date: str, week_increase_rate: float, 
