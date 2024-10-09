@@ -8,25 +8,13 @@ import { useEffect, useState } from 'react';
 import { GoPerson } from 'react-icons/go';
 import { LuChefHat } from 'react-icons/lu';
 import { MdOutlineTimer } from 'react-icons/md';
-import { defaultRecipeImgGrey } from '@/shared/url/defualtImage';
 
 export const RecipeDetailPage = () => {
   const { id = '' } = useParams<{ id: string }>();
   const { data: recipe, isLoading, error } = useRecipeDetail(id);
   const [qrCode, setQrCode] = useState<string>('');
 
-  const baseStyles = `
-    relative 
-    inline-block
-    pb-2
-    before:content-[''] 
-    before:absolute 
-    before:bottom-0 
-    before:left-0 
-    before:w-full 
-    before:h-px 
-  `;
-
+  const baseStyles = `relative inline-block pb-2 before:content-[''] before:absolute before:bottom-0 before:left-0 before:w-full before:h-px`;
   const dtStyle = 'before:bg-black';
   const ddStyle = 'before:bg-gray-300';
 
@@ -57,23 +45,18 @@ export const RecipeDetailPage = () => {
     <div className="grid grid-cols-10">
       <MainLayout>
         {recipe && (
-          <div className="container mx-4 my-8 relative">
-            {/* Recipe Header start */}
-            <div className="flex justify-between">
-              <div className="flex flex-col flex-grow">
-                {/* Recipe Title start */}
-                <h1 className="text-3xl font-bold mb-4">
-                  {recipe.name || '레시피 이름 없음'}
-                </h1>
-                {/* Recipe Title end */}
-
-                {/* Recipe Info start */}
-                <div className="flex flex-col justify-between items-start mb-6">
-                  <div className="text-gray-600 mb-1">
-                    {recipe.kind || '종류 미지정'}
-                  </div>
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="flex space-x-4">
+          <div className="container mx-auto px-4 my-8 max-w-4xl">
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+              <div className="p-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                  <div className="flex-grow">
+                    <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                      {recipe.name || '레시피 이름 없음'}
+                    </h1>
+                    <p className="text-gray-600 mb-2">
+                      {recipe.kind || '종류 미지정'}
+                    </p>
+                    <div className="flex flex-wrap gap-4">
                       <span className="flex items-center">
                         <GoPerson className="mr-1" size={16} />{' '}
                         {recipe.inbun || '인분 정보 없음'}
@@ -88,79 +71,76 @@ export const RecipeDetailPage = () => {
                       </span>
                     </div>
                   </div>
+                  <div className="mt-4 md:mt-0">
+                    <div className="bg-white shadow-md p-2 w-24 h-24 flex-shrink-0 overflow-hidden">
+                      <div
+                        className="w-full h-full flex items-center justify-center"
+                        dangerouslySetInnerHTML={{ __html: qrCode }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                {/* Recipe INfo end */}
-              </div>
-              <div>
-                {/* QR Box Start */}
-                <div className="bg-white shadow-md p-2 w-24 h-24 flex-shrink-0 overflow-hidden">
-                  <div
-                    className="w-full h-full flex items-center justify-center"
-                    dangerouslySetInnerHTML={{ __html: qrCode }}
-                  />
-                </div>
-                {/* QR Box End */}
-              </div>
-            </div>
-            {/* Recipe Header end */}
-            <img
-              src={recipe.image || defaultRecipeImgGrey}
-              alt={recipe.name}
-              className="w-full min-h-96 max-h-96 object-fill mb-4"
-            />
-
-            {/* Recipe materials start */}
-            <div className="bg-white shadow-md mb-4 p-4">
-              <dl className="space-y-4">
-                <dt
-                  className={`text-xl font-semibold mb-2 w-full ${baseStyles} ${dtStyle}`}
-                >
-                  재료
-                </dt>
-                <dd>
-                  <ul className="grid grid-cols-2 gap-4">
+                {recipe.image && (
+                  <div className="aspect-w-4 aspect-h-3 mb-6">
+                    <img
+                      src={recipe.image}
+                      alt={recipe.name}
+                      className="object-cover w-full h-full rounded-lg"
+                    />
+                  </div>
+                )}
+                <div className="mb-6">
+                  <h2
+                    className={`text-xl font-semibold mb-4 ${baseStyles} ${dtStyle}`}
+                  >
+                    재료
+                  </h2>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {recipe.materials.length !== 0
-                      ? recipe.materials.map((materials) => (
+                      ? recipe.materials.map((material) => (
                           <li
-                            key={materials.materialId}
+                            key={material.materialId}
                             className={`flex justify-between items-center ${baseStyles} ${ddStyle}`}
                           >
-                            <div className="text-gray-800">
-                              {materials.name}
-                            </div>
+                            <div className="text-gray-800">{material.name}</div>
                             <div className="text-gray-600">
-                              {materials.capacity}
+                              {material.capacity}
                             </div>
                           </li>
                         ))
                       : '재료 정보가 없습니다.'}
                   </ul>
-                </dd>
-              </dl>
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">조리 순서</h2>
+                  {recipe.steps &&
+                    recipe.steps.map((step) => (
+                      <div
+                        key={step.stepId}
+                        className="flex flex-col md:flex-row mb-6"
+                      >
+                        <div
+                          className={`w-full ${step.image ? 'md:w-2/3 md:pr-6' : ''} mb-4 md:mb-0`}
+                        >
+                          <h3 className="font-semibold mb-2">
+                            Step {step.stepNumber}
+                          </h3>
+                          <p>{step.content}</p>
+                        </div>
+                        {step.image && (
+                          <div className="w-full md:w-1/3 aspect-w-4 aspect-h-3">
+                            <img
+                              src={step.image}
+                              alt={`Step ${step.stepId}`}
+                              className="object-cover w-full h-full rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              </div>
             </div>
-
-            <div className="bg-white shadow-md p-4">
-              <h2 className="text-xl font-semibold mb-2">조리 순서</h2>
-              {recipe.steps &&
-                recipe.steps.map((step) => (
-                  <div key={step.stepId} className="flex mb-4">
-                    <div className="w-3/4 pe-10">
-                      <h3 className="font-semibold mb-2">
-                        Step {step.stepNumber}
-                      </h3>
-                      <p>{step.content}</p>
-                    </div>
-                    <div className="w-1/4">
-                      <img
-                        src={step.image || defaultRecipeImgGrey}
-                        alt={`Step ${step.stepId}`}
-                        className="mt-2 w-full h-40 object-contain rounded"
-                      />
-                    </div>
-                  </div>
-                ))}
-            </div>
-            {/* Recipe materials end */}
           </div>
         )}
       </MainLayout>

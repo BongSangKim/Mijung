@@ -4,11 +4,12 @@ import IngredientClient from '../../shared/api/ingredientClient';
 import { useNavigate } from 'react-router-dom';
 import * as d3 from 'd3';
 import { PulseLoader } from 'react-spinners';
+import { FaInfoCircle } from 'react-icons/fa';
 
 interface NetworkGraphCardProps {
   graphId: number;
   title: string;
-  width?: number;
+  width?: number | string;
   height?: number;
   fontSizes?: { center: number; depth1: number; depth2: number };
 }
@@ -27,9 +28,9 @@ interface Link {
 const NetworkGraphCard = ({
   graphId,
   title,
-  width = 600,
+  width = '100%',
   height = 400,
-  fontSizes = { center: 30, depth1: 20, depth2: 15 },
+  fontSizes = { center: 24, depth1: 16, depth2: 12 },
 }: NetworkGraphCardProps) => {
   const [data, setData] = useState<{ nodes: Node[]; links: Link[] } | null>(
     null
@@ -39,6 +40,7 @@ const NetworkGraphCard = ({
   const svgRef = useRef<SVGSVGElement | null>(null);
   const navigate = useNavigate();
   const ingredientClient = new IngredientClient();
+  const [showTip, setShowTip] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -128,7 +130,7 @@ const NetworkGraphCard = ({
 
         setData({ nodes, links });
       } catch (err) {
-        setError('데이터를 불러오는 중 오류가 발생했습니다.');
+        setError('현재 이 식재료의 네트워크 그래프 정보가 충분하지 않아요.');
         console.error('Error fetching network graph data:', err);
       } finally {
         setLoading(false);
@@ -143,7 +145,17 @@ const NetworkGraphCard = ({
       const svg = d3.select(svgRef.current);
       svg.selectAll('*').remove();
 
-      const viewBox = { x: -width / 2, y: -height / 2, width, height };
+      const containerWidth = svgRef.current.clientWidth;
+      const containerHeight = height;
+
+      svg.attr('width', containerWidth).attr('height', containerHeight);
+
+      const viewBox = {
+        x: -containerWidth / 2,
+        y: -containerHeight / 2,
+        width: containerWidth,
+        height: containerHeight,
+      };
       svg.attr(
         'viewBox',
         `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`
@@ -171,15 +183,16 @@ const NetworkGraphCard = ({
             .forceLink(data.links)
             .id((d: any) => d.id)
             .distance((d: any) => {
-              return (1 - d.value) * 300 + 30;
+              // 길이를 60%로 줄이기
+              return ((1 - d.value) * 300 + 30) * 0.6;
             })
         )
-        .force('charge', d3.forceManyBody().strength(-300))
+        .force('charge', d3.forceManyBody().strength(-200)) // 노드 간 반발력을 약간 줄임
         .force('center', d3.forceCenter(0, 0))
         .force(
           'collision',
           d3.forceCollide().radius((d: any) => {
-            return d.group === 1 ? 40 : d.group === 2 ? 30 : 20;
+            return d.group === 1 ? 32 : d.group === 2 ? 24 : 16;
           })
         );
 
@@ -203,7 +216,7 @@ const NetworkGraphCard = ({
       // 원 추가
       nodeGroup
         .append('circle')
-        .attr('r', (d) => (d.group === 1 ? 50 : d.group === 2 ? 35 : 25))
+        .attr('r', (d) => (d.group === 1 ? 40 : d.group === 2 ? 28 : 20))
         .attr('fill', (d) =>
           d.group === 1 ? '#ff9999' : d.group === 2 ? '#99ff99' : '#9999ff'
         );
@@ -272,6 +285,24 @@ const NetworkGraphCard = ({
     }
   }, [data, width, height, navigate, graphId, fontSizes]);
 
+  const toggleTip = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setShowTip(!showTip);
+  };
+
+  const closeTip = () => {
+    setShowTip(false);
+  };
+
+  useEffect(() => {
+    if (showTip) {
+      document.addEventListener('click', closeTip);
+    }
+    return () => {
+      document.removeEventListener('click', closeTip);
+    };
+  }, [showTip]);
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -311,11 +342,38 @@ const NetworkGraphCard = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full bg-white rounded-lg shadow-md p-4">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
+    <div className="relative flex flex-col w-full h-full bg-white rounded-lg shadow-md p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+        <button
+          onClick={toggleTip}
+          className="text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <FaInfoCircle size={20} />
+        </button>
+      </div>
       <div className="w-full h-full flex items-center justify-center">
         {renderContent()}
       </div>
+      {showTip && (
+        <div className="absolute top-12 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-10 max-w-sm">
+          <p className="text-sm text-gray-600 whitespace-pre-line">
+            {`안녕하세요! 이 멋진 그래프, 어떻게 만들어졌는지 궁금하셨죠? 😊
+
+• 가운데 큰 동그라미는 여러분이 고른 재료예요.
+• 주변의 동그라미들은 이 재료와 찰떡궁합인 재료들이에요.
+• 선이 짧을수록 더 자주 함께 쓰이는 재료랍니다.
+• 각 동그라미를 클릭하면 해당 식재료의 상세 정보를 볼 수 있어요!
+
+이 모든 정보는 수많은 레시피 데이터를 분석해서 만들었어요.
+코사인 유사도 분석으로 재료 간 관계를 계산했답니다!
+
+새로운 요리 조합을 찾고 계셨다면, 이 그래프로 쉽게 찾을 수 있을 거예요.
+동그라미들을 클릭해서 다양한 재료들을 탐험해보세요!
+맛있는 요리 만드세요! 🍳✨`}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
