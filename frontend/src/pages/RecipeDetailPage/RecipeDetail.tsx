@@ -1,6 +1,6 @@
 import MainLayout from '../../app/RoutingLayout/MainLayout';
 import RightSideLayout from '../../app/RoutingLayout/RightSideLayout';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useRecipeDetail } from '@/features/recipeList/api/useRecipeDetail';
 import { Error } from '@/shared/components';
 import { createQRCode } from '@/shared/lib/qrcode';
@@ -102,7 +102,17 @@ export const RecipeDetailPage = () => {
                             key={material.materialId}
                             className={`flex justify-between items-center ${baseStyles} ${ddStyle}`}
                           >
-                            <div className="text-gray-800">{material.name}</div>
+                            <a
+                              href={`/ingredients/${material.ingredientId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group flex items-center hover:text-blue-600 transition-colors duration-200"
+                              aria-label={`${material.name} 상세 정보 (새 창에서 열림)`}
+                            >
+                              <div className="hover:text-blue-600 transition-colors duration-200 text-gray-800">
+                                {material.name}
+                              </div>
+                            </a>
                             <div className="text-gray-600">
                               {material.capacity}
                             </div>
