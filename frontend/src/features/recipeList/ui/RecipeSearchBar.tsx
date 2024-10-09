@@ -2,7 +2,6 @@ import { useSearchSuggestion } from '../api/useSearchSuggestion';
 import { Recipe } from '@/shared/api/recipeTypes';
 import { Error } from '@/shared/components';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
-import { Button } from '@/shared/components/Button';
 import { FaSearch } from 'react-icons/fa';
 
 interface Props {
@@ -107,7 +106,7 @@ export const RecipeSearchBar = ({
 
   return (
     <div className="relative min-w-96 mx-auto mb-5" ref={searchBarRef}>
-      <form className="flex items-center" onSubmit={(e) => handleSubmit(e)}>
+      <form className="relative" onSubmit={(e) => handleSubmit(e)}>
         <input
           type="text"
           placeholder="레시피 검색"
@@ -115,11 +114,14 @@ export const RecipeSearchBar = ({
           onChange={(e) => onKeywordChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={handleInputFocus}
-          className="w-full px-4 py-2 text-text-dark bg-background-light border border-peach rounded-l-full focus:outline-none focus:ring-2 focus:ring-coral focus:border-transparent"
+          className="w-full px-4 py-2 pr-10 text-text-dark bg-background-light border border-peach rounded-full focus:outline-none focus:ring-2 focus:ring-coral focus:border-transparent"
         />
-        <Button type="submit" variant="primary" className="rounded-l-none">
+        <button
+          type="submit"
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-coral hover:text-coral-dark"
+        >
           <FaSearch />
-        </Button>
+        </button>
       </form>
       {suggestions && suggestions.length > 0 && (
         <ul

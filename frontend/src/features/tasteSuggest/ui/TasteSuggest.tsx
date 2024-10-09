@@ -87,7 +87,7 @@ export const TasteSuggest = ({ isOpen }: TasteSuggestProps) => {
           </button>
           <p className="text-sm text-gray-600 pr-6">
             이 추천은 연관 규칙 마이닝 기반의 장바구니 분석 알고리즘을 사용해요.
-            대규모 구매 데이터에서 식재료 간의 연관성을 파악하고, 지지도와
+            레시피 빅데이터를 통해 식재료 간의 연관성을 파악하고, 지지도와
             신뢰도를 계산하여 가장 관련성 높은 식재료를 제안해드려요. 🛒✨
           </p>
         </div>
