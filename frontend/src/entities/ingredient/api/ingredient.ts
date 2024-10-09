@@ -1,9 +1,10 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import FakeIngredientClient from '../../../shared/api/fakeIngredientClient';
 import IngredientClient from '../../../shared/api/ingredientClient';
 import {
   PaginationInfo,
   Ingredient,
+  IngredientSiseResponse,
 } from '../../../shared/api/ingredientTypes';
 import {
   IngredientSiseRequest,
@@ -41,9 +42,11 @@ export default class IngredientApi {
   ): Promise<IngredientSise[]> {
     try {
       console.log('API 호출 파라미터:', params);
-      const response = await this.client.getIngredientSise(params);
+      const response = (await this.client.getIngredientSise(
+        params
+      )) as AxiosResponse<IngredientSiseResponse>;
       console.log('API 응답:', response);
-      if (response instanceof Response && response.status === 204) {
+      if (response.status === 204) {
         console.log('데이터 없음 (204 상태 코드)');
         return [];
       }
