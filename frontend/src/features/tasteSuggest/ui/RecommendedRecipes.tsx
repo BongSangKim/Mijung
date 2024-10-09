@@ -34,7 +34,7 @@ export const RecommendedRecipes = ({ recipes }: RecommendedRecipesProps) => {
               >
                 {recipe.name}
               </div>
-              <div className="text-xs text-sunflower mt-1">{recipe.kind}</div>
+              <div className="text-xs text-text-dark mt-1">{recipe.kind}</div>
             </div>
           </Link>
         ))}
