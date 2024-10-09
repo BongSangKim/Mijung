@@ -1,3 +1,4 @@
+from typing import Optional, Tuple
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from app.databases.database import engineconn
@@ -59,10 +60,8 @@ def fetch_data_from_api():
                     monthprice = extract_price(first_item.find('monthprice').text)
                     yearprice = extract_price(first_item.find('yearprice').text)
 
-                    diffweek = diff_week(weekprice, price)
-                    diffmonth = diff_month(monthprice, price)
-                    diffyear = diff_year(yearprice, price)
-                    
+                    diff_week, diff_month, diff_year = extract_rates_from_element(root)
+
                   #  preditedprice = model.predict()
                     ingredient_info = IngredientInfo(
                         date=today,
@@ -73,10 +72,10 @@ def fetch_data_from_api():
                         date=today,
                         ingredient_id=ingredient.ingredient_id,
                         week_increase_price=abs(weekprice - price), 
-                        week_increase_rate=diffweek,
-                        month_increase_rate=diffmonth,
+                        week_increase_rate=diff_week,
+                        month_increase_rate=diff_month,
                         month_increase_price=abs(monthprice-price),
-                        year_increase_rate=diffyear,
+                        year_increase_rate=diff_year,
                         year_increase_price=abs(yearprice - price)
                     )
 
@@ -105,28 +104,44 @@ def extract_price(price_text):
     # 추출된 문자열이 비어있는 경우 0을 반환, 그렇지 않으면 정수로 변환하여 반환
     return int(extracted) if extracted else 0
 
-def diff_week(weekprice, dayprice):
-    if weekprice ==0:
-        return 0
-    return round((dayprice-weekprice)/weekprice, 3)*100
-
-def diff_month(monthprice, dayprice):
-    if monthprice==0:
-        return 0
-    
-    return round((dayprice - monthprice)/ monthprice, 3) * 100
-
-def diff_year(yearprice, dayprice):
-    if yearprice==0:
-        return 0
-    return round((dayprice- yearprice)/yearprice, 3)*100
-
 def start_scheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(
         fetch_data_from_api,
-        CronTrigger(hour=13, minute=00, second=0, timezone=pytz.timezone('Asia/Seoul')) #실제 서비스
+        CronTrigger(hour=13, minute=00, second=00, timezone=pytz.timezone('Asia/Seoul')) #실제 서비스
         #CronTrigger(minute='*') #테스트
     )
     scheduler.start()
     return scheduler
+
+
+def extract_rates_from_element(root: ET.Element) -> Tuple[Optional[float], Optional[float], Optional[float]]:
+    try:
+        # Find the item with countyname "등락률"
+        rate_item = root.find(".//data/item[countyname='등락률']")
+
+        if rate_item is None:
+            print("Rate information not found in the XML data")
+            return None, None, None
+
+        # Extract rates
+        weekrate = extract_rate(rate_item.find('weekprice').text)
+        monthrate = extract_rate(rate_item.find('monthprice').text)
+        yearrate = extract_rate(rate_item.find('yearprice').text)
+
+        return weekrate, monthrate, yearrate
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return 0, 0, 0
+
+def extract_rate(rate_text: str) -> Optional[float]:
+    if rate_text is None or rate_text == '-':
+        return 0
+    try:
+        # Remove commas and convert to float
+        rate_text = rate_text.replace(',', '')
+        return float(rate_text)
+    except ValueError:
+        print(f"Could not convert '{rate_text}' to float")
+        return 0

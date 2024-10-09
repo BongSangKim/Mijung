@@ -1,5 +1,5 @@
 from enum import Enum
-from fastapi import FastAPI, HTTPException, Request, logger
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -10,6 +10,7 @@ class IngredientMessage(str, Enum):
     CATEGORY_NOT_FOUND = "Category not found."
 
 def add_exception_handlers(app: FastAPI):
+    from app.main import logger
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
         logger.error(f"Response Status Error: {exc.detail}")
