@@ -32,6 +32,7 @@ public class IngredientRepositoryCustom {
     String period = ingredientSiseRequest.getPeriod();
     String change = ingredientSiseRequest.getChange();
     Integer count = ingredientSiseRequest.getCount();
+
     QIngredient ingredient = QIngredient.ingredient;
     QIngredientInfo ingredientInfo = QIngredientInfo.ingredientInfo;
     QIngredientRate ingredientRate = QIngredientRate.ingredientRate;
@@ -57,7 +58,7 @@ public class IngredientRepositoryCustom {
         ))
         .where(getRateCondition(period, change, ingredientRate))
         .orderBy(getRateField(period, ingredientRate).abs().desc())
-        .limit(count+3)
+        .limit(count)
         .fetch();
 
     return results.stream()
