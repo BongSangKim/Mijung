@@ -1,6 +1,7 @@
 # recommend.py
 from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List
+from fastapi.exception_handlers import http_exception_handler
 from pyspark.sql.functions import col, count, when
 import numpy as np
 import logging
@@ -13,6 +14,7 @@ from app.models.models import get_embedding_model, get_recipe_model, get_explode
 from app.schemas.ingredient import Ingredient, IngredientRecommandRequest, RecipeItem, RecipeRecommendRequest, RecommendIngredientListResponse
 from app.schemas.recipe import Recipe, RecipeRead
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+
 router = APIRouter(
     tags=['carts'],
     responses={404: {"description": "Not found"}}
@@ -20,12 +22,12 @@ router = APIRouter(
 
 def find_similar_recipes(recipe_vector, threshold=0.7):
     recipe_model = get_recipe_model()
-    similar_words_recipe = recipe_model.similar_by_vector(recipe_vector, topn=300)
+    similar_words_recipe = recipe_model.similar_by_vector(recipe_vector, topn=10)
     
     if isinstance(similar_words_recipe, list):
         filtered_keys = [word for word, similarity in similar_words_recipe if similarity >= threshold]
     else:
-        logging.error("Unexpected structure returned from similar_by_vector")
+        logging.info("Unexpected structure returned from similar_by_vector")
         filtered_keys = []
     
     return filtered_keys
@@ -39,8 +41,8 @@ def find_top_6_common_rcp_sno(ingredient, nearby_recipe_keys, cnt):
     )
     
     top_6_rcp_sno = result_df.orderBy(col("count").desc()).limit(cnt).collect()
-    return [(row['RCP_SNO'], row['count']) for row in top_6_rcp_sno]
-
+    logging.info(f"{result_df['count']}")
+    return [(row['RCP_SNO']) for row in top_6_rcp_sno]
 
 # 코사인 유사도
 def find_similar_ingredients(embedding_model, recipe_vector, cnt):
@@ -71,7 +73,7 @@ def find_similar_ingredients(embedding_model, recipe_vector, cnt):
         return similar_ingredients
     
     except Exception as e:
-        logging.error(f"Error finding similar ingredients: {str(e)}")
+        http_exception_handler()
         raise
 
 
@@ -82,7 +84,7 @@ def find_cosine_similarity(recipe_vector, cnt):
     if isinstance(similar_words_recipe, list):
         filtered_keys = [word for word, similarity in similar_words_recipe]
     else:
-        logging.error("Unexpected structure returned from similar_by_vector")
+        http_exception_handler()
         filtered_keys = []
     
     return filtered_keys
@@ -103,7 +105,7 @@ def find_cosine_similarity_ingredients(embedding, cnt, ingredientsIdx):
             filtered_keys.append(word)  # ingredientsIdx에 없는 경우에만 추가
         logging.info(f"현재 ingredient 리턴 {filtered_keys}")    
     else:
-        logging.error("Unexpected structure returned from similar_by_vector")
+        http_exception_handler()
         filtered_keys = []
     
     return filtered_keys
@@ -133,12 +135,19 @@ async def getRecipeRecommend(
             raise HTTPException(status_code=400, detail=IngredientMessage.INGREDIENT_NOT_FOUND)
 
         recipe_vector = np.mean(embeddings, axis=0)
-        #nearby_recipe_keys = find_similar_recipes(recipe_vector, threshold=0.8)
+
+
+        # 일일이 개수세기
+
+        # nearby_recipe_keys = find_similar_recipes(recipe_vector, threshold=0.8)
         
-        #logging.info("Recipe 모델에서 유사도가 0.7 이상인 레시피 키: %s", nearby_recipe_keys)
+        # logging.info("Recipe 모델에서 유사도가 0.7 이상인 레시피 키: %s", nearby_recipe_keys)
         
-        #top_6_rcp_sno = find_top_6_common_rcp_sno(ingredients, nearby_recipe_keys, cnt=count)
+        # top_6_rcp_sno = find_top_6_common_rcp_sno(ingredients, nearby_recipe_keys, cnt=count)
+        
+        # 코사인 유사도 만으로 세기
         top_6_rcp_sno = find_cosine_similarity(recipe_vector, cnt= count)
+        
         try:
             recipes = db_session.query(Recipe).filter(Recipe.recipe_id.in_(top_6_rcp_sno)).all()
         except Exception as e:
@@ -194,14 +203,20 @@ async def getIngredientRecommend(
         if not embeddings:
             raise ValueError("No valid embeddings found for the provided ingredients.")
         
+
+        
+
         ingredient_vector = np.mean(embeddings, axis=0)
-        #nearby_recipe_keys = find_similar_recipes(recipe_vector, threshold=0.8)
+        # 일일이 세는 방법
+        # nearby_recipe_keys = find_similar_recipes(ingredient_vector, threshold=0.8)
         
-        #logging.info("Recipe 모델에서 유사도가 0.7 이상인 레시피 키: %s", nearby_recipe_keys)
+        # #logging.info("Recipe 모델에서 유사도가 0.7 이상인 레시피 키: %s", nearby_recipe_keys)
         
-        #top_6_rcp_sno = find_top_6_common_rcp_sno(ingredients, nearby_recipe_keys, cnt=count)
+        # top_6_rcp_sno = find_top_6_common_rcp_sno(ingredients, nearby_recipe_keys, cnt=count)
+        
+        # # 임베딩 모델 활용
         top_6_rcp_sno = find_cosine_similarity_ingredients(ingredient_vector, cnt= count, ingredientsIdx= ingredients)
-        # Database 쿼리
+        # # Database 쿼리
         
         try:
             ingredients = db_session.query(Ingredient).filter(Ingredient.ingredient_id.in_(top_6_rcp_sno)).all()
