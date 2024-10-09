@@ -55,6 +55,30 @@ const IngredientCard = ({
     return retailUnit;
   };
 
+  const getPriceChangeInfo = (
+    changeRate: number | undefined | null,
+    changePrice: number | undefined | null
+  ) => {
+    if (
+      changeRate === undefined ||
+      changeRate === null ||
+      changePrice === undefined ||
+      changePrice === null
+    ) {
+      return { text: '변동 정보 없음', color: 'text-gray-500' };
+    }
+
+    if (changeRate === 0 || changeRate === 0.0) {
+      return { text: '변동 없음', color: 'text-gray-500' };
+    }
+
+    const isIncrease = changeRate > 0;
+    return {
+      text: `${isIncrease ? '▲' : '▼'} ${Math.abs(changeRate).toFixed(1)}% (${formatPrice(Math.abs(changePrice))})`,
+      color: isIncrease ? 'text-red-500' : 'text-blue-500',
+    };
+  };
+
   return (
     <div
       className="bg-white shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-[300px] group cursor-pointer rounded-t-2xl"
@@ -91,16 +115,14 @@ const IngredientCard = ({
           ) : (
             <p className="text-lg text-gray-400">가격정보 없음</p>
           )}
-          {ingredient?.changeRate !== undefined &&
-            ingredient?.changePrice !== undefined && (
-              <p
-                className={`text-sm ${ingredient.changeRate >= 0 ? 'text-red-500' : 'text-blue-500'} mt-1`}
-              >
-                {ingredient.changeRate >= 0 ? '▲' : '▼'}{' '}
-                {Math.abs(ingredient.changeRate).toFixed(1)}% (
-                {formatPrice(Math.abs(ingredient.changePrice))})
-              </p>
-            )}
+          <p
+            className={`text-sm ${getPriceChangeInfo(ingredient.changeRate, ingredient.changePrice).color} mt-1`}
+          >
+            {
+              getPriceChangeInfo(ingredient.changeRate, ingredient.changePrice)
+                .text
+            }
+          </p>
         </div>
       </div>
       <Button
