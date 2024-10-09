@@ -44,6 +44,7 @@ public class FPGrowthModelService {
 
     @PostConstruct
     public void initialize() {
+        System.setProperty("hadoop.home.dir", "C:\\hadoop");
         this.sparkSession = createSparkSession();
 
         if (modelExists()) {
