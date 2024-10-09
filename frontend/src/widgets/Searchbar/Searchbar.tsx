@@ -146,7 +146,9 @@ const Searchbar = ({
           onKeyDown={handleKeyDown}
           className="w-full px-4 py-2 pr-10 text-text-dark bg-background-light border border-peach rounded-full focus:outline-none focus:ring-2 focus:ring-coral focus:border-transparent"
           placeholder={
-            type === 'ingredients' ? '식재료 찾아보기' : '레시피 검색'
+            type === 'ingredients'
+              ? '가지고 있는 재료나 사고 싶은 재료를 찾아보세요'
+              : '레시피 검색'
           }
         />
         <button

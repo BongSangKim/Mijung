@@ -17,7 +17,7 @@ interface TasteSuggestProps {
   onClose: () => void;
 }
 
-export const TasteSuggest = ({ isOpen }: TasteSuggestProps) => {
+export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   const [activeTab, setActiveTab] = useState('ingredients');
   const isMobile = useIsMobile();
 
@@ -32,8 +32,10 @@ export const TasteSuggest = ({ isOpen }: TasteSuggestProps) => {
   );
 
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [addedIngredient, setAddedIngredient] = useState<string | null>(null);
-  const [showClearAlert, setShowClearAlert] = useState(false);
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'add' | 'remove' | 'clear';
+  } | null>(null);
   const [showTip, setShowTip] = useState<string | null>(null);
 
   const toggleTip = (tab: string) => {
@@ -45,34 +47,55 @@ export const TasteSuggest = ({ isOpen }: TasteSuggestProps) => {
   };
 
   useEffect(() => {
-    if (addedIngredient) {
-      const timer = setTimeout(() => {
-        setAddedIngredient(null);
-      }, 1000);
+    const unsubscribe = useMyIngredientsStore.subscribe((state, prevState) => {
+      if (state.ingredients.length > prevState.ingredients.length) {
+        const newIngredient = state.ingredients[state.ingredients.length - 1];
+        setNotification({
+          message: `${newIngredient.name}${checkKoreanIga(newIngredient.name)} 추가되었습니다.`,
+          type: 'add',
+        });
+      } else if (state.ingredients.length < prevState.ingredients.length) {
+        const removedIngredient = prevState.ingredients.find(
+          (ing) => !state.ingredients.some((newIng) => newIng.id === ing.id)
+        );
+        if (removedIngredient) {
+          setNotification({
+            message: `${removedIngredient.name}${checkKoreanIga(removedIngredient.name)} 제거되었습니다.`,
+            type: 'remove',
+          });
+        }
+      } else if (
+        state.ingredients.length === 0 &&
+        prevState.ingredients.length > 0
+      ) {
+        setNotification({
+          message: '모든 재료가 삭제되었습니다.',
+          type: 'clear',
+        });
+      }
+    });
 
-      return () => clearTimeout(timer);
-    }
-  }, [addedIngredient]);
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
-    if (showClearAlert) {
+    if (notification) {
       const timer = setTimeout(() => {
-        setShowClearAlert(false);
+        setNotification(null);
       }, 3000);
-
       return () => clearTimeout(timer);
     }
-  }, [showClearAlert]);
+  }, [notification]);
 
   const handleSuggestItemClick = (item: { id: number; name: string }) => {
     addIngredient(item.id, item.name);
     setSearchKeyword(''); // 검색어 초기화
-    setAddedIngredient(item.name);
   };
 
-  const handleClearIngredients = () => {
-    clearIngredients();
-    setShowClearAlert(true);
+  const handleItemClick = () => {
+    if (isMobile) {
+      onClose();
+    }
   };
 
   const tabContent = (
@@ -111,10 +134,14 @@ export const TasteSuggest = ({ isOpen }: TasteSuggestProps) => {
         <RecommendedIngredients
           ingredients={recommendedIngredients}
           onAdd={addIngredient}
+          onItemClick={handleItemClick}
         />
       )}
       {activeTab === 'recipes' && recommendedRecipes && (
-        <RecommendedRecipes recipes={recommendedRecipes} />
+        <RecommendedRecipes
+          recipes={recommendedRecipes}
+          onItemClick={handleItemClick}
+        />
       )}
     </div>
   );
@@ -157,9 +184,9 @@ export const TasteSuggest = ({ isOpen }: TasteSuggestProps) => {
         <h2 className="text-3xl font-bold mb-4 text-blueberry">
           나만의 요리 도우미
         </h2>
-        <p className="text-text-light mb-4">
+        {/* <p className="text-text-light mb-4">
           가지고 있는 재료나 사고 싶은 재료를 추가해보세요
-        </p>
+        </p> */}
         <Searchbar
           type="ingredients"
           onSearch={() => {}}
@@ -168,20 +195,22 @@ export const TasteSuggest = ({ isOpen }: TasteSuggestProps) => {
           value={searchKeyword}
           onChange={setSearchKeyword}
         />
-        {addedIngredient && (
-          <div className="mt-2 text-green-600 font-semibold">
-            {addedIngredient}
-            {checkKoreanIga(addedIngredient)} 추가되었습니다.
-          </div>
-        )}
         <MyIngredients
           ingredients={ingredients}
           onRemove={removeIngredient}
-          onClear={handleClearIngredients}
+          onClear={clearIngredients}
         />
-        {showClearAlert && (
-          <div className="mt-2 text-red-600 font-semibold">
-            모든 재료가 삭제되었습니다.
+        {notification && (
+          <div
+            className={`mt-2 font-semibold ${
+              notification.type === 'add'
+                ? 'text-green-600'
+                : notification.type === 'remove'
+                  ? 'text-red-600'
+                  : 'text-yellow-600'
+            }`}
+          >
+            {notification.message}
           </div>
         )}
         {tabContent}
