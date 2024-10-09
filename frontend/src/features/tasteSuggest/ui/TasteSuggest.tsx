@@ -22,7 +22,6 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   const [activeTab, setActiveTab] = useState<'ingredients' | 'recipes'>(
     'ingredients'
   );
-  const [tabDescription, setTabDescription] = useState<string>('');
   const [showAnimation, setShowAnimation] = useState(false);
   const isMobile = useIsMobile();
 
@@ -93,30 +92,26 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   }, [notification]);
 
   useEffect(() => {
-    if (activeTab === 'ingredients') {
-      setTabDescription('선택한 재료와 어울리는 재료를 추천해 드립니다.');
-    } else {
-      setTabDescription('선택한 재료로 만들 수 있는 레시피를 추천해 드립니다.');
-    }
-  }, [activeTab]);
+    const hasSeenNotification = sessionStorage.getItem(
+      'tasteSuggestNotificationSeen'
+    );
 
-  useEffect(() => {
-    if (isMobile) {
-      if (isOpen) {
+    if (!hasSeenNotification) {
+      if (isMobile && isOpen) {
         setShowAnimation(true);
+      } else if (!isMobile) {
+        setShowAnimation(true);
+      }
+
+      if (showAnimation) {
         const timer = setTimeout(() => {
           setShowAnimation(false);
-        }, 5000);
+          sessionStorage.setItem('tasteSuggestNotificationSeen', 'true');
+        }, 1000);
         return () => clearTimeout(timer);
       }
-    } else {
-      setShowAnimation(true);
-      const timer = setTimeout(() => {
-        setShowAnimation(false);
-      }, 5000);
-      return () => clearTimeout(timer);
     }
-  }, [isOpen, isMobile]);
+  }, [isOpen, isMobile, showAnimation]);
 
   if (!isOpen && isMobile) return null;
 
@@ -212,8 +207,8 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   );
 
   const content = (
-    <div className="bg-background rounded-2xl overflow-hidden transition-shadow duration-500 h-full flex flex-col h-full">
-      <div className="p-6 flex-grow overflow-auto h-full">
+    <div className="flex flex-col h-full">
+      <div className="p-6 flex-grow overflow-y-auto">
         <h2 className="text-3xl font-bold mb-4 text-blueberry">
           나만의 요리 도우미
         </h2>
@@ -253,21 +248,37 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   );
 
   return (
-    <div className="fixed top-16 right-0 w-full lg:w-[30%] bg-background shadow-lg h-[calc(100vh-4rem)] flex flex-col">
-      {content}
-      <AnimatePresence>
-        {showAnimation && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, x: '100%' }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, y: 20, x: '100%' }}
-            transition={{ duration: 0.5 }}
-            className="absolute bottom-20 right-4 bg-blueberry text-white px-4 py-2 rounded-lg text-sm max-w-[200px] z-50"
-          >
-            여기에서 식재료/레시피를 추천받을 수 있어요!
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ y: isMobile ? '100%' : 0, x: isMobile ? 0 : '100%' }}
+          animate={{ y: 0, x: 0 }}
+          exit={{ y: isMobile ? '100%' : 0, x: isMobile ? 0 : '100%' }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          className={`fixed bg-background shadow-lg flex flex-col z-40 ${
+            isMobile
+              ? 'inset-0 bottom-16'
+              : 'top-16 right-0 w-full lg:w-[30%] h-[calc(100vh-4rem)]'
+          }`}
+        >
+          <div className="flex-grow overflow-y-auto">{content}</div>
+          <AnimatePresence>
+            {showAnimation && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, x: '100%' }}
+                animate={{ opacity: 1, y: 0, x: 0 }}
+                exit={{ opacity: 0, y: 20, x: '100%' }}
+                transition={{ duration: 0.5 }}
+                className={`absolute bg-blueberry text-white px-4 py-2 rounded-lg text-sm max-w-[200px] z-50 ${
+                  isMobile ? 'bottom-20 right-4' : 'bottom-4 right-4'
+                }`}
+              >
+                여기에서 식재료/레시피를 추천받을 수 있어요!
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
