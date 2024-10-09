@@ -47,7 +47,11 @@ const IngredientCard = ({
     return `${Number(price).toLocaleString()}원`;
   };
 
-  const formatUnit = (retailUnitsize: string, retailUnit: string) => {
+  const formatUnit = (
+    retailUnitsize: string | null | undefined,
+    retailUnit: string | null | undefined
+  ) => {
+    if (retailUnitsize == null || retailUnit == null) return '';
     const size = Number(retailUnitsize);
     if (size > 1) {
       return `${size}${retailUnit}`;
@@ -59,12 +63,7 @@ const IngredientCard = ({
     changeRate: number | undefined | null,
     changePrice: number | undefined | null
   ) => {
-    if (
-      changeRate === undefined ||
-      changeRate === null ||
-      changePrice === undefined ||
-      changePrice === null
-    ) {
+    if (changeRate == null || changePrice == null) {
       return { text: '변동 정보 없음', color: 'text-gray-500' };
     }
 
@@ -92,7 +91,7 @@ const IngredientCard = ({
         )}
         <img
           src={ingredient.image || '/public/images/vetables.png'}
-          alt={ingredient.name}
+          alt={ingredient.name || '식재료 이미지'}
           className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
@@ -100,21 +99,18 @@ const IngredientCard = ({
           onError={() => setImageError(true)}
         />
         <div className="absolute top-2 left-2 right-2 flex justify-between items-center">
-          <span className="inline-block px-3 py-1.5 bg-white bg-opacity-70 text-black text-base font-bold rounded-full shadow-md">
-            {ingredient.name}
+          <span className="inline-block px-3 py-1.5 bg-white bg-opacity-80 text-black text-base font-bold rounded-full shadow-md">
+            {ingredient.name || '이름 없음'}
           </span>
         </div>
       </div>
       <div className="pt-2 pb-3 px-5 flex-grow flex flex-col justify-between">
         <div>
-          {ingredient?.price ? (
-            <p className="text-xl font-bold text-black-500">
-              {formatPrice(ingredient.price)}/
-              {formatUnit(ingredient.retailUnitsize, ingredient.retailUnit)}
-            </p>
-          ) : (
-            <p className="text-lg text-gray-400">가격정보 없음</p>
-          )}
+          <p className="text-xl font-bold text-black-500">
+            {formatPrice(ingredient.price)}/
+            {formatUnit(ingredient.retailUnitsize, ingredient.retailUnit) ||
+              '단위 정보 없음'}
+          </p>
           <p
             className={`text-sm ${getPriceChangeInfo(ingredient.changeRate, ingredient.changePrice).color} mt-1`}
           >
@@ -133,7 +129,7 @@ const IngredientCard = ({
       >
         {isInMyIngredients
           ? '목록에서 제거'
-          : `${ingredient.name}${checkKoreanRo(ingredient.name)} 추천받기`}
+          : `${ingredient.name || '식재료'}${checkKoreanRo(ingredient.name || '식재료')} 추천받기`}
       </Button>
     </div>
   );
