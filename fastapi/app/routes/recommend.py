@@ -27,7 +27,7 @@ def find_similar_recipes(recipe_vector, threshold=0.7):
     if isinstance(similar_words_recipe, list):
         filtered_keys = [word for word, similarity in similar_words_recipe if similarity >= threshold]
     else:
-        logging.info("Unexpected structure returned from similar_by_vector")
+        logging.error("Unexpected structure returned from similar_by_vector")
         filtered_keys = []
     
     return filtered_keys
