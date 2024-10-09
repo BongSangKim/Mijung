@@ -100,7 +100,7 @@ const IngredientCard = ({
           onError={() => setImageError(true)}
         />
         <div className="absolute top-2 left-2 right-2 flex justify-between items-center">
-          <span className="inline-block px-2 py-1 bg-white bg-opacity-70 text-black text-sm font-semibold rounded-full">
+          <span className="inline-block px-3 py-1.5 bg-white bg-opacity-70 text-black text-base font-bold rounded-full shadow-md">
             {ingredient.name}
           </span>
         </div>

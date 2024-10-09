@@ -86,7 +86,7 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
     if (notification) {
       const timer = setTimeout(() => {
         setNotification(null);
-      }, 3000);
+      }, 6000);
       return () => clearTimeout(timer);
     }
   }, [notification]);
@@ -107,7 +107,7 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
         const timer = setTimeout(() => {
           setShowAnimation(false);
           sessionStorage.setItem('tasteSuggestNotificationSeen', 'true');
-        }, 1000);
+        }, 2000);
         return () => clearTimeout(timer);
       }
     }

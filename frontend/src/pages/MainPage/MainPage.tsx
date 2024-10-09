@@ -8,19 +8,19 @@ const MainPage = () => {
     data: weeklyIngredients,
     isError: isWeeklyError,
     error: weeklyError,
-  } = useIngredientSise({ period: 'week', change: 'negative', count: 4 });
+  } = useIngredientSise({ period: 'week', change: 'positive', count: 4 });
   const {
     data: monthlyIngredients,
     isError: isMonthlyError,
     error: monthlyError,
-  } = useIngredientSise({ period: 'month', change: 'negative', count: 4 });
+  } = useIngredientSise({ period: 'month', change: 'positive', count: 4 });
   const {
     data: mainIngredients,
     isError: isMainError,
     error: mainError,
   } = useIngredientSise({
     period: 'year',
-    change: 'negative',
+    change: 'positive',
     count: 4,
   });
 
