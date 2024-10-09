@@ -10,7 +10,7 @@ from app.error.GlobalExceptionHandler import IngredientMessage
 from .base import Base
 
 class Ingredient(Base):
-    __tablename__ = 'ingredient'
+    __tablename__ = 'Ingredient'
 
     ingredient_id = Column(Integer, primary_key=True, nullable=False)
     item_category_code = Column(String(20), nullable=False)
@@ -24,13 +24,14 @@ class Ingredient(Base):
     product_rank_code = Column(String(3), nullable=False)
     image = Column(String(255))
     is_priced = Column(Boolean, nullable=False)
+    colorHdx = Column(String(255))
 
     ingredientinfo = relationship("IngredientInfo", back_populates="ingredient") # back_populates는 db 이름이랑 맞아야됨
     ingredientrate = relationship("IngredientRate", back_populates="ingredient") # 앞은 class이름과 같아야됨
     material = relationship("Material", back_populates="ingredient")
     def __init__(self, id, item_category_code, item_category_name, item_code, item_name,
                  kind_code, kind_name, retail_unit=None, retail_unitsize=None,
-                 product_rank_code=None, image=None, is_priced=True):
+                 product_rank_code=None, image=None, is_priced=True, colorHex=None):
         self.ingredient_id = id
         self.item_category_code = item_category_code
         self.item_category_name = item_category_name
@@ -43,6 +44,7 @@ class Ingredient(Base):
         self.product_rank_code = product_rank_code
         self.image = image
         self.is_priced = is_priced
+        self.colorHdx = colorHex
 
 
     def __str__(self):

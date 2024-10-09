@@ -7,12 +7,12 @@ from .base import Base
 
 # SQLAlchemy ORM 모델
 class IngredientInfo(Base):
-    __tablename__ = 'ingredientinfo'
+    __tablename__ = 'IngredientInfo'
 
     ingredient_info_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     date = Column(Date, nullable=False)
     price = Column(Integer, nullable=False)
-    ingredient_id = Column(Integer, ForeignKey('ingredient.ingredient_id'), nullable=False)
+    ingredient_id = Column(Integer, ForeignKey('Ingredient.ingredient_id'), nullable=False)
     
     ingredient = relationship("Ingredient",  back_populates="ingredientinfo")
 

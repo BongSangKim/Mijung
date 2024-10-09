@@ -55,7 +55,7 @@ class CookingTime(str, enum.Enum):
     MORE_THAN_2_HOURS = "2시간이상"
 
 class Recipe(Base):
-    __tablename__ = 'recipe'
+    __tablename__ = 'Recipe'
 
     recipe_id: int = Column(Integer, primary_key=True, nullable=False)
     name: Optional[str] = Column(TEXT, nullable=True)
