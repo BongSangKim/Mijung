@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, TouchEvent, KeyboardEvent } from 'react';
+import { useState, useEffect, useRef, KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
 import IngredientCard from '@/widgets/IngredientCard/IngredientCard';
 import {
@@ -63,12 +63,12 @@ const LandingPage = () => {
       }
     };
 
-    const handleTouchStart = (e: TouchEvent) => {
-      setTouchStart(e.targetTouches[0].clientY);
+    const handleTouchStart = (e: React.TouchEvent) => {
+      setTouchStart(e.touches[0].clientY);
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      setTouchEnd(e.targetTouches[0].clientY);
+    const handleTouchMove = (e: React.TouchEvent) => {
+      setTouchEnd(e.touches[0].clientY);
     };
 
     const handleTouchEnd = () => {
@@ -106,12 +106,20 @@ const LandingPage = () => {
     };
 
     window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, {
-      passive: false,
-    });
-    window.addEventListener('touchmove', handleTouchMove, {
-      passive: false,
-    });
+    window.addEventListener(
+      'touchstart',
+      handleTouchStart as unknown as EventListener,
+      {
+        passive: false,
+      }
+    );
+    window.addEventListener(
+      'touchmove',
+      handleTouchMove as unknown as EventListener,
+      {
+        passive: false,
+      }
+    );
     window.addEventListener('touchend', handleTouchEnd, {
       passive: false,
     });
@@ -122,8 +130,14 @@ const LandingPage = () => {
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener(
+        'touchstart',
+        handleTouchStart as unknown as EventListener
+      );
+      window.removeEventListener(
+        'touchmove',
+        handleTouchMove as unknown as EventListener
+      );
       window.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener(
         'keydown',
@@ -138,7 +152,7 @@ const LandingPage = () => {
         const { top, bottom } = cardRef.current.getBoundingClientRect();
         const windowHeight = window.innerHeight;
         const progress = 1 - (bottom - windowHeight) / (bottom - top);
-        controls.start({ progress: Math.max(0, Math.min(1, progress)) });
+        controls.start({ y: Math.max(0, Math.min(1, progress)) * 100 });
       }
     };
 
