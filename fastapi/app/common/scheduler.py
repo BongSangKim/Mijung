@@ -22,8 +22,7 @@ def fetch_data_from_api():
     try:
         # 데이터베이스에서 필터링
         filtered_ingredients = db_session.query(Ingredient).filter(
-            Ingredient.is_priced == True,
-            not_(Ingredient.product_rank_code.like('%07%'))
+            Ingredient.is_priced == True
         ).all()
         print(f"Filtered ingredients count: {len(filtered_ingredients)}")  # 필터링된 재료 수 확인
         today = datetime.date.today().strftime('%Y-%m-%d')

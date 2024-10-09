@@ -84,28 +84,8 @@ public class IngredientService {
         if(!isValidIngredientRequest(request)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, INGREDIENT_NOT_FOUND.getMessage());
         }
-        return ingredientRepositoryCustom.ingredientViewResponseList(request);
 
-        /*
-        * ingredient_id가 다른데 재료 이름이 같은 데이터가 있어서 임시방편으로 마련함.
-        * 데이터가 완전해지면 위의 로직을 실행하면 됨
-        * */
-//        List<IngredientViewResponse> list = ingredientRepositoryCustom.ingredientViewResponseList(request);
-//        if(list == null || list.isEmpty())
-//        {
-//            throw new ResponseStatusException(HttpStatus.NO_CONTENT, INGREDIENT_NOT_FOUND.getMessage());
-//        }
-//
-//        List<IngredientViewResponse> result = new ArrayList<>();
-//        Set<String> names = new HashSet<>();
-//        int size = request.getCount();
-//        for (IngredientViewResponse ingredient : list) {
-//            if(result.size()==size) break;
-//            if (names.contains(ingredient.getName())) continue;
-//            names.add(ingredient.getName());
-//            result.add(ingredient);
-//        }
-//        return result;
+        return ingredientRepositoryCustom.ingredientViewResponseList(request);
     }
 
     @Transactional

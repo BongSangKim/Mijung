@@ -2,6 +2,7 @@ from time import perf_counter
 from fastapi import FastAPI, Request
 from app.error.GlobalExceptionHandler import add_exception_handlers
 from app.routes.recommend import router as recommend_router
+from app.routes.startscheduler import router as scheduler_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.common.scheduler import start_scheduler
 from contextlib import asynccontextmanager
@@ -38,6 +39,7 @@ app = FastAPI(lifespan=lifespan)
 add_exception_handlers(app)
 
 app.include_router(recommend_router, prefix="/fastapi/v1")
+app.include_router(scheduler_router, prefix="/fastapi/v1")
 origins = settings.CORS_ORIGIN.split(', ')
 
 app.add_middleware(
