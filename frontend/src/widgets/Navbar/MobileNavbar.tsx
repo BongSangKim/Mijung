@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaSearch, FaBook, FaHeart, FaBars, FaHome } from 'react-icons/fa';
+import { FaCarrot, FaUtensils, FaHeart, FaMagic, FaHome } from 'react-icons/fa';
 
 interface MobileNavbarProps {
   onToggleTasteSuggest: () => void;
@@ -39,14 +39,14 @@ const MobileNavbar = ({
           onClick={() => handleNavigation('/ingredients')}
           className={getButtonClass('/ingredients')}
         >
-          <FaSearch className="text-2xl" />
+          <FaCarrot className="text-2xl" />
           <span className="text-xs mt-1">식재료</span>
         </button>
         <button
           onClick={() => handleNavigation('/recipes')}
           className={getButtonClass('/recipes')}
         >
-          <FaBook className="text-2xl" />
+          <FaUtensils className="text-2xl" />
           <span className="text-xs mt-1">레시피</span>
         </button>
         <button
@@ -69,8 +69,8 @@ const MobileNavbar = ({
             isTasteSuggestOpen ? 'text-coral' : 'text-text-light'
           }`}
         >
-          <FaBars className="text-2xl" />
-          <span className="text-xs mt-1">추천</span>
+          <FaMagic className="text-2xl" />
+          <span className="text-xs mt-1">맞춤 추천</span>
         </button>
       </div>
     </nav>

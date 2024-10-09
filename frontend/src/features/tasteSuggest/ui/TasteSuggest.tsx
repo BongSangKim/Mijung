@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MyIngredients } from './MyIngredients';
 import { RecommendedIngredients } from './RecommendedIngredients';
 import { RecommendedRecipes } from './RecommendedRecipes';
@@ -18,7 +19,10 @@ interface TasteSuggestProps {
 }
 
 export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
-  const [activeTab, setActiveTab] = useState('ingredients');
+  const [activeTab, setActiveTab] = useState<'ingredients' | 'recipes'>(
+    'ingredients'
+  );
+  const [showAnimation, setShowAnimation] = useState(false);
   const isMobile = useIsMobile();
 
   const { ingredients, addIngredient, removeIngredient, clearIngredients } =
@@ -86,6 +90,30 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
       return () => clearTimeout(timer);
     }
   }, [notification]);
+
+  useEffect(() => {
+    const hasSeenNotification = sessionStorage.getItem(
+      'tasteSuggestNotificationSeen'
+    );
+
+    if (!hasSeenNotification) {
+      if (isMobile && isOpen) {
+        setShowAnimation(true);
+      } else if (!isMobile) {
+        setShowAnimation(true);
+      }
+
+      if (showAnimation) {
+        const timer = setTimeout(() => {
+          setShowAnimation(false);
+          sessionStorage.setItem('tasteSuggestNotificationSeen', 'true');
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isOpen, isMobile, showAnimation]);
+
+  if (!isOpen && isMobile) return null;
 
   const handleSuggestItemClick = (item: { id: number; name: string }) => {
     addIngredient(item.id, item.name);
@@ -179,8 +207,8 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   );
 
   const content = (
-    <div className="bg-background rounded-2xl overflow-hidden transition-shadow duration-500 h-full flex flex-col h-full">
-      <div className="p-6 flex-grow overflow-auto h-full">
+    <div className="flex flex-col h-full">
+      <div className="p-6 flex-grow overflow-y-auto">
         <h2 className="text-3xl font-bold mb-4 text-blueberry">
           나만의 요리 도우미
         </h2>
@@ -219,21 +247,38 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
     </div>
   );
 
-  if (isMobile) {
-    return (
-      <>
-        {isOpen && (
-          <div className="fixed inset-0 bg-white z-40 flex flex-col pb-16">
-            {content}
-          </div>
-        )}
-      </>
-    );
-  }
-
   return (
-    <div className="fixed top-16 right-0 w-full lg:w-[30%] bg-background shadow-lg h-[calc(100vh-4rem)] flex flex-col">
-      {content}
-    </div>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ y: isMobile ? '100%' : 0, x: isMobile ? 0 : '100%' }}
+          animate={{ y: 0, x: 0 }}
+          exit={{ y: isMobile ? '100%' : 0, x: isMobile ? 0 : '100%' }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          className={`fixed bg-background shadow-lg flex flex-col z-40 ${
+            isMobile
+              ? 'inset-0 bottom-16'
+              : 'top-16 right-0 w-full lg:w-[30%] h-[calc(100vh-4rem)]'
+          }`}
+        >
+          <div className="flex-grow overflow-y-auto">{content}</div>
+          <AnimatePresence>
+            {showAnimation && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, x: '100%' }}
+                animate={{ opacity: 1, y: 0, x: 0 }}
+                exit={{ opacity: 0, y: 20, x: '100%' }}
+                transition={{ duration: 0.5 }}
+                className={`absolute bg-blueberry text-white px-4 py-2 rounded-lg text-sm max-w-[200px] z-50 ${
+                  isMobile ? 'bottom-20 right-4' : 'bottom-4 right-4'
+                }`}
+              >
+                여기에서 식재료/레시피를 추천받을 수 있어요!
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

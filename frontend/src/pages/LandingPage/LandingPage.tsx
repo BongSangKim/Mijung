@@ -27,7 +27,7 @@ const LandingPage = () => {
 
   const { data: ingredientSiseData } = useIngredientSise({
     period: 'week',
-    change: 'positive',
+    change: 'negative',
     count: 4,
   });
 
