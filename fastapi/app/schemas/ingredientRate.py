@@ -7,7 +7,7 @@ from .base import Base
 
 # SQLAlchemy ORM 모델
 class IngredientRate(Base):
-    __tablename__ = 'Ingredientrate'
+    __tablename__ = 'IngredientRate'
 
     ingredient_rate_id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     date = Column(Date, nullable=False)

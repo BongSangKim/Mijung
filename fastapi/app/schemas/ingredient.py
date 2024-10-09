@@ -26,9 +26,9 @@ class Ingredient(Base):
     is_priced = Column(Boolean, nullable=False)
     colorHdx = Column(String(255))
 
-    ingredientinfo = relationship("IngredientInfo", back_populates="Ingredient") # back_populates는 db 이름이랑 맞아야됨
-    ingredientrate = relationship("IngredientRate", back_populates="Ingredient") # 앞은 class이름과 같아야됨
-    material = relationship("Material", back_populates="Ingredient")
+    ingredientinfo = relationship("IngredientInfo", back_populates="ingredient") # back_populates는 db 이름이랑 맞아야됨
+    ingredientrate = relationship("IngredientRate", back_populates="ingredient") # 앞은 class이름과 같아야됨
+    material = relationship("Material", back_populates="ingredient")
     def __init__(self, id, item_category_code, item_category_name, item_code, item_name,
                  kind_code, kind_name, retail_unit=None, retail_unitsize=None,
                  product_rank_code=None, image=None, is_priced=True, colorHex=None):

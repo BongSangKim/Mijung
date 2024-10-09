@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from .base import Base
 
 class Material(Base):
-    __tablename__ = 'material'
+    __tablename__ = 'Material'
     
     material_id: int = Column(Integer, primary_key=True, nullable=False)
     name: str = Column(TEXT, nullable=False)
@@ -13,8 +13,8 @@ class Material(Base):
     type: str = Column(TEXT, nullable=False)
     analyzed: bool = Column(Boolean, nullable=False)
 
-    recipe_id: int = Column(Integer, ForeignKey('recipe.recipe_id'), nullable=False)
-    ingredient_id: Optional[int] = Column(Integer, ForeignKey('ingredient.ingredient_id'), nullable=True)
+    recipe_id: int = Column(Integer, ForeignKey('Recipe.recipe_id'), nullable=False)
+    ingredient_id: Optional[int] = Column(Integer, ForeignKey('Ingredient.ingredient_id'), nullable=True)
 
     recipe = relationship("Recipe", back_populates="material")  # Adjust back_populates accordingly
     ingredient = relationship("Ingredient", back_populates="material")  # Adjust back_populates accordingly
