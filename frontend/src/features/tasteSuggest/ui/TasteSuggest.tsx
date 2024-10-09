@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MyIngredients } from './MyIngredients';
 import { RecommendedIngredients } from './RecommendedIngredients';
 import { RecommendedRecipes } from './RecommendedRecipes';
@@ -18,7 +19,11 @@ interface TasteSuggestProps {
 }
 
 export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
-  const [activeTab, setActiveTab] = useState('ingredients');
+  const [activeTab, setActiveTab] = useState<'ingredients' | 'recipes'>(
+    'ingredients'
+  );
+  const [tabDescription, setTabDescription] = useState<string>('');
+  const [showAnimation, setShowAnimation] = useState(false);
   const isMobile = useIsMobile();
 
   const { ingredients, addIngredient, removeIngredient, clearIngredients } =
@@ -86,6 +91,34 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
       return () => clearTimeout(timer);
     }
   }, [notification]);
+
+  useEffect(() => {
+    if (activeTab === 'ingredients') {
+      setTabDescription('선택한 재료와 어울리는 재료를 추천해 드립니다.');
+    } else {
+      setTabDescription('선택한 재료로 만들 수 있는 레시피를 추천해 드립니다.');
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (isMobile) {
+      if (isOpen) {
+        setShowAnimation(true);
+        const timer = setTimeout(() => {
+          setShowAnimation(false);
+        }, 5000);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      setShowAnimation(true);
+      const timer = setTimeout(() => {
+        setShowAnimation(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, isMobile]);
+
+  if (!isOpen && isMobile) return null;
 
   const handleSuggestItemClick = (item: { id: number; name: string }) => {
     addIngredient(item.id, item.name);
@@ -219,21 +252,22 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
     </div>
   );
 
-  if (isMobile) {
-    return (
-      <>
-        {isOpen && (
-          <div className="fixed inset-0 bg-white z-40 flex flex-col pb-16">
-            {content}
-          </div>
-        )}
-      </>
-    );
-  }
-
   return (
     <div className="fixed top-16 right-0 w-full lg:w-[30%] bg-background shadow-lg h-[calc(100vh-4rem)] flex flex-col">
       {content}
+      <AnimatePresence>
+        {showAnimation && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, x: '100%' }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: 20, x: '100%' }}
+            transition={{ duration: 0.5 }}
+            className="absolute bottom-20 right-4 bg-blueberry text-white px-4 py-2 rounded-lg text-sm max-w-[200px] z-50"
+          >
+            여기에서 식재료/레시피를 추천받을 수 있어요!
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
