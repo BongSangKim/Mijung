@@ -1,6 +1,6 @@
 import MainLayout from '../../app/RoutingLayout/MainLayout';
 import RightSideLayout from '../../app/RoutingLayout/RightSideLayout';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useRecipeDetail } from '@/features/recipeList/api/useRecipeDetail';
 import { Error } from '@/shared/components';
 import { createQRCode } from '@/shared/lib/qrcode';
