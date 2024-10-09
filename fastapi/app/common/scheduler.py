@@ -26,11 +26,16 @@ def fetch_data_from_api():
             not_(Ingredient.product_rank_code.like('%07%'))
         ).all()
         print(f"Filtered ingredients count: {len(filtered_ingredients)}")  # 필터링된 재료 수 확인
+        today = datetime.date.today().strftime('%Y-%m-%d')
+        db_session.query(IngredientInfo).filter(IngredientInfo.date == today).delete()
+        db_session.query(ingredientRate.IngredientRate).filter(ingredientRate.IngredientRate.date == today).delete()
+
         # 각 ingredient에 대해 API 요청
         for ingredient in filtered_ingredients:
             # 현재 날짜를 p_regday로 설정 (yyyy-mm-dd 포맷)
-            today = datetime.date.today().strftime('%Y-%m-%d')
-
+            
+                    # 기존 데이터 삭제: ingredient_info 및 ingredient_rate 테이블에서 오늘 날짜의 데이터
+            
             # API 요청 구성
             url = (
                 f"http://www.kamis.or.kr/service/price/xml.do?action=ItemInfo"
@@ -108,7 +113,7 @@ def start_scheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(
         fetch_data_from_api,
-        CronTrigger(hour=13, minute=00, second=00, timezone=pytz.timezone('Asia/Seoul')) #실제 서비스
+        CronTrigger(hour=22, minute=00, second=0, timezone=pytz.timezone('Asia/Seoul')) #실제 서비스
         #CronTrigger(minute='*') #테스트
     )
     scheduler.start()
