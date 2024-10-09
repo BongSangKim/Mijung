@@ -8,11 +8,24 @@ import { useEffect, useState } from 'react';
 import { GoPerson } from 'react-icons/go';
 import { LuChefHat } from 'react-icons/lu';
 import { MdOutlineTimer } from 'react-icons/md';
+import { extractTimeInfo } from '@/shared/utils/timeExtractor';
+import Timer from '@/shared/components/Timer';
+import { toast } from 'react-toastify';
+import useSound from 'use-sound';
+import { useTimerStore } from '@/shared/stores/timerStore';
+import { FaClock, FaInfoCircle, FaHeart } from 'react-icons/fa';
+import timerStartSound from '@sound/timer-start';
+import { useRecipeStore } from '@/shared/stores/jjimStore';
 
 export const RecipeDetailPage = () => {
   const { id = '' } = useParams<{ id: string }>();
   const { data: recipe, isLoading, error } = useRecipeDetail(id);
   const [qrCode, setQrCode] = useState<string>('');
+  const [showExplanation, setShowExplanation] = useState(false);
+  const { setIsOpen, setDuration, setIsRunning } = useTimerStore();
+  const { addRecipe, removeRecipe, isRecipeSaved } = useRecipeStore();
+
+  const [playStart] = useSound('/sounds/timer-start.mp3');
 
   const baseStyles = `relative inline-block pb-2 before:content-[''] before:absolute before:bottom-0 before:left-0 before:w-full before:h-px`;
   const dtStyle = 'before:bg-black';
@@ -33,10 +46,36 @@ export const RecipeDetailPage = () => {
         'Vertical thickness': 0.7,
         'Cross thickness': 0.7,
       };
-      const logoUrl = '/icons/android-chrome-192x192.png'; // 로고 이미지 경로 지정
+      const logoUrl = '/icons/android-chrome-192x192.png';
       createQRCode(url, params, logoUrl).then(setQrCode);
     }
   }, [recipe]);
+
+  const handleTimeClick = (minutes: number) => {
+    setDuration(minutes * 60);
+    setIsOpen(true);
+    setIsRunning(true);
+    playStart();
+    toast.success(`${minutes}분 타이머가 시작되었습니다!`);
+  };
+
+  const handleOpenTimer = () => {
+    setIsOpen(true);
+  };
+
+  const handleOpenExplanation = () => {
+    setShowExplanation(true);
+  };
+
+  const handleToggleJjim = () => {
+    if (recipe) {
+      if (isRecipeSaved(recipe.recipeId)) {
+        removeRecipe(recipe.recipeId);
+      } else {
+        addRecipe(recipe);
+      }
+    }
+  };
 
   if (error) return <Error />;
   if (isLoading) return <div>로딩 중...</div>;
@@ -46,13 +85,45 @@ export const RecipeDetailPage = () => {
       <MainLayout>
         {recipe && (
           <div className="container mx-auto px-4 my-8 max-w-4xl">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center space-x-4">
+                <h1 className="text-3xl font-bold">{recipe.name}</h1>
+                <button
+                  onClick={handleToggleJjim}
+                  className={`p-2 rounded-full transition-colors ${
+                    isRecipeSaved(recipe.recipeId)
+                      ? 'text-red-500 hover:text-red-600'
+                      : 'text-gray-400 hover:text-gray-500'
+                  }`}
+                  aria-label={
+                    isRecipeSaved(recipe.recipeId) ? '찜 해제' : '찜하기'
+                  }
+                >
+                  <FaHeart size={24} />
+                </button>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleOpenTimer}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  <FaClock className="inline-block mr-2" />
+                  타이머 설정
+                </button>
+                <button
+                  onClick={handleOpenExplanation}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded"
+                >
+                  <FaInfoCircle className="inline-block mr-2" />
+                  타이머 설명
+                </button>
+              </div>
+            </div>
+
             <div className="bg-white shadow-md rounded-lg overflow-hidden">
               <div className="p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                   <div className="flex-grow">
-                    <h1 className="text-2xl md:text-3xl font-bold mb-2">
-                      {recipe.name || '레시피 이름 없음'}
-                    </h1>
                     <p className="text-gray-600 mb-2">
                       {recipe.kind || '종류 미지정'}
                     </p>
@@ -135,7 +206,25 @@ export const RecipeDetailPage = () => {
                           <h3 className="font-semibold mb-2">
                             Step {step.stepNumber}
                           </h3>
-                          <p>{step.content}</p>
+                          <p>
+                            {step.content.split(' ').map((word, index) => {
+                              const timeInfo = extractTimeInfo(word);
+                              if (timeInfo) {
+                                return (
+                                  <button
+                                    key={index}
+                                    onClick={() =>
+                                      handleTimeClick(timeInfo.minutes)
+                                    }
+                                    className="text-blue-600 hover:underline"
+                                  >
+                                    {word}
+                                  </button>
+                                );
+                              }
+                              return ` ${word} `;
+                            })}
+                          </p>
                         </div>
                         {step.image && (
                           <div className="w-full md:w-1/3 aspect-w-4 aspect-h-3">
@@ -151,6 +240,32 @@ export const RecipeDetailPage = () => {
                 </div>
               </div>
             </div>
+            {showExplanation && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg max-w-md">
+                  <h2 className="text-xl font-bold mb-4">타이머 사용 안내</h2>
+                  <ul className="list-disc list-inside">
+                    <li>
+                      레시피 내 시간 정보(예: 30분, 1시간 등)를 클릭하시면
+                      자동으로 타이머가 설정됩니다.
+                    </li>
+                    <li>타이머는 원하는 위치로 드래그하여 이동할 수 있어요.</li>
+                    <li>
+                      일시정지와 재생 기능을 자유롭게 사용하실 수 있습니다.
+                    </li>
+                    <li>타이머가 종료되면 알람이 울립니다.</li>
+                    <li>15초 이하로 남으면 초읽기 소리가 나요.</li>
+                    <li>다른 페이지로 이동해도 타이머는 계속 작동합니다.</li>
+                  </ul>
+                  <button
+                    onClick={() => setShowExplanation(false)}
+                    className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                  >
+                    닫기
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </MainLayout>
