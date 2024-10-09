@@ -124,7 +124,7 @@ export const RecipeCardStack = (props: Props) => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full"
+      className="relative w-full h-full min-h-0"
       onClick={handleContainerClick}
     >
       <div className="absolute top-40 left-1/2 transform -translate-x-20">

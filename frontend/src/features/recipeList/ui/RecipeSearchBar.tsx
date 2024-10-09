@@ -105,7 +105,7 @@ export const RecipeSearchBar = ({
   }
 
   return (
-    <div className="relative min-w-96 mx-auto mb-5" ref={searchBarRef}>
+    <div className="relative w-full max-w-xl mx-auto mb-5" ref={searchBarRef}>
       <form className="relative" onSubmit={(e) => handleSubmit(e)}>
         <input
           type="text"
