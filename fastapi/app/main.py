@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from time import perf_counter
+from fastapi import FastAPI, Request
 from app.error.GlobalExceptionHandler import add_exception_handlers
 from app.routes.recommend import router as recommend_router
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,3 +47,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = perf_counter()
+    response = await call_next(request)
+    process_time = perf_counter() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response

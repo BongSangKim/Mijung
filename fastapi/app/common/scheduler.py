@@ -72,12 +72,12 @@ def fetch_data_from_api():
                     ingredient_rate = ingredientRate.IngredientRate(
                         date=today,
                         ingredient_id=ingredient.ingredient_id,
-                        week_increase_price=weekprice,
+                        week_increase_price=abs(weekprice - price), 
                         week_increase_rate=diffweek,
                         month_increase_rate=diffmonth,
-                        month_increase_price=monthprice,
+                        month_increase_price=abs(monthprice-price),
                         year_increase_rate=diffyear,
-                        year_increase_price=yearprice
+                        year_increase_price=abs(yearprice - price)
                     )
 
                     db_session.add(ingredient_info)
@@ -108,18 +108,18 @@ def extract_price(price_text):
 def diff_week(weekprice, dayprice):
     if weekprice ==0:
         return 0
-    return round((dayprice-weekprice)/weekprice, 1)
+    return round((dayprice-weekprice)/weekprice, 3)*100
 
 def diff_month(monthprice, dayprice):
     if monthprice==0:
         return 0
     
-    return round((dayprice - monthprice)/ monthprice, 1)
+    return round((dayprice - monthprice)/ monthprice, 3) * 100
 
 def diff_year(yearprice, dayprice):
     if yearprice==0:
         return 0
-    return round((dayprice- yearprice)/yearprice, 1)
+    return round((dayprice- yearprice)/yearprice, 3)*100
 
 def start_scheduler():
     scheduler = BackgroundScheduler()
