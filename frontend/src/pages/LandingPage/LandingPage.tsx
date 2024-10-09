@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, TouchEvent } from 'react';
+import { useState, useEffect, useRef, TouchEvent, KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
 import IngredientCard from '@/widgets/IngredientCard/IngredientCard';
 import {
@@ -23,6 +23,7 @@ const LandingPage = () => {
   const [direction, setDirection] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const { data: ingredientSiseData } = useIngredientSise({
     period: 'week',
@@ -40,6 +41,15 @@ const LandingPage = () => {
     };
   }, []);
 
+  const changeSection = (newSection: number) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    const newDirection = newSection > currentSection ? 1 : -1;
+    setDirection(newDirection);
+    setCurrentSection(newSection);
+    setTimeout(() => setIsAnimating(false), 1000); // 애니메이션 시간과 일치
+  };
+
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -49,8 +59,7 @@ const LandingPage = () => {
         Math.min(3, currentSection + newDirection)
       );
       if (nextSection !== currentSection) {
-        setDirection(newDirection);
-        setCurrentSection(nextSection);
+        changeSection(nextSection);
       }
     };
 
@@ -67,8 +76,7 @@ const LandingPage = () => {
         // 위로 스와이프
         const nextSection = Math.min(3, currentSection + 1);
         if (nextSection !== currentSection) {
-          setDirection(1);
-          setCurrentSection(nextSection);
+          changeSection(nextSection);
         }
       }
 
@@ -76,30 +84,53 @@ const LandingPage = () => {
         // 아래로 스와이프
         const nextSection = Math.max(0, currentSection - 1);
         if (nextSection !== currentSection) {
-          setDirection(-1);
-          setCurrentSection(nextSection);
+          changeSection(nextSection);
+        }
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextSection = Math.min(3, currentSection + 1);
+        if (nextSection !== currentSection) {
+          changeSection(nextSection);
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const nextSection = Math.max(0, currentSection - 1);
+        if (nextSection !== currentSection) {
+          changeSection(nextSection);
         }
       }
     };
 
     window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart as any, {
+    window.addEventListener('touchstart', handleTouchStart, {
       passive: false,
     });
-    window.addEventListener('touchmove', handleTouchMove as any, {
+    window.addEventListener('touchmove', handleTouchMove, {
       passive: false,
     });
-    window.addEventListener('touchend', handleTouchEnd as any, {
+    window.addEventListener('touchend', handleTouchEnd, {
       passive: false,
     });
+    window.addEventListener(
+      'keydown',
+      handleKeyDown as unknown as EventListener
+    );
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart as any);
-      window.removeEventListener('touchmove', handleTouchMove as any);
-      window.removeEventListener('touchend', handleTouchEnd as any);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener(
+        'keydown',
+        handleKeyDown as unknown as EventListener
+      );
     };
-  }, [currentSection, touchStart, touchEnd]);
+  }, [currentSection, touchStart, touchEnd, isAnimating]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -107,7 +138,7 @@ const LandingPage = () => {
         const { top, bottom } = cardRef.current.getBoundingClientRect();
         const windowHeight = window.innerHeight;
         const progress = 1 - (bottom - windowHeight) / (bottom - top);
-        controls.start({ progress: Math.max(0, Math.min(1, progress)) } as any);
+        controls.start({ progress: Math.max(0, Math.min(1, progress)) });
       }
     };
 
@@ -353,10 +384,8 @@ const LandingPage = () => {
             className={`w-3 h-3 rounded-full mx-1 ${
               currentSection === index ? 'bg-coral' : 'bg-gray-300'
             }`}
-            onClick={() => {
-              setDirection(index > currentSection ? 1 : -1);
-              setCurrentSection(index);
-            }}
+            onClick={() => changeSection(index)}
+            aria-label={`섹션 ${index + 1}로 이동`}
           />
         ))}
       </nav>
