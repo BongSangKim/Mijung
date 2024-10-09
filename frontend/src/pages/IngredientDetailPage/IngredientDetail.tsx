@@ -226,7 +226,7 @@ const IngredientDetailPage = () => {
                   height={400}
                 />
               </div>
-              <div className="w-full max-w-4xl">
+              <div className="w-full max-w-4xl mb-8">
                 <PriceGraphCard
                   graphId={ingredientId}
                   title={`${name ?? '식재료'} 가격 추이`}
