@@ -3,9 +3,13 @@ import { RecipeRecommendation } from '@/shared/api/tasteSuggestTypes';
 
 interface RecommendedRecipesProps {
   recipes: RecipeRecommendation[] | undefined;
+  onItemClick: () => void;
 }
 
-export const RecommendedRecipes = ({ recipes }: RecommendedRecipesProps) => {
+export const RecommendedRecipes = ({
+  recipes,
+  onItemClick,
+}: RecommendedRecipesProps) => {
   if (!recipes || recipes.length === 0) {
     return <div className="text-text-light">추천 레시피가 없습니다.</div>;
   }
@@ -19,6 +23,7 @@ export const RecommendedRecipes = ({ recipes }: RecommendedRecipesProps) => {
             key={recipe.recipeId}
             to={`/recipes/${recipe.recipeId}`}
             className="bg-background-light rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col"
+            onClick={onItemClick}
           >
             <div className="relative pb-[100%]">
               <img
