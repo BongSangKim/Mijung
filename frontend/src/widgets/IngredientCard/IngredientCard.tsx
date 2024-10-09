@@ -55,6 +55,30 @@ const IngredientCard = ({
     return retailUnit;
   };
 
+  const getPriceChangeInfo = (
+    changeRate: number | undefined | null,
+    changePrice: number | undefined | null
+  ) => {
+    if (
+      changeRate === undefined ||
+      changeRate === null ||
+      changePrice === undefined ||
+      changePrice === null
+    ) {
+      return { text: '변동 정보 없음', color: 'text-gray-500' };
+    }
+
+    if (changeRate === 0 || changeRate === 0.0) {
+      return { text: '변동 없음', color: 'text-gray-500' };
+    }
+
+    const isIncrease = changeRate > 0;
+    return {
+      text: `${isIncrease ? '▲' : '▼'} ${Math.abs(changeRate).toFixed(1)}% (${formatPrice(Math.abs(changePrice))})`,
+      color: isIncrease ? 'text-red-500' : 'text-blue-500',
+    };
+  };
+
   return (
     <div
       className="bg-white shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-[300px] group cursor-pointer rounded-t-2xl"
@@ -76,7 +100,7 @@ const IngredientCard = ({
           onError={() => setImageError(true)}
         />
         <div className="absolute top-2 left-2 right-2 flex justify-between items-center">
-          <span className="inline-block px-2 py-1 bg-white bg-opacity-70 text-black text-sm font-semibold rounded-full">
+          <span className="inline-block px-3 py-1.5 bg-white bg-opacity-70 text-black text-base font-bold rounded-full shadow-md">
             {ingredient.name}
           </span>
         </div>
@@ -91,16 +115,14 @@ const IngredientCard = ({
           ) : (
             <p className="text-lg text-gray-400">가격정보 없음</p>
           )}
-          {ingredient?.changeRate !== undefined &&
-            ingredient?.changePrice !== undefined && (
-              <p
-                className={`text-sm ${ingredient.changeRate >= 0 ? 'text-red-500' : 'text-blue-500'} mt-1`}
-              >
-                {ingredient.changeRate >= 0 ? '▲' : '▼'}{' '}
-                {Math.abs(ingredient.changeRate).toFixed(1)}% (
-                {formatPrice(Math.abs(ingredient.changePrice))})
-              </p>
-            )}
+          <p
+            className={`text-sm ${getPriceChangeInfo(ingredient.changeRate, ingredient.changePrice).color} mt-1`}
+          >
+            {
+              getPriceChangeInfo(ingredient.changeRate, ingredient.changePrice)
+                .text
+            }
+          </p>
         </div>
       </div>
       <Button

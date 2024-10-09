@@ -109,6 +109,10 @@ const IngredientDetailPage = () => {
     changePrice: number | null | undefined
   ) => {
     if (changeRate == null || changePrice == null) {
+      return { text: '변동 정보 없음', color: 'text-gray-500' };
+    }
+
+    if (changeRate === 0 || changeRate === 0.0) {
       return { text: '변동 없음', color: 'text-gray-500' };
     }
 
