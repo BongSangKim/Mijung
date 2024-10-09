@@ -36,7 +36,6 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
     message: string;
     type: 'add' | 'remove' | 'clear';
   } | null>(null);
-  const [showClearAlert, setShowClearAlert] = useState(false);
   const [showTip, setShowTip] = useState<string | null>(null);
 
   const toggleTip = (tab: string) => {
@@ -91,15 +90,6 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   const handleSuggestItemClick = (item: { id: number; name: string }) => {
     addIngredient(item.id, item.name);
     setSearchKeyword(''); // 검색어 초기화
-  };
-
-  const handleIngredientRemove = (id: number, name: string) => {
-    removeIngredient(id);
-  };
-
-  const handleClearIngredients = () => {
-    clearIngredients();
-    setShowClearAlert(true);
   };
 
   const handleItemClick = () => {
