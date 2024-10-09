@@ -10,6 +10,9 @@ import {
   RecommendedRecipe,
 } from '../../features/ingredient/api/useIngredientRecommendRecipes';
 import { FaArrowLeft } from 'react-icons/fa';
+import { Button } from '@/shared/components/Button';
+import { useMyIngredientsStore } from '@/shared/stores/myIngredientsStore';
+import { checkKoreanRo } from '@/shared/utils/checkKorean';
 
 // 배경색에 따라 텍스트 색상을 결정하는 함수
 const getContrastColor = (hexColor: string) => {
@@ -52,6 +55,8 @@ const IngredientDetailPage = () => {
   } = useIngredientInfo(Number(id));
   const { data: recommendedRecipesResponse, isLoading: isLoadingRecipes } =
     useIngredientRecommendRecipes(Number(id));
+  const { ingredients, addIngredient, removeIngredient } =
+    useMyIngredientsStore();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -76,76 +81,121 @@ const IngredientDetailPage = () => {
     changePrice,
     colorHex,
   } = ingredientInfo;
-  const [primaryColor] = colorHex?.split(',') ?? ['#FFFFFF'];
+  const [primaryColor, secondaryColor] = colorHex?.split(',') ?? [
+    '#FFFFFF',
+    '#EEEEEE',
+  ];
   const pastelColor = toPastelColor(primaryColor);
   const textColor = getContrastColor(pastelColor);
+
+  const isInMyIngredients = ingredients.some((i) => i.id === ingredientId);
+
+  const handleAddOrRemove = () => {
+    if (isInMyIngredients) {
+      removeIngredient(ingredientId);
+    } else {
+      addIngredient(ingredientId, name);
+    }
+  };
 
   const formatPrice = (price: number | null | undefined) => {
     return price != null ? price.toLocaleString('ko-KR') : '정보 없음';
   };
 
+  const getPriceChangeInfo = (
+    changeRate: number | null | undefined,
+    changePrice: number | null | undefined
+  ) => {
+    if (changeRate == null || changePrice == null) {
+      return { text: '변동 없음', color: 'text-gray-500' };
+    }
+
+    const isIncrease = changeRate > 0;
+    const absoluteChangeRate = Math.abs(changeRate);
+    const absoluteChangePrice = Math.abs(changePrice);
+
+    return {
+      text: `${isIncrease ? '▲' : '▼'} ${absoluteChangeRate.toFixed(1)}% (${formatPrice(absoluteChangePrice)}원 ${isIncrease ? '상승' : '하락'})`,
+      color: isIncrease ? 'text-red-500' : 'text-blue-500',
+    };
+  };
+
+  const priceChangeInfo = getPriceChangeInfo(changeRate, changePrice);
+
   return (
     <>
-      <div
-        className="w-full py-8 px-4 mb-8 relative"
-        style={{ backgroundColor: pastelColor, color: textColor }}
-      >
-        <button
-          onClick={handleGoBack}
-          className="absolute left-4 top-4 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 rounded-full p-2 transition-all duration-200"
-          style={{ color: textColor }}
+      <div className="w-full lg:w-[70%] relative">
+        <div
+          className="py-8 px-4 mb-8"
+          style={{ backgroundColor: pastelColor, color: textColor }}
         >
-          <FaArrowLeft size={24} />
-        </button>
-        <div className="container mx-auto flex flex-col sm:flex-row items-center">
-          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md mb-4 sm:mb-0 sm:mr-6 flex-shrink-0">
-            <img
-              src={image ?? '/default-image.png'}
-              alt={name ?? '식재료 이미지'}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-grow text-center sm:text-left">
-            <h1 className="text-4xl font-bold mb-4">
-              {name ?? '알 수 없는 식재료'}
-            </h1>
-            <div className="flex flex-col sm:flex-row justify-between items-center sm:items-end">
-              <div>
-                <p className="text-3xl font-semibold mb-2">
-                  {price != null
-                    ? `${formatPrice(Number(price))}원`
-                    : '정보 없음'}
-                </p>
-                {retailUnitsize && retailUnit && (
-                  <p className="text-lg opacity-80">
-                    {retailUnitsize}
-                    {retailUnit} 기준
-                  </p>
-                )}
+          <button
+            onClick={handleGoBack}
+            className="absolute left-4 top-4 bg-white bg-opacity-50 hover:bg-opacity-75 text-gray-800 rounded-full p-2 transition-all duration-200"
+            style={{ color: textColor }}
+          >
+            <FaArrowLeft size={24} />
+          </button>
+          <div className="container mx-auto">
+            <div className="flex flex-col sm:flex-row items-center">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md mb-4 sm:mb-0 sm:mr-6 flex-shrink-0">
+                <img
+                  src={image ?? '/default-image.png'}
+                  alt={name ?? '식재료 이미지'}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <div className="text-center sm:text-right mt-4 sm:mt-0">
-                {changeRate != null && (
-                  <p
-                    className={`text-2xl font-bold ${changeRate >= 0 ? 'text-red-500' : 'text-blue-500'}`}
-                  >
-                    {changeRate >= 0 ? '▲' : '▼'}{' '}
-                    {Math.abs(changeRate).toFixed(1)}%
-                  </p>
-                )}
-                {changePrice != null && (
-                  <p className="text-lg opacity-80">
-                    {formatPrice(Math.abs(changePrice))}원{' '}
-                    {changePrice >= 0 ? '상승' : '하락'}
-                  </p>
-                )}
+              <div className="flex-grow text-center sm:text-left">
+                <h1 className="text-4xl font-bold mb-4">
+                  {name ?? '알 수 없는 식재료'}
+                </h1>
+                <div className="flex flex-col sm:flex-row justify-between items-center sm:items-end">
+                  <div>
+                    <p className="text-3xl font-semibold mb-2">
+                      {price != null
+                        ? `${formatPrice(Number(price))}원`
+                        : '정보 없음'}
+                    </p>
+                    {retailUnitsize && retailUnit && (
+                      <p className="text-lg opacity-80">
+                        {retailUnitsize}
+                        {retailUnit} 기준
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-center sm:text-right mt-4 sm:mt-0">
+                    <p
+                      className={`text-2xl font-bold ${priceChangeInfo.color}`}
+                    >
+                      {priceChangeInfo.text}
+                    </p>
+                  </div>
+                </div>
               </div>
+              <Button
+                variant={isInMyIngredients ? 'secondary' : 'primary'}
+                size="lg"
+                onClick={handleAddOrRemove}
+                className="mt-4 sm:mt-0 sm:ml-4 px-6 py-3 text-lg font-semibold transition-colors duration-300"
+                style={{
+                  backgroundColor: isInMyIngredients ? 'white' : secondaryColor,
+                  color: isInMyIngredients
+                    ? secondaryColor
+                    : getContrastColor(secondaryColor),
+                  borderColor: secondaryColor,
+                }}
+              >
+                {isInMyIngredients
+                  ? '목록에서 제거'
+                  : `${name}${checkKoreanRo(name)} 추천받기`}
+              </Button>
             </div>
           </div>
         </div>
       </div>
       <div className="grid grid-cols-10">
         <MainLayout>
-          <div className="container mx-auto px-4">
+          <div className="container mx-auto px-4 lg:px-0 max-w-6xl">
             <div className="flex flex-col items-center gap-8">
               <div className="w-full max-w-4xl mt-8 bg-white shadow-md rounded-lg p-6">
                 <h2 className="text-2xl font-semibold mb-4">추천 레시피</h2>
@@ -170,6 +220,8 @@ const IngredientDetailPage = () => {
                 <NetworkGraphCard
                   graphId={ingredientId}
                   title={`${name ?? '식재료'} 관련 네트워크 그래프`}
+                  width="100%"
+                  height={400}
                 />
               </div>
               <div className="w-full max-w-4xl">
