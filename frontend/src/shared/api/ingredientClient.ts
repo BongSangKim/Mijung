@@ -6,6 +6,7 @@ import {
   IngredientInfo,
   IngredientCosineResponse,
   RecommendedRecipe,
+  IngredientPrediction,
 } from './ingredientTypes';
 
 // 실제 API와 통신하는 클라이언트 클래스
@@ -75,6 +76,15 @@ export default class IngredientClient {
   ): Promise<AxiosResponse<RecommendedRecipe[]>> {
     return axios.get<RecommendedRecipe[]>(
       `${this.baseURL}/ingredients/${ingredientId}/recommend-recipes`
+    );
+  }
+
+  async getIngredientPredictions(
+    ingredientId: number
+  ): Promise<AxiosResponse<{ data: IngredientPrediction[] }>> {
+    console.log(`Fetching predictions for ingredient ID: ${ingredientId}`);
+    return axios.get<{ data: IngredientPrediction[] }>(
+      `${this.baseURL}/ingredients/${ingredientId}/price-graph`
     );
   }
 }
