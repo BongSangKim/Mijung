@@ -20,8 +20,8 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Integer>
     Page<Ingredient> findByItemNameContaining(String keyword, Pageable pageable);
     @Query("SELECT i FROM IngredientInfo i WHERE i.ingredient.id = :ingredientId AND i.date BETWEEN :oneYearAgo AND :today")
     List<IngredientInfo> findInfoByDateRange(Integer ingredientId, LocalDate oneYearAgo, LocalDate today);
-    @Query("SELECT p FROM IngredientPredict p WHERE p.ingredient.id = :ingredientId AND p.date BETWEEN :today AND :oneWeekLater")
-    List<IngredientPredict> findPredictByDateRange(Integer ingredientId, LocalDate today, LocalDate oneWeekLater);
+    @Query("SELECT p FROM IngredientPredict p WHERE p.ingredient.id = :ingredientId AND p.date BETWEEN :today AND :endOfYear")
+    List<IngredientPredict> findPredictByDateRange(Integer ingredientId, LocalDate today, LocalDate endOfYear);
 
     @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM Ingredient i WHERE i.id IN :ids")
     boolean existsByIdIn(@Param("ids") List<Integer> ids);

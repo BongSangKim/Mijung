@@ -121,31 +121,29 @@ public class IngredientService {
 
         LocalDate today = LocalDate.now();
         LocalDate oneYearAgo = today.minusYears(1);
-        LocalDate oneWeekLater = today.plusWeeks(1);
+        LocalDate endOfYear = LocalDate.of(today.getYear(), 12, 31); // 12월 31일 설정
 
         List<IngredientInfo> infoList = ingredientRepository.findInfoByDateRange(ingredientId, oneYearAgo, today);
-        List<IngredientPredict> predictList = ingredientRepository.findPredictByDateRange(ingredientId, oneYearAgo, oneWeekLater);
-
+        List<IngredientPredict> predictList = ingredientRepository.findPredictByDateRange(ingredientId, oneYearAgo, endOfYear);
 
         Map<LocalDate, Integer> predictPriceMap = predictList.stream()
-            .collect(Collectors.toMap(IngredientPredict::getDate, IngredientPredict::getPredictedPrice));
+                .collect(Collectors.toMap(IngredientPredict::getDate, IngredientPredict::getPredictedPrice));
 
         List<IngredientPriceGraphViewResponse> result = infoList.stream()
-            .map(info -> IngredientPriceGraphViewResponse.of(
-                info.getDate(),
-                info.getPrice(),
-                predictPriceMap.getOrDefault(info.getDate(), null)
-            ))
-            .collect(Collectors.toList());
-
+                .map(info -> IngredientPriceGraphViewResponse.of(
+                        info.getDate(),
+                        info.getPrice(),
+                        predictPriceMap.getOrDefault(info.getDate(), null)
+                ))
+                .collect(Collectors.toList());
 
         predictList.stream()
-            .filter(predict -> predict.getDate().isAfter(today))
-            .forEach(predict -> result.add(IngredientPriceGraphViewResponse.of(
-                predict.getDate(),
-                null, // 미래 날짜의 실제 가격은 null
-                predict.getPredictedPrice()
-            )));
+                .filter(predict -> predict.getDate().isAfter(today))
+                .forEach(predict -> result.add(IngredientPriceGraphViewResponse.of(
+                        predict.getDate(),
+                        null, // 미래 날짜의 실제 가격은 null
+                        predict.getPredictedPrice()
+                )));
 
         return result;
     }
