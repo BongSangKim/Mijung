@@ -61,7 +61,7 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
         const timer = setTimeout(() => {
           setShowAnimation(false);
           sessionStorage.setItem('tasteSuggestNotificationSeen', 'true');
-        }, 2000);
+        }, 10000);
         return () => clearTimeout(timer);
       }
     }
@@ -189,10 +189,10 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ y: isMobile ? '100%' : 0, x: isMobile ? 0 : '100%' }}
-          animate={{ y: 0, x: 0 }}
-          exit={{ y: isMobile ? '100%' : 0, x: isMobile ? 0 : '100%' }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
           className={`fixed bg-background shadow-lg flex flex-col z-40 ${
             isMobile
               ? 'inset-0 bottom-16'
@@ -203,15 +203,38 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
           <AnimatePresence>
             {showAnimation && (
               <motion.div
-                initial={{ opacity: 0, y: 20, x: '100%' }}
-                animate={{ opacity: 1, y: 0, x: 0 }}
-                exit={{ opacity: 0, y: 20, x: '100%' }}
-                transition={{ duration: 0.5 }}
-                className={`absolute bg-blueberry text-white px-4 py-2 rounded-lg text-sm max-w-[200px] z-50 ${
-                  isMobile ? 'bottom-20 right-4' : 'bottom-4 right-4'
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                transition={{
+                  duration: 0.5,
+                  ease: [0.19, 1, 0.22, 1],
+                }}
+                className={`absolute bg-blueberry text-white px-6 py-4 rounded-2xl text-sm max-w-[280px] z-50 shadow-xl ${
+                  isMobile ? 'bottom-32 right-4' : 'bottom-16 right-4'
                 }`}
               >
-                여기에서 식재료/레시피를 추천받을 수 있어요!
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                >
+                  여기서 식재료와 레시피를
+                </motion.p>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.7, duration: 0.5 }}
+                >
+                  추천받을 수 있어요!
+                </motion.p>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2, duration: 0.5 }}
+                >
+                  맛있는 요리 여정을 시작해보세요.
+                </motion.p>
               </motion.div>
             )}
           </AnimatePresence>

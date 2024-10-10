@@ -228,7 +228,7 @@ const IngredientDetailPage = () => {
                   <p>추천 레시피가 없습니다.</p>
                 )}
               </div>
-              <div className="w-full max-w-4xl">
+              <div className={`w-full max-w-4xl`}>
                 <NetworkGraphCard
                   graphId={ingredientId}
                   title={`${name ?? '식재료'} 관련 네트워크 그래프`}
@@ -236,12 +236,15 @@ const IngredientDetailPage = () => {
                   height={400}
                 />
               </div>
-              <div className="w-full max-w-4xl mb-8">
-                <PriceGraphCard
-                  graphId={ingredientId}
-                  title={`${name ?? '식재료'} 가격 추이`}
-                />
-              </div>
+              {price != null && (
+                <div className="w-full max-w-4xl">
+                  <PriceGraphCard
+                    graphId={ingredientId}
+                    title={`${name ?? '식재료'} 가격 추이`}
+                  />
+                </div>
+              )}
+              <div className="mb-8"></div>
             </div>
           </div>
         </MainLayout>
