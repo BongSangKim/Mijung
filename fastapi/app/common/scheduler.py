@@ -153,7 +153,7 @@ def extract_rates_from_element(root: ET.Element) -> Tuple[Optional[float], Optio
 
         if rate_item is None:
             logging.info("Rate information not found in the XML data")
-            return None, None, None
+            return 0, 0, 0
 
         # Extract rates
         weekrate = extract_rate(rate_item.find('weekprice').text)

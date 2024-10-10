@@ -22,20 +22,6 @@ def initialize_models():
     logging.info("IS_LOCAL: %s", settings.IS_LOCAL)
         
     try:
-        # Spark 초기화
-        #.master("local[*]") \
-        #.master("spark://3.35.55.230:7077") \
-        
-        #    .master("local[*]") \ 백업용 (원래 코드)
-        #   .master("spark://3.36.68.89:7077") \
-        # spark = SparkSession.builder \
-        #     .appName("MySparkApp") \
-        #     .master("local[*]")\
-        #     .config("spark.hadoop.fs.defaultFS", "hdfs://172.26.3.102:9000") \
-        #     .config("spark.ui.enabled", "false") \
-        #         .config("spark.hadoop.fs.socket.timeout", "10000") \
-        #     .getOrCreate()
-        # logging.info("Spark 세션이 성공적으로 초기화되었습니다.")
         builder = SparkSession.builder.appName("MySparkApp")
         if settings.IS_LOCAL == 'local':
             builder = builder.master("local[*]")
