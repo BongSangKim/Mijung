@@ -246,7 +246,15 @@ const PriceGraphCard: React.FC<PriceGraphCardProps> = ({ graphId, title }) => {
                 stroke="#4A5568"
               />
               <Tooltip
-                formatter={(value: number) => [formatYAxis(value), '가격']}
+                formatter={(value: number, name: string) => {
+                  const formattedValue = formatYAxis(value);
+                  if (name === 'price') {
+                    return [formattedValue, '실제 가격'];
+                  } else if (name === 'expectedPrice') {
+                    return [formattedValue, '예측 가격'];
+                  }
+                  return [formattedValue, name];
+                }}
                 contentStyle={{
                   backgroundColor: 'rgba(255, 255, 255, 0.8)',
                   borderRadius: '0.375rem',
