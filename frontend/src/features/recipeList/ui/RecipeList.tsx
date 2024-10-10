@@ -49,6 +49,7 @@ export const RecipeList = ({ keyword }: Props) => {
         >
           <RxReload />
         </motion.div>
+        <span className="text-sm ml-2">추천받기</span>
       </Button>
       {data?.recipes.length === 0 ? (
         <div className="text-text-light">데이터가 없습니다.</div>

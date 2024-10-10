@@ -15,6 +15,15 @@ export const useIngredientRecommendations = (ingredients: number[]) => {
   });
 };
 
+// 이전 재료 추천을 위한 커스텀 훅
+export const useOldIngredientRecommendations = (ingredients: number[]) => {
+  return useQuery<IngredientRecommendation[], Error>({
+    queryKey: ['oldIngredientRecommendations', ingredients],
+    queryFn: () => tasteSuggestApi.getOldRecommendedIngredients(ingredients),
+    enabled: ingredients.length > 0,
+  });
+};
+
 // 레시피 추천을 위한 커스텀 훅
 export const useRecipeRecommendations = (ingredients: number[]) => {
   return useQuery<RecipeRecommendation[], Error>({
