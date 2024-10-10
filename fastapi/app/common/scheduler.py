@@ -60,7 +60,7 @@ def fetch_data_from_api():
                     f"&p_cert_key={settings.KAMIS_KEY}&p_cert_id={settings.KAMIS_ID}&p_returntype=xml"
                 )
             
-
+            
             try:
                 response = requests.get(url)
                 response.raise_for_status()  # Raise an HTTPError for bad status
@@ -70,20 +70,28 @@ def fetch_data_from_api():
 
                 # 첫 번째 <item> 요소 찾기
                 first_item = root.find('.//data/item')
-
+                
                 # price, weekprice, monthprice, yearprice 추출하기
                 if first_item is not None:
+                    
                     price = extract_price(first_item.find('price').text)
                     if ingredient.product_rank_code != '07':
+                        weekprice, monthprice, yearprice = 0,0,0
                         week_item = first_item.find('weekprice')
                         month_item = first_item.find('monthprice')
                         year_item = first_item.find('yearprice')
-                        if week_item is not None and month_item is not None and year_item is not None:
+                        if week_item is not None:
                             weekprice = extract_price(week_item.text)
+                            if weekprice == 0:
+                                weekprice = price
+                        if month_item is not None:
                             monthprice = extract_price(month_item.text)
+                            if monthprice == 0:
+                                monthprice=price
+                        if year_item is not None:
                             yearprice = extract_price(year_item.text)
-                            if price ==0:
-                                price = weekprice
+                            if yearprice==0:
+                                yearprice=price
                             
                         else:
                             print("Week, month, or year price not found in the XML data for item: " + str(ingredient))
@@ -93,7 +101,10 @@ def fetch_data_from_api():
                         weekprice = monthprice = yearprice = price
                         
                     diff_week, diff_month, diff_year = extract_rates_from_element(root)
-                        
+                    
+                    if price == 0:
+                        price = weekprice
+
                   #  preditedprice = model.predict()
                     ingredient_info = IngredientInfo(
                         date=today,
