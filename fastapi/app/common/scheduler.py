@@ -1,6 +1,7 @@
 from typing import Optional, Tuple
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from fastapi.exceptions import RequestValidationError
 from app.databases.database import engineconn
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from app.schemas.ingredient import Ingredient
@@ -8,10 +9,12 @@ from app.schemas import IngredientInfo, ingredientRate
 from sqlalchemy import not_
 import requests
 import datetime
+from app.error.GlobalExceptionHandler import add_exception_handlers
 from app.common.config import settings
 import xml.etree.ElementTree as ET
 import pytz
 import re
+import logging
 def fetch_data_from_api():
     # SQLAlchemy engine과 세션 가져오기
     db_engine = engineconn()
@@ -24,7 +27,7 @@ def fetch_data_from_api():
         filtered_ingredients = db_session.query(Ingredient).filter(
             Ingredient.is_priced == True
         ).all()
-        print(f"Filtered ingredients count: {len(filtered_ingredients)}")  # 필터링된 재료 수 확인
+        logging.debug(f"Filtered ingredients count: {len(filtered_ingredients)}")  # 필터링된 재료 수 확인
         today = datetime.date.today().strftime('%Y-%m-%d')
         db_session.query(IngredientInfo).filter(IngredientInfo.date == today).delete()
         db_session.query(ingredientRate.IngredientRate).filter(ingredientRate.IngredientRate.date == today).delete()
@@ -43,7 +46,7 @@ def fetch_data_from_api():
                     f"&p_itemcategorycode={ingredient.item_category_code}"
                     f"&p_itemcode={ingredient.item_code}"
                     f"&p_kindcode={ingredient.kind_code}"
-                    f"&p_convert_kg_yn=Y"
+                    f"&p_convert_kg_yn=N"
                     f"&p_cert_key={settings.KAMIS_KEY}&p_cert_id={settings.KAMIS_ID}&p_returntype=xml"
                 )
             else :
@@ -53,7 +56,7 @@ def fetch_data_from_api():
                     f"&p_itemcategorycode={ingredient.item_category_code}"
                     f"&p_itemcode={ingredient.item_code}"
                     f"&p_kindcode={ingredient.kind_code}"
-                    f"&p_convert_kg_yn=Y"
+                    f"&p_convert_kg_yn=N"
                     f"&p_cert_key={settings.KAMIS_KEY}&p_cert_id={settings.KAMIS_ID}&p_returntype=xml"
                 )
             
@@ -113,16 +116,16 @@ def fetch_data_from_api():
                     db_session.commit()
 
                 else:
-                    print("No item found in the XML data." + str(ingredient))
+                    logging.info("No item found in the XML data." + str(ingredient))
             except requests.RequestException as e:  # requests 라이브러리 전용 예외 처리
-                print(f"An error occurred while fetching data for item code {ingredient.item_code}: {e}")
+                logging.info(f"An error occurred while fetching data for item code {ingredient.item_code}: {e}")
             except SQLAlchemyError as e:
-                print(f"Error occurred while inserting into the database: {e}")
+                logging.info(f"Error occurred while inserting into the database: {e}")
         
     except (IntegrityError, SQLAlchemyError) as e:
-        print(f"Database error occurred: {e}")  # 두 에러를 한 번의 메시지 출력으로 통합
+        logging.info(f"Database error occurred: {e}")  # 두 에러를 한 번의 메시지 출력으로 통합
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")  # 일반적인 예외 처리
+        logging.info(f"An unexpected error occurred: {e}")  # 일반적인 예외 처리
     finally:
         db_session.close()  # 세션을 닫습니다.
 
@@ -149,7 +152,7 @@ def extract_rates_from_element(root: ET.Element) -> Tuple[Optional[float], Optio
         rate_item = root.find(".//data/item[countyname='등락률']")
 
         if rate_item is None:
-            print("Rate information not found in the XML data")
+            logging.info("Rate information not found in the XML data")
             return None, None, None
 
         # Extract rates
@@ -159,8 +162,8 @@ def extract_rates_from_element(root: ET.Element) -> Tuple[Optional[float], Optio
 
         return weekrate, monthrate, yearrate
 
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+    except RequestValidationError as e:
+        logging.info("not valid data")
         return 0, 0, 0
 
 def extract_rate(rate_text: str) -> Optional[float]:
