@@ -1,0 +1,120 @@
+# Version top-level element is obsolete
+# https://docs.docker.com/reference/compose-file/version-and-name/
+
+name: mijung
+
+services:
+  db:
+    image: mysql:8.4.1
+    volumes:
+      - "../mysql/mysql-data:/var/lib/mysql"
+      - "../mysql/mysql-config:/etc/mysql/conf.d"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Seoul
+      LANG: C.UTF-8
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    networks:
+      - mijung_net
+    container_name: mijung_db
+
+  webserver:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+    volumes:
+      - ./dist:/usr/share/nginx/html
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf:/etc/nginx/ssl/:ro
+    networks:
+      - mijung_net
+    container_name: nginx
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+    networks:
+      - mijung_net
+    container_name: certbot
+
+  backend:
+    image: vaaastlake/mijung_backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_DB: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      DDL_AUTO_OPTION: update
+      CORS_URL: https://mijung.store
+      FPGROWTH_MODEL_PATH: ${FPGROWTH_MODEL_PATH}
+    expose:
+      - "8080"
+    networks:
+      - mijung_net
+    container_name: mijung_backend
+
+  fast_api:
+    build:
+      context: ./fastapi
+      target: builder
+    ports:
+      - "8000:8000"
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      PORT: 8000
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DB: ${MYSQL_DB}
+      MYSQL_PORT: ${MYSQL_PORT}
+      KAMIS_KEY: ${KAMIS_KEY}
+      KAMIS_ID: ${KAMIS_ID}
+      CORS_URL: ${CORS_URL}
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+      SPARK_ENV: ${SPARK_ENV}
+      SPARK_URL: ${SPARK_URL}
+      HADOOP_URL: ${HADOOP_URL}
+      BASIC_PATH: ${BASIC_PATH}
+      CSV_FILE: ${CSV_FILE}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL}
+      RECIPE_MODEL: ${RECIPE_MODEL}
+    volumes:
+      - ./hadoop-conf:/etc/hadoop
+    networks:
+      - mijung_net
+    container_name: mijung_fastapi
+
+volumes:
+  mysql_data:
+
+networks:
+  mijung_net:
+    driver: bridge
