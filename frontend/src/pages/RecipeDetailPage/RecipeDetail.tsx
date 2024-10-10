@@ -266,6 +266,50 @@ export const RecipeDetailPage = () => {
     }
   };
 
+  const [fontSize, setFontSize] = useState(48); // 초기 폰트 크기
+
+  useEffect(() => {
+    if (!recipe || recipe.steps.length === 0) return;
+
+    const adjustFontSize = () => {
+      if (contentRef.current) {
+        const container = contentRef.current.parentElement;
+        if (container) {
+          let size = 48;
+          let minSize = 16;
+          let maxSize = 48;
+
+          const fitText = () => {
+            contentRef.current!.style.fontSize = `${size}px`;
+            return (
+              contentRef.current!.scrollHeight <= container.clientHeight &&
+              contentRef.current!.scrollWidth <= container.clientWidth
+            );
+          };
+
+          // 이진 검색을 사용하여 적절한 폰트 크기를 찾습니다.
+          while (maxSize - minSize > 1) {
+            size = Math.floor((minSize + maxSize) / 2);
+            if (fitText()) {
+              minSize = size;
+            } else {
+              maxSize = size;
+            }
+          }
+
+          // 최종적으로 맞는 크기를 설정합니다.
+          size = minSize;
+          contentRef.current.style.fontSize = `${size}px`;
+          setFontSize(size);
+        }
+      }
+    };
+
+    adjustFontSize();
+    window.addEventListener('resize', adjustFontSize);
+    return () => window.removeEventListener('resize', adjustFontSize);
+  }, [recipe, currentStepIndex]);
+
   if (error) return <Error />;
   if (isLoading) return <div>로딩 중...</div>;
 
@@ -291,27 +335,27 @@ export const RecipeDetailPage = () => {
                   <FaHeart size={24} />
                 </button>
               </div>
-              <div className="flex space-x-2">
+              <div className="flex flex-wrap space-x-2">
                 <button
                   onClick={handleOpenTimer}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs sm:text-sm sm:px-4 sm:py-2"
                 >
-                  <FaClock className="inline-block mr-2" />
-                  타이머 설정
-                </button>
-                <button
-                  onClick={handleOpenExplanation}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded"
-                >
-                  <FaInfoCircle className="inline-block mr-2" />
-                  타이머 설명
+                  <FaClock className="inline-block mr-1" />
+                  타이머
                 </button>
                 <button
                   onClick={toggleAudioMode}
-                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                  className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs sm:text-sm sm:px-4 sm:py-2"
                 >
-                  <FaVolumeUp className="inline-block mr-2" />
-                  소리 듣기 모드
+                  <FaVolumeUp className="inline-block mr-1" />
+                  음성모드
+                </button>
+                <button
+                  onClick={handleOpenExplanation}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-2 py-1 rounded text-xs sm:text-sm sm:px-4 sm:py-2"
+                >
+                  <FaInfoCircle className="inline-block mr-1" />
+                  설명
                 </button>
               </div>
             </div>
@@ -458,19 +502,26 @@ export const RecipeDetailPage = () => {
             {showExplanation && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white p-6 rounded-lg max-w-md">
-                  <h2 className="text-xl font-bold mb-4">타이머 사용 안내</h2>
-                  <ul className="list-disc list-inside">
+                  <h2 className="text-xl font-bold mb-4">
+                    요리 도우미 사용 안내
+                  </h2>
+                  <ul className="list-disc list-inside space-y-2">
                     <li>
-                      레시피 내 시간 정보(예: 30분, 1시간 등)를 클릭하시면
-                      자동으로 타이머가 설정됩니다.
+                      <strong>타이머:</strong> 레시피 내 시간 정보(예: 30분,
+                      1시간 등)를 클릭하면 자동으로 타이머가 설정됩니다.
+                      타이머는 드래그로 이동 가능하며, 일시정지와 재생 기능을
+                      사용할 수 있습니다.
                     </li>
-                    <li>타이머는 원하는 위치로 드래그하여 이동할 수 있어요.</li>
                     <li>
-                      일시정지와 재생 기능을 자유롭게 사용하실 수 있습니다.
+                      <strong>음성모드:</strong> 요리 중 손을 사용하지 않고
+                      레시피를 들을 수 있습니다. 화면을 좌우로 스와이프하거나
+                      화면 양쪽을 탭하여 단계를 이동할 수 있고, 화면을
+                      더블탭하면 현재 단계를 다시 들을 수 있습니다.
                     </li>
-                    <li>타이머가 종료되면 알람이 울립니다.</li>
-                    <li>15초 이하로 남으면 초읽기 소리가 나요.</li>
-                    <li>다른 페이지로 이동해도 타이머는 계속 작동합니다.</li>
+                    <li>
+                      이 기능들은 요리 중 편리하게 레시피를 확인하고 따라할 수
+                      있도록 도와드립니다. 맛있는 요리 되세요!
+                    </li>
                   </ul>
                   <button
                     onClick={() => setShowExplanation(false)}
@@ -511,7 +562,11 @@ export const RecipeDetailPage = () => {
                       onDoubleClick={handleDoubleClick}
                     >
                       <div className="w-full p-6 relative">
-                        <p className="text-3xl leading-relaxed">
+                        <p
+                          ref={contentRef}
+                          className="leading-relaxed overflow-auto max-h-full"
+                          style={{ fontSize: `${fontSize}px` }}
+                        >
                           {recipe.steps[currentStepIndex].content}
                         </p>
                       </div>
@@ -526,7 +581,7 @@ export const RecipeDetailPage = () => {
                       <img
                         src={recipe.steps[currentStepIndex].image}
                         alt={`Step ${recipe.steps[currentStepIndex].stepNumber}`}
-                        className="max-w-full max-h-full object-contain opacity-10"
+                        className="max-w-full max-h-full object-contain opacity-40"
                       />
                     </div>
                   )}

@@ -8,19 +8,19 @@ const MainPage = () => {
     data: weeklyIngredients,
     isError: isWeeklyError,
     error: weeklyError,
-  } = useIngredientSise({ period: 'week', change: 'positive', count: 4 });
+  } = useIngredientSise({ period: 'week', change: 'negative', count: 4 });
   const {
     data: monthlyIngredients,
     isError: isMonthlyError,
     error: monthlyError,
-  } = useIngredientSise({ period: 'month', change: 'positive', count: 4 });
+  } = useIngredientSise({ period: 'month', change: 'negative', count: 4 });
   const {
     data: mainIngredients,
     isError: isMainError,
     error: mainError,
   } = useIngredientSise({
     period: 'year',
-    change: 'positive',
+    change: 'negative',
     count: 4,
   });
 
@@ -40,39 +40,21 @@ const MainPage = () => {
             실시간 식재료 가격
           </h1>
           <div className="mt-8">
-            <h2 className="text-2xl font-semibold mb-4 text-coral-dark">
-              이번 주 특가 식재료
-            </h2>
-            <p className="text-text-light mb-4">
-              지난 주보다 가격이 내려간 식재료예요
-            </p>
             <IngredientSiseList
               ingredients={weeklyIngredients ?? []}
-              title="주간 시세"
+              title="이번 주 특가 식재료"
             />
           </div>
           <div className="mt-8">
-            <h2 className="text-2xl font-semibold mb-4 text-coral-dark">
-              이번 달 인기 식재료
-            </h2>
-            <p className="text-text-light mb-4">
-              지난 달보다 많이 팔린 식재료예요
-            </p>
             <IngredientSiseList
               ingredients={monthlyIngredients ?? []}
-              title="월간 시세"
+              title="이번 달 인기 식재료"
             />
           </div>
           <div className="mt-8">
-            <h2 className="text-2xl font-semibold mb-4 text-coral-dark">
-              연중 저렴한 식재료
-            </h2>
-            <p className="text-text-light mb-4">
-              1년 내내 가격 변동이 적은 식재료예요
-            </p>
             <IngredientSiseList
               ingredients={mainIngredients ?? []}
-              title="주요 식재료"
+              title="올해 저렴한 식재료"
             />
           </div>
         </div>

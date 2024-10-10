@@ -72,9 +72,16 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
   }, [isOpen, isMobile, showAnimation]);
 
   const handleSuggestItemClick = useCallback(
+    (item: { id: number; name: string }) => {
+      addIngredient(item.id, item.name);
+      setSearchKeyword('');
+    },
+    [addIngredient]
+  );
+
+  const handleAddRecommendedIngredient = useCallback(
     (id: number, name: string) => {
       addIngredient(id, name);
-      setSearchKeyword('');
     },
     [addIngredient]
   );
@@ -85,71 +92,109 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
     }
   }, [isMobile, onClose]);
 
-  const tabBar = (
-    <div className="flex border-t border-gray-200">
-      <button
-        className={`flex-1 py-2 px-4 text-sm font-medium ${
-          activeTab === 'ingredients'
-            ? 'text-mint border-t-2 border-mint'
-            : 'text-gray-500 hover:text-gray-700'
-        }`}
-        onClick={() => setActiveTab('ingredients')}
-      >
-        추천 식재료
-      </button>
-      <button
-        className={`flex-1 py-2 px-4 text-sm font-medium ${
-          activeTab === 'recipes'
-            ? 'text-mint border-t-2 border-mint'
-            : 'text-gray-500 hover:text-gray-700'
-        }`}
-        onClick={() => setActiveTab('recipes')}
-      >
-        추천 레시피
-      </button>
-    </div>
-  );
-
-  const content = (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-bold mb-4 text-blueberry">
-          나만의 요리 도우미
-        </h2>
-        <button
-          onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <FaTimes size={24} />
-        </button>
-      </div>
-      <Searchbar
-        type="ingredients"
-        onSearch={() => {}}
-        isSuggestSearch={true}
-        onSuggestItemClick={handleSuggestItemClick}
-        value={searchKeyword}
-        onChange={setSearchKeyword}
-      />
-      <MyIngredients
-        ingredients={ingredients}
-        onRemove={removeIngredient}
-        onClear={clearIngredients}
-      />
+  const tabContent = (
+    <div className="flex-grow overflow-auto">
+      {showTip === 'ingredients' && (
+        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 mb-4 relative">
+          <button
+            onClick={closeTip}
+            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+          >
+            <FaTimes />
+          </button>
+          <p className="text-sm text-gray-600 pr-6">
+            이 추천은 연관 규칙 마이닝 기반의 장바구니 분석 알고리즘을 사용해요.
+            레시피 빅데이터를 통해 식재료 간의 연관성을 파악하고, 지지도와
+            신뢰도를 계산하여 가장 관련성 높은 식재료를 제안해드려요. 🛒✨
+          </p>
+        </div>
+      )}
+      {showTip === 'recipes' && (
+        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 mb-4 relative">
+          <button
+            onClick={closeTip}
+            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+          >
+            <FaTimes />
+          </button>
+          <p className="text-sm text-gray-600 pr-6">
+            이 추천은 선택한 식재료들의 코사인 유사도 벡터를 활용해요. 각
+            식재료의 벡터값을 조합하여 복합적인 유사도를 계산하고, 이를 바탕으로
+            가장 적합한 레시피를 찾아내요. 🍳🧮
+          </p>
+        </div>
+      )}
       {activeTab === 'ingredients' && (
         <RecommendedIngredients
           ingredients={recommendedIngredients || []}
           oldIngredients={oldRecommendedIngredients || []}
-          onAdd={handleSuggestItemClick}
+          onAdd={handleAddRecommendedIngredient}
           onItemClick={handleItemClick}
         />
       )}
-      {activeTab === 'recipes' && (
+      {activeTab === 'recipes' && recommendedRecipes && (
         <RecommendedRecipes
           recipes={recommendedRecipes}
           onItemClick={handleItemClick}
         />
       )}
+    </div>
+  );
+
+  const tabBar = (
+    <div className="flex justify-around items-center bg-gradient-to-b from-gray-100 to-gray-200 border-t border-gray-300 p-3 rounded-t-2xl shadow-lg">
+      <button
+        onClick={() => {
+          setActiveTab('ingredients');
+          toggleTip('ingredients');
+        }}
+        className={`flex-1 py-2 px-4 text-center relative rounded-lg transition-all duration-300 ${
+          activeTab === 'ingredients'
+            ? 'bg-mint text-white font-bold shadow-md'
+            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+        }`}
+      >
+        식재료 추천받기
+      </button>
+      <div className="w-px h-8 bg-gray-400 mx-2"></div>
+      <button
+        onClick={() => {
+          setActiveTab('recipes');
+          toggleTip('recipes');
+        }}
+        className={`flex-1 py-2 px-4 text-center relative rounded-lg transition-all duration-300 ${
+          activeTab === 'recipes'
+            ? 'bg-mint text-white font-bold shadow-md'
+            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+        }`}
+      >
+        레시피 추천받기
+      </button>
+    </div>
+  );
+
+  const content = (
+    <div className="flex flex-col h-full">
+      <div className="p-6 flex-grow overflow-y-auto">
+        <h2 className="text-3xl font-bold mb-4 text-blueberry">
+          나만의 요리 도우미
+        </h2>
+        <Searchbar
+          type="ingredients"
+          onSearch={() => {}}
+          isSuggestSearch={true}
+          onSuggestItemClick={handleSuggestItemClick}
+          value={searchKeyword}
+          onChange={setSearchKeyword}
+        />
+        <MyIngredients
+          ingredients={ingredients}
+          onRemove={removeIngredient}
+          onClear={clearIngredients}
+        />
+        {tabContent}
+      </div>
+      {tabBar}
     </div>
   );
 
@@ -159,10 +204,10 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+          initial={{ y: isMobile ? '100%' : 0, x: isMobile ? 0 : '100%' }}
+          animate={{ y: 0, x: 0 }}
+          exit={{ y: isMobile ? '100%' : 0, x: isMobile ? 0 : '100%' }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           className={`fixed bg-background shadow-lg flex flex-col z-40 ${
             isMobile
               ? 'inset-0 bottom-16'
@@ -170,7 +215,6 @@ export const TasteSuggest = ({ isOpen, onClose }: TasteSuggestProps) => {
           }`}
         >
           <div className="flex-grow overflow-y-auto">{content}</div>
-          {!isMobile && tabBar}
           <AnimatePresence>
             {showAnimation && (
               <motion.div

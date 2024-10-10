@@ -8,6 +8,6 @@ import './styles/tailwind.css';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
-    <ToastContainer position="bottom-right" autoClose={1000} />
+    <ToastContainer position="top-right" autoClose={1000} />
   </React.StrictMode>
 );
