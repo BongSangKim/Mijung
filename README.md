@@ -45,37 +45,45 @@
 
 ## 🖥️ 미정(味定) 서비스 화면
 
+### 랜딩 페이지
+
+![랜딩 페이지](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/9f44fd1c-e9ca-4838-8b13-d23af39bb3e9/%EB%A0%88%EC%8B%9C%ED%94%BC-%EB%AA%A9%EB%A1%9D%EA%B2%80%EC%83%89.gif?table=block&id=ea49707c-0454-441d-9ab2-578c74ad1eb9&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728691200000&signature=nxX_k6ANditlr7Dqg8n2g0k-CMoKNIFAUyF1NDUUpxs)
+
 ### 메인화면 - 식재료 가격
 
-![메인]()
+![메인](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/ace393dc-687d-46d1-8879-d98a78ed6e62/%EB%A9%94%EC%9D%B8.gif?table=block&id=d6247ab7-fab6-49f0-8c34-9b554b77b4db&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728691200000&signature=rG3p9WyW7hsoIe7_aAk9MnppcidoEW4DUwK8qy92Up8)
 
 ### 식재료 - 목록, 검색
 
-![식재료 목록 조회]()
+![식재료 목록 조회](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/74df7771-ab87-427c-95e9-7890cc5415fa/%EC%8B%9D%EC%9E%AC%EB%A3%8C-%EB%AA%A9%EB%A1%9D%EA%B2%80%EC%83%89.gif?table=block&id=b5198845-17df-4937-86be-87f75e98192b&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728691200000&signature=rtia7y7w_YU7mhIJ_gFPYsXITyAmmT-uotGi8gnZZ_I)
 
 ### 식재료 상세보기 - 식재료 정보, 식재료 가격추이 그래프, 네트워크 그래프, 레시피 추천
 
-![식재료 상세보기]()
-
-### 나만의 요리 도우미 - 식재료 추가, 삭제, 검색
-
-![나만의 요리 도우미 - 식재료 추가, 삭제, 검색]()
-
-### 나만의 요리 도우미 - 어울리는 식재료 추천
-
-![나만의 요리 도우미 - 어울리는 식재료 추천]()
-
-### 나만의 요리 도우미 - 추천 레시피
-
-![나만의 요리 도우미 - 추천 레시피]()
+![식재료 상세보기](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/f1233a5e-19db-48df-86bf-55dd4975d0f3/%EC%8B%9D%EC%9E%AC%EB%A3%8C_%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0.gif?table=block&id=b8b1ab3d-84a4-49f1-8d5d-79601a2ab711&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728691200000&signature=4GgnDW5sxXNDK6nUindNwXNCeusQxT91CdEprIEjsLg)
 
 ### 레시피 - 목록, 검색
 
-![레시피 목록 조회]()
+![레시피 목록 조회](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/37510f50-18c7-42fc-b22c-5ff36db101f7/%EB%A0%88%EC%8B%9C%ED%94%BC-%EB%AA%A9%EB%A1%9D%EA%B2%80%EC%83%89.gif?table=block&id=687f3d9f-e3a6-459f-896c-5572e1009327&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728691200000&signature=MeFzRnoKplASYz-8WAFRRn2lCAXihNgmLjp5ui0rLVM)
 
 ### 레시피 상세보기 - 레시피 재료, 조리 방법, QR코드
 
-![레시피 상세보기]()
+![레시피 상세보기](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/e4025851-9e57-4015-ae80-db9a9075fb0f/%EB%A0%88%EC%8B%9C%ED%94%BC_%EC%83%81%EC%84%B8%EB%B3%B4%EA%B8%B0.gif?table=block&id=ff006ed6-c2a3-498d-8d78-96b00222f310&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728691200000&signature=uS5HjN6x0sFO7CLXuaXo9YHCQhOGv4ibEQ8Fbl3SGlQ)
+
+### 나만의 요리 도우미 - 식재료 추가, 삭제, 검색
+
+![나만의 요리 도우미 - 식재료 추가, 삭제, 검색](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/fad1f958-bc99-45ce-9cfb-c1465cd77833/%EB%82%98%EB%A7%8C%EC%9D%98_%EC%9A%94%EB%A6%AC_%EB%8F%84%EC%9A%B0%EB%AF%B8-%EC%8B%9D%EC%9E%AC%EB%A3%8C_%EC%B6%94%EA%B0%80_%EC%82%AD%EC%A0%9C_%EA%B2%80%EC%83%89.gif?table=block&id=9dde10b0-e430-49a0-9805-c5693d5169f1&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728691200000&signature=vLgh8WIrUCA-w9o5YTW0WgNyk-AFGjkmwPQ-OrMiInU)
+
+### 나만의 요리 도우미 - 식재료 추천
+
+![나만의 요리 도우미 - 식재료 추천](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/2cda2355-e176-4f0f-855d-7199c17abbdb/%EB%82%98%EB%A7%8C%EC%9D%98_%EC%9A%94%EB%A6%AC_%EB%8F%84%EC%9A%B0%EB%AF%B8-%EC%8B%9D%EC%9E%AC%EB%A3%8C_%EC%B6%94%EC%B2%9C.gif?table=block&id=d24f257b-47c4-4165-aa4f-cf9967c276ba&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728691200000&signature=2Pvz2jhLmydn6uLW83mZcRv0n-uSlUD7RIWIgn3wQeo)
+
+### 나만의 요리 도우미 - 추천 레시피
+
+![나만의 요리 도우미 - 추천 레시피](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/d3016467-c34e-47d8-a227-7ba855e7a538/%EB%82%98%EB%A7%8C%EC%9D%98_%EC%9A%94%EB%A6%AC_%EB%8F%84%EC%9A%B0%EB%AF%B8-%EC%B6%94%EC%B2%9C_%EB%A0%88%EC%8B%9C%ED%94%BC.gif?table=block&id=8bd9215b-bb0d-49ee-9bdc-8729c55cb78f&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728691200000&signature=npZ1hVXZxwmlGyvAV68OaqbrSJsl_dq-3-5qLqn_4gU)
+
+### 찜한 레시피
+
+![찜한 레시피](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/e21f937f-0f31-4d0b-b1a7-ab8ef4c11892/%EC%B0%9C%ED%95%9C_%EB%A0%88%EC%8B%9C%ED%94%BC.gif?table=block&id=78dbf4fe-6201-41ef-8dd0-53ff81d587c4&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728691200000&signature=5QPoieT5Pp92yuePgFPmA98aWoLiy_jimoc0Lc5v_ms)
 
 <br>
 <br>
