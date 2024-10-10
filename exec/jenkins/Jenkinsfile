@@ -1,0 +1,230 @@
+pipeline {
+    agent any
+
+    tools {
+        gradle 'gradle-8.10'
+        nodejs 'node-20.15.0'
+    }
+
+    environment {
+        FRONTEND_DIR = './frontend'
+        BACKEND_DIR = './backend/mijung'
+        BACKEND_IMG = 'mijung_backend'
+        PROJECT_DIR = './S11P21D107'
+        TEST_PROJECT_DIR = '/home/ubuntu/jenkins-project'
+        AWS_HOST = credentials('AWS_HOST')
+        AWS_IP = credentials('AWS_IP')
+    }
+
+    triggers {
+        pollSCM 'H 12,5,23 * * 1-5'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checkout processing...'
+                checkout scm
+                echo 'Checkout done'
+            }
+        }
+        stage('Prepare Environment') {
+            steps {
+                // Config File Provider 플러그인을 사용하여 .env 파일 가져오기
+                configFileProvider([configFile(fileId: 'react-production-env', variable: 'FE_ENV_FILE')]) {
+                    sh "cp ${FE_ENV_FILE} ${FRONTEND_DIR}/.env.production"
+                }
+            }
+        }
+        stage('Builds') {
+            parallel {
+                stage('BE Build') {
+                    steps {
+                        echo 'BE Building...'
+                        dir("${BACKEND_DIR}") {
+                            sh 'chmod +x ./gradlew'
+                            sh './gradlew clean build -x test'
+                        }
+                        echo 'BE Building complete.'
+                    }
+                }
+                stage('FE Build') {
+                    steps {
+                        echo 'FE Building...'
+                        dir("${FRONTEND_DIR}") {
+                            sh 'npm install'
+                            sh 'npm run build'
+                        }
+                        echo 'FE Building complete.'
+                    }
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'No test here.'
+            }
+        }
+        stage('Build Backend docker images & deliver') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub',
+                        passwordVariable: 'DOCKER_PASSWORD',
+                        usernameVariable: 'DOCKER_USERNAME'
+                )]) {
+                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                    dir("${BACKEND_DIR}") {
+                        echo 'Building BE docker image...'
+                        sh "docker build -t $DOCKER_USERNAME/${BACKEND_IMG}:${env.BUILD_ID} ."
+                        sh "docker tag $DOCKER_USERNAME/${BACKEND_IMG}:${env.BUILD_ID} \
+                            $DOCKER_USERNAME/${BACKEND_IMG}:latest"
+                        sh "docker push $DOCKER_USERNAME/${BACKEND_IMG}:${env.BUILD_ID}"
+                        sh "docker push $DOCKER_USERNAME/${BACKEND_IMG}:latest"
+                        echo 'Building BE docker image complete.'
+                    }
+                    // fe build 결과는 nginx로 배포하기에 도커 이미지 빌드 불필요
+                }
+            }
+        }
+        stage('Send Frontend build file to EC2') {
+            steps{
+                dir("${FRONTEND_DIR}") {
+                    sshagent(['ssh-agent']) {
+                        script {
+                             // 먼저 원격 서버에 임시 디렉토리 생성
+                            sh "ssh ubuntu@${AWS_IP} 'mkdir -p ${PROJECT_DIR}/temp'"
+                            
+                            // scp를 사용하여 파일을 전송
+                            sh "scp -r ./dist/* ubuntu@${AWS_IP}:${PROJECT_DIR}/temp/"
+                            
+                            // 원격 서버에서 파일을 이동하고 정리
+                            sh """
+                                ssh ubuntu@${AWS_IP} '
+                                    rm -rf ${PROJECT_DIR}/dist &&
+                                    mv ${PROJECT_DIR}/temp ${PROJECT_DIR}/dist &&
+                                    find ${PROJECT_DIR}/dist -type d -exec chmod 755 {} \\; &&
+                                    find ${PROJECT_DIR}/dist -type f -exec chmod 644 {} \\;
+                                '
+                            """
+                        }
+                    }
+                }
+            }
+        }
+        stage('Deploy to EC2') {
+            stages {
+                stage('Initializing server') {
+                    steps {
+                        echo 'Initializing....'
+                        withCredentials([
+                            usernamePassword(
+                                credentialsId: 'gitlab-credential', 
+                                usernameVariable: 'GITLAB_USERNAME', 
+                                passwordVariable: 'GITLAB_PASSWORD')
+                        ]) {
+                            sshagent(['ssh-agent']) {
+                                script {
+                                    configFileProvider([configFile(fileId: 'docker-compose-env', variable: 'DOCKER_ENV_FILE')]) {
+                                        sh "scp ${DOCKER_ENV_FILE} ubuntu@${AWS_IP}:~/S11P21D107/.env"
+                                    }
+
+                                    sh """
+                                        ssh ubuntu@${AWS_IP} '
+                                            echo current branch name is ${env.BRANCH_NAME}
+
+                                            cd ./S11P21D107
+                                            git switch ${env.BRANCH_NAME}
+                                            git pull https://${GITLAB_USERNAME}:${GITLAB_PASSWORD}@lab.ssafy.com/s11-bigdata-dist-sub1/S11P21D107.git ${env.BRANCH_NAME}
+
+                                            docker compose stop backend
+                                            docker compose rm -f backend
+                                            docker rmi vaaastlake/${BACKEND_IMG}
+
+                                            docker compose stop fast_api
+                                            docker compose rm -f fast_api
+                                            docker rmi mijung-fast_api
+                                        '
+                                    """
+                                } 
+                            }
+                        }
+                    }
+                }
+                stage('Restarting apps') {
+                    steps {
+                        echo 'Restarting...'
+                        sshagent(['ssh-agent']) {
+                            script {
+                                sh """
+                                    ssh ubuntu@${AWS_IP} '
+                                        cd ./S11P21D107
+                                        docker compose up -d --no-deps backend
+                                        docker compose restart webserver
+                                        docker compose up -d --no-deps fast_api
+                                    '
+                                """
+                            }
+                        }
+                    }
+                }
+                stage('Cleaning Server') {
+                    steps {
+                        echo 'Cleaning...'
+                        sshagent(['ssh-agent']) {
+                            script {
+                                sh """
+                                    ssh ubuntu@${AWS_IP} '
+                                        cd ./S11P21D107
+                                    '
+                                """
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Build Success.'
+            dir("${PROJECT_DIR}") {
+                script {
+                    def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+                    def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+                    mattermostSend(color: 'good',
+                        message: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)",
+                        endpoint: 'https://meeting.ssafy.com/hooks/43tjcd33mfybfeu8isx8uatxmr',
+                        channel: 'Jenkins-build-notification',
+                        failOnError: true
+                    )
+                }
+            }
+            cleanWs()
+        }
+        failure {
+            echo 'Build Fail.'
+            dir("${PROJECT_DIR}") {
+                script {
+                    def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+                    def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+                    mattermostSend(color: 'danger',
+                        message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)",
+                        endpoint: 'https://meeting.ssafy.com/hooks/43tjcd33mfybfeu8isx8uatxmr',
+                        channel: 'Jenkins-build-notification',
+                        failOnError: true
+                    )
+                }
+            }
+            cleanWs()
+        }
+        always {
+            sh """
+                pwd
+                docker logout
+                rm -f ${FRONTEND_DIR}/.env.production       
+            """
+            echo 'everything is done'
+        }
+    }
+}
