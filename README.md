@@ -178,7 +178,10 @@
 - mlxtend: 카테고리별 연관 규칙 학습
 - collections: 빈도 분석
 - scikit-learn: 코사인 유사도 계산
-
+- APScheduler: 작업 스케쥴러
+- fastapi: 서버
+- PyMySQL: DB
+- pytest: 테스트
 ## 📋 미정(味定) 관련 문서
 
 ### 기능 명세서
