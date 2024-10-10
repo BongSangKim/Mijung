@@ -100,8 +100,9 @@ const IngredientDetailPage = () => {
     }
   };
 
-  const formatPrice = (price: number | null | undefined) => {
-    return price != null ? price.toLocaleString('ko-KR') : '정보 없음';
+  const formatPrice = (price: number | string | null | undefined) => {
+    if (price == null) return '정보 없음';
+    return Number(price).toLocaleString('ko-KR');
   };
 
   const getPriceChangeInfo = (
@@ -133,7 +134,10 @@ const IngredientDetailPage = () => {
       <div className="w-full lg:w-[70%] relative">
         <div
           className="py-8 px-4 mb-8"
-          style={{ backgroundColor: pastelColor, color: textColor }}
+          style={{
+            backgroundColor: pastelColor || '#FFFFFF',
+            color: textColor || '#000000',
+          }}
         >
           <button
             onClick={handleGoBack}
@@ -159,10 +163,10 @@ const IngredientDetailPage = () => {
                   <div>
                     <p className="text-3xl font-semibold mb-2">
                       {price != null
-                        ? `${formatPrice(Number(price))}원`
-                        : '정보 없음'}
+                        ? `${formatPrice(price)}원`
+                        : '가격 정보 없음'}
                     </p>
-                    {retailUnitsize && retailUnit && (
+                    {retailUnitsize != null && retailUnit != null && (
                       <p className="text-lg opacity-80">
                         {retailUnitsize}
                         {retailUnit} 기준
@@ -184,16 +188,18 @@ const IngredientDetailPage = () => {
                 onClick={handleAddOrRemove}
                 className="mt-4 sm:mt-0 sm:ml-4 px-6 py-3 text-lg font-semibold transition-colors duration-300"
                 style={{
-                  backgroundColor: isInMyIngredients ? 'white' : secondaryColor,
+                  backgroundColor: isInMyIngredients
+                    ? 'white'
+                    : secondaryColor || '#EEEEEE',
                   color: isInMyIngredients
-                    ? secondaryColor
-                    : getContrastColor(secondaryColor),
-                  borderColor: secondaryColor,
+                    ? secondaryColor || '#EEEEEE'
+                    : getContrastColor(secondaryColor || '#EEEEEE'),
+                  borderColor: secondaryColor || '#EEEEEE',
                 }}
               >
                 {isInMyIngredients
                   ? '목록에서 제거'
-                  : `${name}${checkKoreanRo(name)} 추천받기`}
+                  : `${name || '식재료'}${checkKoreanRo(name || '식재료')} 추천받기`}
               </Button>
             </div>
           </div>
