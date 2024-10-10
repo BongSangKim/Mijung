@@ -71,3 +71,9 @@ export interface RecommendedRecipe {
 export interface IngredientRecommendRecipeResponse {
   data: RecommendedRecipe[];
 }
+
+export interface IngredientPrediction {
+  date: string;
+  price: number | null;
+  expectedPrice: number | null;
+}
