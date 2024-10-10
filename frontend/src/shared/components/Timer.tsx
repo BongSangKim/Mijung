@@ -24,6 +24,7 @@ const Timer: React.FC = () => {
   const [playStart] = useSound('/sounds/timer-start.mp3');
   const [playEnd] = useSound('/sounds/timer-end.mp3');
   const [playTick] = useSound('/sounds/timer-tick.mp3');
+  const [playClick] = useSound('/sounds/click.mp3', { volume: 0.5 });
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const endedRef = useRef(false);
@@ -160,20 +161,31 @@ const Timer: React.FC = () => {
     }
   };
 
-  const handleClose = () => {
-    try {
-      if (isRunning) {
-        setIsRunning(false);
-        toast.info('타이머를 중단시켰습니다.');
-      }
-      setIsOpen(false);
-    } catch (error) {
-      console.error('타이머 닫기 중 오류 발생:', error);
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    if (isRunning) {
+      pauseTimer();
     }
-  };
+  }, [isRunning, pauseTimer, setIsOpen]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    try {
+  const handleWheel = useCallback(
+    (e: React.WheelEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const delta = Math.sign(e.deltaY) * -1; // 스크롤 방향에 따라 1 또는 -1
+      if (focusedDial === 'hours') {
+        setHours((prev) => (prev + delta + 24) % 24);
+      } else if (focusedDial === 'minutes') {
+        setMinutes((prev) => (prev + delta + 60) % 60);
+      } else if (focusedDial === 'seconds') {
+        setSeconds((prev) => (prev + delta + 60) % 60);
+      }
+      playClick();
+    },
+    [focusedDial, playClick]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
       e.preventDefault();
       if (e.key === 'ArrowLeft') {
         setFocusedDial((prev) =>
@@ -192,7 +204,7 @@ const Timer: React.FC = () => {
               : 'hours'
         );
       } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-        const increment = e.key === 'ArrowUp' ? -1 : 1;
+        const increment = e.key === 'ArrowUp' ? 1 : -1;
         if (focusedDial === 'hours') {
           setHours((prev) => (prev + increment + 24) % 24);
         } else if (focusedDial === 'minutes') {
@@ -200,21 +212,35 @@ const Timer: React.FC = () => {
         } else if (focusedDial === 'seconds') {
           setSeconds((prev) => (prev + increment + 60) % 60);
         }
+        playClick();
       } else if (e.key === 'Enter') {
         handleSettingsSubmit();
       }
-    } catch (error) {
-      console.error('키 입력 처리 중 오류 발생:', error);
-    }
-  };
+    },
+    [focusedDial, playClick, handleSettingsSubmit]
+  );
+
+  useEffect(() => {
+    const preventScroll = (e: WheelEvent) => {
+      if (showSettings) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('wheel', preventScroll, { passive: false });
+
+    return () => {
+      window.removeEventListener('wheel', preventScroll);
+    };
+  }, [showSettings]);
 
   return (
     <Draggable cancel=".no-drag">
-      <div className="fixed top-4 left-4 bg-gray-900 shadow-lg rounded-lg p-6 cursor-move max-w-xs w-full text-gray-200">
+      <div className="fixed top-20 left-4 bg-gray-900 shadow-lg rounded-lg p-6 cursor-move max-w-xs w-full text-gray-200">
         <div className="absolute top-2 right-2">
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-gray-400 hover:text-white transition-colors no-drag"
             aria-label="닫기"
           >
             <FaTimes size={20} />
@@ -228,29 +254,37 @@ const Timer: React.FC = () => {
         <div className="flex justify-between space-x-2 mb-2">
           <button
             onClick={isRunning ? pauseTimer : startTimer}
-            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-full transition-colors flex items-center justify-center"
+            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-full transition-colors flex items-center justify-center no-drag"
           >
             {isRunning ? <FaPause /> : <FaPlay />}
           </button>
           <button
             onClick={resetTimer}
-            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-full transition-colors flex items-center justify-center"
+            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-full transition-colors flex items-center justify-center no-drag"
           >
             <FaStop />
           </button>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-full transition-colors flex items-center justify-center"
+            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-full transition-colors flex items-center justify-center no-drag"
           >
             <FaCog />
           </button>
         </div>
         {showSettings && (
-          <div className="mt-6 no-drag" onKeyDown={handleKeyDown} tabIndex={0}>
+          <div
+            className="mt-6 no-drag"
+            onKeyDown={handleKeyDown}
+            onWheel={handleWheel}
+            tabIndex={0}
+          >
             <div className="flex justify-between mb-6">
               <RotaryDial
                 value={hours}
-                onChange={setHours}
+                onChange={(newValue) => {
+                  setHours(newValue);
+                  playClick();
+                }}
                 max={23}
                 label="시"
                 isFocused={focusedDial === 'hours'}
@@ -258,7 +292,10 @@ const Timer: React.FC = () => {
               />
               <RotaryDial
                 value={minutes}
-                onChange={setMinutes}
+                onChange={(newValue) => {
+                  setMinutes(newValue);
+                  playClick();
+                }}
                 max={59}
                 label="분"
                 isFocused={focusedDial === 'minutes'}
@@ -266,7 +303,10 @@ const Timer: React.FC = () => {
               />
               <RotaryDial
                 value={seconds}
-                onChange={setSeconds}
+                onChange={(newValue) => {
+                  setSeconds(newValue);
+                  playClick();
+                }}
                 max={59}
                 label="초"
                 isFocused={focusedDial === 'seconds'}
@@ -275,7 +315,7 @@ const Timer: React.FC = () => {
             </div>
             <button
               onClick={handleSettingsSubmit}
-              className="w-full bg-gray-700 hover:bg-gray-600 text-white font-light px-4 py-3 rounded-full transition-colors"
+              className="w-full bg-gray-700 hover:bg-gray-600 text-white font-light px-4 py-3 rounded-full transition-colors no-drag"
             >
               설정 완료
             </button>

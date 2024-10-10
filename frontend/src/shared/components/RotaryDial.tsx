@@ -36,8 +36,8 @@ const RotaryDial: React.FC<RotaryDialProps> = ({
   const handleMove = (clientY: number) => {
     if (!isDragging) return;
     const deltaY = startY - clientY;
-    if (Math.abs(deltaY) > 20) {
-      // 틱틱 걸리는 느낌을 위해 임계값 증가
+    if (Math.abs(deltaY) > 10) {
+      // 감도를 조금 높임
       const newValue = (value + Math.sign(deltaY) + max + 1) % (max + 1);
       onChange(newValue);
       setStartY(clientY);
@@ -51,14 +51,23 @@ const RotaryDial: React.FC<RotaryDialProps> = ({
 
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
-    const newValue = (value + Math.sign(e.deltaY) + max + 1) % (max + 1);
+    const newValue = (value - Math.sign(e.deltaY) + max + 1) % (max + 1);
     onChange(newValue);
     playClick();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     e.preventDefault();
-    // 키보드 이벤트 처리는 상위 컴포넌트에서 수행합니다.
+    let newValue = value;
+    if (e.key === 'ArrowUp') {
+      newValue = (value + 1 + max + 1) % (max + 1);
+    } else if (e.key === 'ArrowDown') {
+      newValue = (value - 1 + max + 1) % (max + 1);
+    }
+    if (newValue !== value) {
+      onChange(newValue);
+      playClick();
+    }
   };
 
   useEffect(() => {
@@ -95,7 +104,9 @@ const RotaryDial: React.FC<RotaryDialProps> = ({
 
   return (
     <div
-      className={`flex flex-col items-center select-none ${isFocused ? 'ring-1 ring-blue-400' : ''}`}
+      className={`flex flex-col items-center select-none ${
+        isFocused ? 'ring-2 ring-blue-400 rounded-md' : ''
+      }`}
       ref={containerRef}
       onWheel={handleWheel}
       onMouseDown={(e) => handleStart(e.clientY)}
@@ -109,7 +120,7 @@ const RotaryDial: React.FC<RotaryDialProps> = ({
       <div className="text-sm font-light mb-2">{label}</div>
       <div className="relative w-16 h-28 bg-gray-700 rounded-md overflow-hidden">
         <div
-          className="absolute inset-0 flex flex-col items-center justify-center transition-transform duration-100 ease-in-out"
+          className="absolute inset-0 flex flex-col items-center justify-center transition-transform duration-150 ease-out"
           style={{ transform: `translateY(${(value - animatedValue) * 28}px)` }}
         >
           {[...Array(5)].map((_, i) => {
@@ -117,7 +128,9 @@ const RotaryDial: React.FC<RotaryDialProps> = ({
             return (
               <div
                 key={i}
-                className={`text-xl font-light ${i === 2 ? 'text-white scale-110' : 'text-gray-400'} transition-all duration-100`}
+                className={`text-xl font-light ${
+                  i === 2 ? 'text-white scale-110' : 'text-gray-400'
+                } transition-all duration-150`}
               >
                 {itemValue.toString().padStart(2, '0')}
               </div>

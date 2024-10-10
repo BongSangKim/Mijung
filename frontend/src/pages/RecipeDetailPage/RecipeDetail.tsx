@@ -1,21 +1,30 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSwipeable } from 'react-swipeable';
 import MainLayout from '../../app/RoutingLayout/MainLayout';
 import RightSideLayout from '../../app/RoutingLayout/RightSideLayout';
 import { useParams } from 'react-router-dom';
 import { useRecipeDetail } from '@/features/recipeList/api/useRecipeDetail';
 import { Error } from '@/shared/components';
 import { createQRCode } from '@/shared/lib/qrcode';
-import { useEffect, useState } from 'react';
 import { GoPerson } from 'react-icons/go';
 import { LuChefHat } from 'react-icons/lu';
 import { MdOutlineTimer } from 'react-icons/md';
 import { extractTimeInfo } from '@/shared/utils/timeExtractor';
-import Timer from '@/shared/components/Timer';
 import { toast } from 'react-toastify';
 import useSound from 'use-sound';
 import { useTimerStore } from '@/shared/stores/timerStore';
-import { FaClock, FaInfoCircle, FaHeart } from 'react-icons/fa';
-import timerStartSound from '@sound/timer-start';
+import {
+  FaClock,
+  FaInfoCircle,
+  FaHeart,
+  FaVolumeUp,
+  FaVolumeMute,
+  FaTimes,
+  FaChevronLeft,
+  FaChevronRight,
+} from 'react-icons/fa';
 import { useRecipeStore } from '@/shared/stores/jjimStore';
+import { speak, stopSpeaking } from '@/shared/utils/tts';
 
 export const RecipeDetailPage = () => {
   const { id = '' } = useParams<{ id: string }>();
@@ -27,9 +36,189 @@ export const RecipeDetailPage = () => {
 
   const [playStart] = useSound('/sounds/timer-start.mp3');
 
+  const [isAudioMode, setIsAudioMode] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  // const [transitionDirection, setTransitionDirection] = useState<
+  //   'left' | 'right' | null
+  // >(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // const [feedback, setFeedback] = useState<string | null>(null);
+  const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [showTTSMessage, setShowTTSMessage] = useState(false);
+  const speakingAnimationRef = useRef<NodeJS.Timeout | null>(null);
+  const ttsMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // const showFeedback = (message: string) => {
+  //   setFeedback(message);
+  //   if (feedbackTimeoutRef.current) {
+  //     clearTimeout(feedbackTimeoutRef.current);
+  //   }
+  //   feedbackTimeoutRef.current = setTimeout(() => {
+  //     setFeedback(null);
+  //   }, 1500);
+  // };
+
+  // const handleAreaClick = (area: 'left' | 'center' | 'right') => {
+  //   if (area === 'left') {
+  //     moveToStep('prev');
+  //   } else if (area === 'right') {
+  //     moveToStep('next');
+  //   }
+  // };
+
+  const handleDoubleClick = useCallback(() => {
+    if (recipe) {
+      stopSpeaking();
+      setIsSpeaking(true);
+      setShowTTSMessage(true);
+      speak(recipe.steps[currentStepIndex].content);
+
+      if (speakingAnimationRef.current) {
+        clearTimeout(speakingAnimationRef.current);
+      }
+      speakingAnimationRef.current = setTimeout(() => {
+        setIsSpeaking(false);
+      }, 500);
+
+      if (ttsMessageTimeoutRef.current) {
+        clearTimeout(ttsMessageTimeoutRef.current);
+      }
+      ttsMessageTimeoutRef.current = setTimeout(() => {
+        setShowTTSMessage(false);
+      }, 1500);
+    }
+  }, [recipe, currentStepIndex]);
+
+  const toggleAudioMode = useCallback(() => {
+    setIsAudioMode((prev) => {
+      if (!prev) {
+        setCurrentStepIndex(0);
+        if (recipe?.steps[0]) {
+          // setTimeout을 사용하여 상태 업데이트 후 speak 함수가 실행되도록 합니다.
+          setTimeout(() => {
+            speak(recipe.steps[0].content);
+          }, 0);
+        }
+      } else {
+        stopSpeaking();
+      }
+      return !prev;
+    });
+  }, [recipe]);
+
+  const moveToStep = useCallback(
+    (direction: 'next' | 'prev') => {
+      if (!recipe) return;
+      stopSpeaking();
+      // setTransitionDirection(direction === 'next' ? 'left' : 'right');
+      setCurrentStepIndex((prevIndex) => {
+        let newIndex = direction === 'next' ? prevIndex + 1 : prevIndex - 1;
+        if (newIndex < 0) newIndex = recipe.steps.length - 1;
+        if (newIndex >= recipe.steps.length) newIndex = 0;
+
+        if (contentRef.current) {
+          contentRef.current.style.transition = 'none';
+          contentRef.current.style.transform =
+            direction === 'next' ? 'translateX(100%)' : 'translateX(-100%)';
+
+          setTimeout(() => {
+            if (contentRef.current) {
+              contentRef.current.style.transition = 'transform 0.3s ease-out';
+              contentRef.current.style.transform = 'translateX(0)';
+            }
+          }, 50);
+        }
+
+        setTimeout(() => {
+          speak(recipe.steps[newIndex].content);
+          // setTransitionDirection(null);
+        }, 300);
+
+        return newIndex;
+      });
+    },
+    [recipe]
+  );
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => moveToStep('next'),
+    onSwipedRight: () => moveToStep('prev'),
+    // preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+    delta: 50, // 스와이프 감지 거리를 늘립니다.
+  });
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isAudioMode) {
+        if (e.key === 'ArrowRight') moveToStep('next');
+        if (e.key === 'ArrowLeft') moveToStep('prev');
+        if (e.key === 'Escape') toggleAudioMode();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      stopSpeaking();
+    };
+  }, [isAudioMode, moveToStep, toggleAudioMode]);
+
+  useEffect(() => {
+    const preventDefaultSwipe = (e: TouchEvent) => {
+      if (isAudioMode) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('touchmove', preventDefaultSwipe, {
+      passive: false,
+    });
+
+    return () => {
+      document.removeEventListener('touchmove', preventDefaultSwipe);
+    };
+  }, [isAudioMode]);
+
+  useEffect(() => {
+    return () => {
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current);
+      }
+      if (speakingAnimationRef.current) {
+        clearTimeout(speakingAnimationRef.current);
+      }
+      if (ttsMessageTimeoutRef.current) {
+        clearTimeout(ttsMessageTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const baseStyles = `relative inline-block pb-2 before:content-[''] before:absolute before:bottom-0 before:left-0 before:w-full before:h-px`;
   const dtStyle = 'before:bg-black';
   const ddStyle = 'before:bg-gray-300';
+
+  const [speakingStepId, setSpeakingStepId] = useState<number | null>(null);
+
+  const handleSpeak = (stepId: number, content: string) => {
+    if (speakingStepId === stepId) {
+      stopSpeaking();
+      setSpeakingStepId(null);
+    } else {
+      stopSpeaking();
+      speak(content);
+      setSpeakingStepId(stepId);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      stopSpeaking();
+    };
+  }, []);
 
   // Create QR Box
   useEffect(() => {
@@ -117,6 +306,13 @@ export const RecipeDetailPage = () => {
                   <FaInfoCircle className="inline-block mr-2" />
                   타이머 설명
                 </button>
+                <button
+                  onClick={toggleAudioMode}
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                >
+                  <FaVolumeUp className="inline-block mr-2" />
+                  소리 듣기 모드
+                </button>
               </div>
             </div>
 
@@ -203,9 +399,28 @@ export const RecipeDetailPage = () => {
                         <div
                           className={`w-full ${step.image ? 'md:w-2/3 md:pr-6' : ''} mb-4 md:mb-0`}
                         >
-                          <h3 className="font-semibold mb-2">
-                            Step {step.stepNumber}
-                          </h3>
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-semibold">
+                              Step {step.stepNumber}
+                            </h3>
+                            <button
+                              onClick={() =>
+                                handleSpeak(step.stepId, step.content)
+                              }
+                              className="text-blue-600 hover:text-blue-800"
+                              aria-label={
+                                speakingStepId === step.stepId
+                                  ? '음성 중지'
+                                  : '음성으로 듣기'
+                              }
+                            >
+                              {speakingStepId === step.stepId ? (
+                                <FaVolumeMute size={20} />
+                              ) : (
+                                <FaVolumeUp size={20} />
+                              )}
+                            </button>
+                          </div>
                           <p>
                             {step.content.split(' ').map((word, index) => {
                               const timeInfo = extractTimeInfo(word);
@@ -263,6 +478,72 @@ export const RecipeDetailPage = () => {
                   >
                     닫기
                   </button>
+                </div>
+              </div>
+            )}
+            {isAudioMode && (
+              <div
+                className="fixed inset-0 bg-white z-50 flex flex-col overflow-hidden"
+                {...handlers}
+              >
+                <div className="flex justify-between items-center p-4 bg-gray-100">
+                  <h2 className="text-3xl font-bold">
+                    Step {recipe.steps[currentStepIndex].stepNumber}
+                  </h2>
+                  <button
+                    onClick={toggleAudioMode}
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    <FaTimes size={30} />
+                  </button>
+                </div>
+                <div className="flex-grow relative overflow-hidden">
+                  <div
+                    ref={contentRef}
+                    className={`absolute inset-0 flex ${isSpeaking ? 'animate-pulse' : ''}`}
+                  >
+                    <div
+                      className="w-1/6 h-full"
+                      onClick={() => moveToStep('prev')}
+                    />
+                    <div
+                      className="w-2/3 h-full flex items-center justify-center"
+                      onDoubleClick={handleDoubleClick}
+                    >
+                      <div className="w-full p-6 relative">
+                        <p className="text-3xl leading-relaxed">
+                          {recipe.steps[currentStepIndex].content}
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      className="w-1/6 h-full"
+                      onClick={() => moveToStep('next')}
+                    />
+                  </div>
+                  {recipe.steps[currentStepIndex].image && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <img
+                        src={recipe.steps[currentStepIndex].image}
+                        alt={`Step ${recipe.steps[currentStepIndex].stepNumber}`}
+                        className="max-w-full max-h-full object-contain opacity-10"
+                      />
+                    </div>
+                  )}
+                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                    <FaChevronLeft size={36} />
+                  </div>
+                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                    <FaChevronRight size={36} />
+                  </div>
+                  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-gray-400 pointer-events-none">
+                    <FaVolumeUp size={36} />
+                  </div>
+                  {showTTSMessage && (
+                    <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-70 text-white px-6 py-3 rounded text-2xl">
+                      다시 들려드릴게요. 맛있는 요리 하세요!
+                    </div>
+                  )}
                 </div>
               </div>
             )}
