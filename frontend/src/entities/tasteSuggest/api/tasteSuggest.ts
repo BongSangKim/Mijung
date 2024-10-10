@@ -17,6 +17,14 @@ export default class TasteSuggestApi {
     return response.data.data;
   }
 
+  async getOldRecommendedIngredients(
+    ingredients: number[]
+  ): Promise<IngredientRecommendation[]> {
+    const response =
+      await this.client.getOldRecommendedIngredients(ingredients);
+    return response.data.data;
+  }
+
   async getRecommendedRecipes(
     ingredients: number[]
   ): Promise<RecipeRecommendation[]> {
