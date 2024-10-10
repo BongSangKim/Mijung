@@ -84,14 +84,15 @@ def fetch_data_from_api():
                             yearprice = extract_price(year_item.text)
                             if price ==0:
                                 price = weekprice
-                            diff_week, diff_month, diff_year = extract_rates_from_element(root)
+                            
                         else:
                             print("Week, month, or year price not found in the XML data for item: " + str(ingredient))
                             continue  # 다음 반복으로 넘어갑니다.
 
                     else: 
                         weekprice = monthprice = yearprice = price
-
+                        
+                    diff_week, diff_month, diff_year = extract_rates_from_element(root)
                         
                   #  preditedprice = model.predict()
                     ingredient_info = IngredientInfo(
