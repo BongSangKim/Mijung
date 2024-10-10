@@ -262,7 +262,7 @@ const PriceGraphCard: React.FC<PriceGraphCardProps> = ({ graphId, title }) => {
                 name="실제 가격"
                 dot={renderCustomizedDot as any} //build용 테스트. 고장나면 체크
                 activeDot={{ r: 8 }}
-                strokeWidth={2}
+                strokeWidth={3}
               />
               {showExpectedPrice && (
                 <Line
@@ -272,7 +272,7 @@ const PriceGraphCard: React.FC<PriceGraphCardProps> = ({ graphId, title }) => {
                   strokeDasharray="5 5"
                   name="예측 가격"
                   dot={false}
-                  strokeWidth={2}
+                  strokeWidth={3}
                 />
               )}
             </LineChart>

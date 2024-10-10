@@ -218,7 +218,7 @@ const NetworkGraphCard = ({
         .append('circle')
         .attr('r', (d) => (d.group === 1 ? 40 : d.group === 2 ? 28 : 20))
         .attr('fill', (d) =>
-          d.group === 1 ? '#ff9999' : d.group === 2 ? '#99ff99' : '#9999ff'
+          d.group === 1 ? '#FFBE98' : d.group === 2 ? '#EFCFBA' : '#FFBE98'
         );
 
       // 텍스트 추가
