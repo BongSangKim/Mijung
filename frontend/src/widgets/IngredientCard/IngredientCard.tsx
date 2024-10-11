@@ -47,17 +47,17 @@ const IngredientCard = ({
     return `${Number(price).toLocaleString()}원`;
   };
 
-  // const formatUnit = (
-  //   retailUnitsize: string | null | undefined,
-  //   retailUnit: string | null | undefined
-  // ) => {
-  //   if (retailUnitsize == null || retailUnit == null) return '';
-  //   const size = Number(retailUnitsize);
-  //   if (size > 1) {
-  //     return `${size}${retailUnit}`;
-  //   }
-  //   return retailUnit;
-  // };
+  const formatUnit = (
+    retailUnitsize: string | null | undefined,
+    retailUnit: string | null | undefined
+  ) => {
+    if (retailUnitsize == null || retailUnit == null) return '';
+    const size = Number(retailUnitsize);
+    if (size > 1) {
+      return `${size}${retailUnit}`;
+    }
+    return retailUnit;
+  };
 
   const getPriceChangeInfo = (
     changeRate: number | undefined | null,
@@ -107,15 +107,15 @@ const IngredientCard = ({
       <div className="pt-2 pb-3 px-5 flex-grow flex flex-col justify-between">
         <div>
           {/* DB 오류로 인해 가격을 제대로 표시하기 위한 임시 코드. */}
-          <p className="text-xl font-bold text-black-500">
+          {/* <p className="text-xl font-bold text-black-500">
             {formatPrice(ingredient.price)}/
             {ingredient.retailUnitsize ? 'kg' : '단위 정보 없음'}
-          </p>
-          {/* <p className="text-xl font-bold text-black-500">
+          </p> */}
+          <p className="text-xl font-bold text-black-500">
             {formatPrice(ingredient.price)}/
             {formatUnit(ingredient.retailUnitsize, ingredient.retailUnit) ||
               '단위 정보 없음'}
-          </p> */}
+          </p>
           <p
             className={`text-sm ${getPriceChangeInfo(ingredient.changeRate, ingredient.changePrice).color} mt-1`}
           >
