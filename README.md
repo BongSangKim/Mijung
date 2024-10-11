@@ -16,7 +16,7 @@
 
 ## 👇 미정(味定) 소개 및 시연 영상 👇
 
-[<img src="./images/logo.svg" width="250">](https://www.youtube.com/watch?v=_U6xNSv4kFM)
+[<img src="./images/logo.svg" width="250">](https://file.notion.so/f/f/5dd88902-74d6-4473-8ddd-8fa9e78b1bf1/898cb0bf-1c5f-48a3-a72a-ae66be4501e2/11%EA%B8%B0_%ED%8A%B9%ED%99%94PJT_%EC%98%81%EC%83%81_%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4_D107.mp4?table=block&id=597f7aa3-3ed9-4b81-9861-d875a9b4d904&spaceId=5dd88902-74d6-4473-8ddd-8fa9e78b1bf1&expirationTimestamp=1728777600000&signature=YRHa67cK7ctJQAse1CrtEQfYFXvnDy09CFRaROFS_zQ&downloadName=11%EA%B8%B0_%ED%8A%B9%ED%99%94PJT_%EC%98%81%EC%83%81_%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4_D107.mp4)
 
 미정(味定) 시나리오는 👉[여기](https://www.notion.so/tassel/b615636bcacb4165a24c6d3ba2e9e7fa?pvs=4)👈에서 더 자세히 보실 수 있습니다.
 
