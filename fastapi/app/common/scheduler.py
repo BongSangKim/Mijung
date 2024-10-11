@@ -46,7 +46,7 @@ def fetch_data_from_api():
                     f"&p_itemcategorycode={ingredient.item_category_code}"
                     f"&p_itemcode={ingredient.item_code}"
                     f"&p_kindcode={ingredient.kind_code}"
-                    f"&p_convert_kg_yn=Y"
+                    f"&p_convert_kg_yn=N"
                     f"&p_cert_key={settings.KAMIS_KEY}&p_cert_id={settings.KAMIS_ID}&p_returntype=xml"
                 )
             else :
@@ -56,7 +56,7 @@ def fetch_data_from_api():
                     f"&p_itemcategorycode={ingredient.item_category_code}"
                     f"&p_itemcode={ingredient.item_code}"
                     f"&p_kindcode={ingredient.kind_code}"
-                    f"&p_convert_kg_yn=Y"
+                    f"&p_convert_kg_yn=N"
                     f"&p_cert_key={settings.KAMIS_KEY}&p_cert_id={settings.KAMIS_ID}&p_returntype=xml"
                 )
             
