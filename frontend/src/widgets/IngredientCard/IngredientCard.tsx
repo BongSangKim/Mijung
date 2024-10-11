@@ -47,17 +47,17 @@ const IngredientCard = ({
     return `${Number(price).toLocaleString()}원`;
   };
 
-  const formatUnit = (
-    retailUnitsize: string | null | undefined,
-    retailUnit: string | null | undefined
-  ) => {
-    if (retailUnitsize == null || retailUnit == null) return '';
-    const size = Number(retailUnitsize);
-    if (size > 1) {
-      return `${size}${retailUnit}`;
-    }
-    return retailUnit;
-  };
+  // const formatUnit = (
+  //   retailUnitsize: string | null | undefined,
+  //   retailUnit: string | null | undefined
+  // ) => {
+  //   if (retailUnitsize == null || retailUnit == null) return '';
+  //   const size = Number(retailUnitsize);
+  //   if (size > 1) {
+  //     return `${size}${retailUnit}`;
+  //   }
+  //   return retailUnit;
+  // };
 
   const getPriceChangeInfo = (
     changeRate: number | undefined | null,
