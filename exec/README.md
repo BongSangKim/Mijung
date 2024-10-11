@@ -4,7 +4,7 @@
 - [환경변수](#환경변수)
   - [frontend .env](#frontend-env)
   - [backend .env](#backend-env)
-  - [fastapi .evn](#fastapi-evn)
+  - [fastapi .env](#fastapi-env)
 - [배포 시 주의사항](#배포-시-주의사항)
 - [시나리오](#시나리오)
   - [메인](#메인)
@@ -68,7 +68,7 @@ DDL_AUTO_OPTION = Hibernate의 데이터베이스 스키마 생성 옵션을 설
 FPGROWTH_MODEL_PATH = 학습한 모델을 저장할 경로
 ```
 
-## fastapi .evn
+## fastapi .env
 
 ```
 MYSQL_HOST = DB 서버의 호스트 주소
