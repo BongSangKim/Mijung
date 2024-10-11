@@ -6,6 +6,7 @@
   - [backend .env](#backend-env)
   - [fastapi .env](#fastapi-env)
 - [배포 시 주의사항](#배포-시-주의사항)
+- [데이터](#데이터)
 - [시나리오](#시나리오)
   - [메인](#메인)
   - [식재료-디테일](#식재료-디테일)
@@ -97,6 +98,12 @@ RECIPE_MODEL: Recipe 모델 파일명
 
 - certbot을 통해서 HTTPS 인증서를 발급받아야 합니다.
 - KAMIS 요청을 위한 KEY 값을 발급받아야 합니다.
+
+---
+
+# 데이터
+
+[dump.sql](/uploads/6aa8b3185323324ca6c03328f7876b28/dump.sql)
 
 ---
 
