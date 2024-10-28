@@ -227,5 +227,5 @@
 
 |                     권대호                     |                     김봉상                     |                            신건우                            |
 | :--------------------------------------------: | :--------------------------------------------: | :----------------------------------------------------------: |
-|                     **FE**                     |                     **FE**                     |                            **FE**                            |
+|                     **FE**                     |                     **FE**                     |                            **데이터 시각화**                            |
 | [@vaaast-lake](https://github.com/vaaast-lake) | [@BongSangKim](https://github.com/BongSangKim) | [twey163@gmail.com](<[singunu](https://github.com/singunu)>) |
